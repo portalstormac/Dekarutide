@@ -1382,7 +1382,7 @@ namespace ACE.Server.WorldObjects
 
                 case ItemType.Weapon:
                     //return target is MeleeWeapon || target is MissileLauncher;
-                    return target is Creature || target is MeleeWeapon || target is MissileLauncher;
+                    return target is Creature || target is MeleeWeapon || target is MissileLauncher || target.IsThrownWeapon;
 
                 case ItemType.Caster:
                     //return target is Caster;
@@ -1390,7 +1390,7 @@ namespace ACE.Server.WorldObjects
 
                 case ItemType.WeaponOrCaster:
                     //return target is MeleeWeapon || target is MissileLauncher || target is Caster;
-                    return target is Creature || target is MeleeWeapon || target is MissileLauncher || target is Caster;
+                    return target is Creature || target is MeleeWeapon || target is MissileLauncher || target.IsThrownWeapon || target is Caster;
 
                 case ItemType.Portal:
 

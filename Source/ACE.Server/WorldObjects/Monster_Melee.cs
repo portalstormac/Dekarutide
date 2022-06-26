@@ -97,6 +97,9 @@ namespace ACE.Server.WorldObjects
                     }
 
                     var damageEvent = DamageEvent.CalculateDamage(this, target, weapon, motionCommand, attackFrames[0].attackHook);
+                    
+                    if (!damageEvent.Evaded)
+                        TryCastAssessCreatureAndPersonDebuffs(target, CombatType.Melee);
 
                     //var damage = CalculateDamage(ref damageType, maneuver, bodyPart, ref critical, ref shieldMod);
 

@@ -34,40 +34,53 @@ namespace ACE.Server.Factories
                     return;
             }
 
-            wo.UiEffects = UiEffects.Magical;
-
-            var maxBaseMana = GetMaxBaseMana(wo);
-
-            wo.ManaRate = CalculateManaRate(maxBaseMana);
-
-            if (roll == null)
+            if (numSpells == 0)
             {
-                wo.ItemMaxMana = RollItemMaxMana(profile.Tier, numSpells);
-                wo.ItemCurMana = wo.ItemMaxMana;
-
-                wo.ItemSpellcraft = RollSpellcraft(wo);
-                wo.ItemDifficulty = RollItemDifficulty(wo, numEpics, numLegendaries);
+                // we ended up without any spells, revert to non-magic item.
+                wo.ItemManaCost = null;
+                wo.ItemMaxMana = null;
+                wo.ItemCurMana = null;
+                wo.ItemSpellcraft = null;
+                wo.ItemDifficulty = null;
             }
             else
             {
-                var maxSpellMana = maxBaseMana;
+                if(!wo.UiEffects.HasValue) // Elemental effects take precendence over magical as it is more important to know the element of a weapon than if it has spells.
+                    wo.UiEffects = UiEffects.Magical;
 
-                if (wo.SpellDID != null)
+                var maxBaseMana = GetMaxBaseMana(wo);
+
+                wo.ManaRate = CalculateManaRate(maxBaseMana);
+
+                if (roll == null)
                 {
-                    var spell = new Server.Entity.Spell(wo.SpellDID.Value);
+                    wo.ItemMaxMana = RollItemMaxMana(profile.Tier, numSpells);
+                    wo.ItemCurMana = wo.ItemMaxMana;
 
-                    var castableMana = (int)spell.BaseMana * 5;
-
-                    if (castableMana > maxSpellMana)
-                        maxSpellMana = castableMana;
+                    wo.ItemSpellcraft = RollSpellcraft(wo);
+                    wo.ItemDifficulty = RollItemDifficulty(wo, numEpics, numLegendaries);
                 }
+                else
+                {
+                    var maxSpellMana = maxBaseMana;
 
-                wo.ItemMaxMana = RollItemMaxMana_New(wo, roll, maxSpellMana);
-                wo.ItemCurMana = wo.ItemMaxMana;
+                    if (wo.SpellDID != null)
+                    {
+                        var spell = new Server.Entity.Spell(wo.SpellDID.Value);
 
-                wo.ItemSpellcraft = RollSpellcraft(wo, roll);
+                        var castableMana = (int)spell.BaseMana * 5;
 
-                AddActivationRequirements(wo, roll);
+                        if (castableMana > maxSpellMana)
+                            maxSpellMana = castableMana;
+                    }
+
+                    wo.ItemMaxMana = RollItemMaxMana_New(wo, roll, maxSpellMana);
+                    wo.ItemCurMana = wo.ItemMaxMana;
+
+                    wo.ItemSpellcraft = RollSpellcraft(wo, roll);
+
+                    AddActivationRequirements(wo, profile, roll);
+                }
             }
         }
 
@@ -658,16 +671,68 @@ namespace ACE.Server.Factories
                         maxSpellPower = (int)spell.Power;
                 }
             }
+
+            maxSpellPower = Math.Max(maxSpellPower, 20); // Balance to make level I spell items have non-trivial arcane lore requirements.
+
             return maxSpellPower;
         }
 
-        private static void AddActivationRequirements(WorldObject wo, TreasureRoll roll)
+        private static void AddActivationRequirements(WorldObject wo, TreasureDeath profile, TreasureRoll roll)
         {
-            // ItemSkill/LevelLimit
-            TryMutate_ItemSkillLimit(wo, roll);
+            if (Common.ConfigManager.Config.Server.WorldRuleset != Common.Ruleset.Infiltration)
+                TryMutate_ItemSkillLimit(wo, roll); // ItemSkill/LevelLimit
+
+            if (Common.ConfigManager.Config.Server.WorldRuleset <= Common.Ruleset.Infiltration)
+            {
+                TryMutate_HeritageRequirement(wo);
+                TryMutate_AllegianceRequirement(wo, profile, roll);
+            }
 
             // Arcane Lore / ItemDifficulty
             wo.ItemDifficulty = CalculateArcaneLore(wo, roll);
+        }
+
+        private static bool TryMutate_HeritageRequirement(WorldObject wo)
+        {
+            if (wo.Biota.PropertiesSpellBook == null)
+                return false;
+
+            var rng = ThreadSafeRandom.Next(0.0f, 1.0f);
+            if (rng < 0.05)
+            {
+                HeritageGroup heritage = (HeritageGroup)ThreadSafeRandom.Next(1, 3);
+
+                switch (heritage)
+                {
+                    case HeritageGroup.Aluvian:
+                        wo.HeritageGroup = HeritageGroup.Aluvian;
+                        break;
+
+                    case HeritageGroup.Gharundim:
+                        wo.HeritageGroup = HeritageGroup.Gharundim;
+                        break;
+
+                    case HeritageGroup.Sho:
+                        wo.HeritageGroup = HeritageGroup.Sho;
+                        break;
+                }
+                return true;
+            }
+            return false;
+        }
+
+        private static bool TryMutate_AllegianceRequirement(WorldObject wo, TreasureDeath profile, TreasureRoll roll)
+        {
+            if (wo.Biota.PropertiesSpellBook == null)
+                return false;
+
+            var rng = ThreadSafeRandom.Next(0.0f, 1.0f);
+            if (rng < (roll.Wcid == Enum.WeenieClassName.crown ? 0.25 : 0.05)) // Crowns are special and have allegiance requirements more often.
+            {
+                wo.ItemAllegianceRankLimit = AllegianceRankChance.Roll(profile.Tier);
+                return true;
+            }
+            return false;
         }
 
         private static bool TryMutate_ItemSkillLimit(WorldObject wo, TreasureRoll roll)
@@ -765,10 +830,24 @@ namespace ACE.Server.Factories
             // - mutates 0% of the time for all other item types
             var itemSkillLevelFactor = 0.0f;
 
-            if (wo.ItemSkillLevelLimit > 0)
-                itemSkillLevelFactor = wo.ItemSkillLevelLimit.Value / 2.0f;
+            if (Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.CustomDM)
+            {
+                if (wo.ItemSkillLevelLimit > 0)
+                    itemSkillLevelFactor = wo.ItemSkillLevelLimit.Value / 4.0f;
+            }
+            else
+            {
+                if (wo.ItemSkillLevelLimit > 0)
+                    itemSkillLevelFactor = wo.ItemSkillLevelLimit.Value / 2.0f;
+            }
 
             var fArcane = spellcraft - itemSkillLevelFactor;
+
+            if (wo.ItemAllegianceRankLimit > 0)
+                fArcane -= (float)wo.ItemAllegianceRankLimit * 10.0f;
+
+            if (wo.HeritageGroup != 0)
+                fArcane -= fArcane * 0.2f;
 
             if (fArcane < 0)
                 fArcane = 0;

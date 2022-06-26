@@ -157,6 +157,8 @@ namespace ACE.Server
                 Console.Title = consoleTitle;
             }
 
+            log.Info($"Server Ruleset: {ConfigManager.Config.Server.WorldRuleset}"); 
+
             if (ConfigManager.Config.Offline.PurgeDeletedCharacters)
             {
                 log.Info($"Purging deleted characters, and their possessions, older than {ConfigManager.Config.Offline.PurgeDeletedCharactersDays} days ({DateTime.Now.AddDays(-ConfigManager.Config.Offline.PurgeDeletedCharactersDays)})...");

@@ -27,6 +27,7 @@ using ACE.Server.Network.GameMessages;
 using ACE.Server.WorldObjects;
 
 using Position = ACE.Entity.Position;
+using ACE.Common;
 
 namespace ACE.Server.Entity
 {
@@ -271,6 +272,51 @@ namespace ACE.Server.Entity
             // get the encounter spawns for this landblock
             var encounters = DatabaseManager.World.GetCachedEncountersByLandblock(Id.Landblock);
 
+            //temp landscape spawn density multiplier test
+            List<int> encounterCoords = new List<int>();
+            foreach (var encounter in encounters)
+            {
+                encounterCoords.Add(encounter.CellX << 16 | encounter.CellY);
+            }
+            if (encounters.Count > 0)
+            {
+                int newCount;
+                //if (encounters.Count == 1)
+                //    newCount = encounters.Count * 8;
+                //else if (encounters.Count == 2)
+                //    newCount = encounters.Count * 6;
+                //else if (encounters.Count <= 5)
+                //    newCount = (int)(encounters.Count * 2.5f);
+                //else if (encounters.Count <= 8)
+                //    newCount = (int)(encounters.Count * 1.5f);
+                if (encounters.Count < 8)
+                    newCount = 8;
+                else
+                    newCount = encounters.Count;
+
+                int failedAttempts = 0;
+                while (encounters.Count < newCount && failedAttempts < 10)
+                {
+                    var encounter = encounters[ThreadSafeRandom.Next(0, encounters.Count - 1)];
+
+                    Encounter newEncounter = new Encounter();
+                    newEncounter.WeenieClassId = encounter.WeenieClassId;
+                    newEncounter.Landblock = encounter.Landblock;
+                    newEncounter.CellX = Math.Clamp(encounter.CellX + ThreadSafeRandom.Next(-1, 1) * (ThreadSafeRandom.Next(1, 2) * 2), 0, 7);
+                    newEncounter.CellY = Math.Clamp(encounter.CellY + ThreadSafeRandom.Next(-1, 1) * (ThreadSafeRandom.Next(1, 2) * 2), 0, 7);
+
+                    int newEncounterCoords = newEncounter.CellX << 16 | newEncounter.CellY;
+                    if (!encounterCoords.Contains(newEncounterCoords))
+                    {
+                        encounters.Add(newEncounter);
+                        encounterCoords.Add(newEncounterCoords);
+                        failedAttempts = 0;
+                    }
+                    else
+                        failedAttempts++;
+                }
+            }
+
             foreach (var encounter in encounters)
             {
                 var wo = WorldObjectFactory.CreateNewWorldObject(encounter.WeenieClassId);
@@ -296,7 +342,13 @@ namespace ACE.Server.Entity
                     {
                         wo.Destroy();
                         return;
-                    }
+					}
+					
+                    if (!wo.Location.IsWalkable())
+                        return;
+
+                    if (PhysicsLandblock.OnRoad(new Vector3(xPos, yPos, pos.Frame.Origin.Z)))
+                        return;
 
                     if (PropertyManager.GetBool("override_encounter_spawn_rates").Item)
                     {
@@ -808,6 +860,8 @@ namespace ACE.Server.Entity
                 log.DebugFormat("Landblock 0x{0} failed to add 0x{1:X8} {2}. Invalid Location", Id, wo.Biota.Id, wo.Name);
                 return false;
             }
+
+            wo.BeforeEnterWorld();
 
             return AddWorldObjectInternal(wo);
         }

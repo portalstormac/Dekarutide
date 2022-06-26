@@ -2127,7 +2127,7 @@ namespace ACE.Server.WorldObjects
                     }
                 }
             }
-            else if (spell.IsOtherNegativeRedirectable || spell.IsItemRedirectableType)
+            else if (spell.IsOtherRedirectable || spell.IsItemRedirectableType)
             {
                 // blood loather, spirit loather, lure blade, turn blade, leaden weapon, hermetic void
                 if (targetCreature == null)

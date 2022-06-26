@@ -37,6 +37,16 @@ namespace ACE.Server.Factories.Tables
 
         static MissileSpells()
         {
+            if (Common.ConfigManager.Config.Server.WorldRuleset == Ruleset.CustomDM)
+            {
+                weaponMissileSpells = new List<(SpellId, float)>()
+                {
+                    ( SpellId.SwiftKillerSelf1,  0.30f ),
+                    ( SpellId.DefenderSelf1,     0.25f ),
+                    //( SpellId.BloodDrinkerSelf1, 1.00f ),
+                };
+            }
+
             // takes ~0.3ms
             BuildSpells();
         }

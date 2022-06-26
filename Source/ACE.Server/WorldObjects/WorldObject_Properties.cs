@@ -2068,6 +2068,11 @@ namespace ACE.Server.WorldObjects
             get => GetProperty(PropertyInt.ChessTotalGames);
             set { if (!value.HasValue) RemoveProperty(PropertyInt.ChessTotalGames); else SetProperty(PropertyInt.ChessTotalGames, value.Value); }
         }
+        public int? MerchandiseItemTypes
+        {
+            get => GetProperty(PropertyInt.MerchandiseItemTypes);
+            set { if (!value.HasValue) RemoveProperty(PropertyInt.MerchandiseItemTypes); else SetProperty(PropertyInt.MerchandiseItemTypes, value.Value); }
+        }
 
         public double? HeartbeatInterval
         {

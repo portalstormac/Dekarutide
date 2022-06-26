@@ -66,19 +66,27 @@ namespace ACE.Server.WorldObjects
             var weapon = GetEquippedWeapon();
 
             if (weapon?.WeaponSkill == null)
-                return GetHighestMeleeSkill();
+            {
+                if (Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.EoR)
+                    return GetHighestMeleeSkill();
+                else
+                    return Skill.UnarmedCombat;
+            }
 
             var skill = ConvertToMoASkill(weapon.WeaponSkill);
 
-            // DualWieldAlternate will be TRUE if *next* attack is offhand
-            if (IsDualWieldAttack && !DualWieldAlternate)
+            if (Common.ConfigManager.Config.Server.WorldRuleset == Ruleset.EoR)
             {
-                var weaponSkill = GetCreatureSkill(skill);
-                var dualWield = GetCreatureSkill(Skill.DualWield);
+                // DualWieldAlternate will be TRUE if *next* attack is offhand
+                if (IsDualWieldAttack && !DualWieldAlternate)
+                {
+                    var weaponSkill = GetCreatureSkill(skill);
+                    var dualWield = GetCreatureSkill(Skill.DualWield);
 
-                // offhand attacks use the lower skill level between dual wield and weapon skill
-                if (dualWield.Current < weaponSkill.Current)
-                    skill = Skill.DualWield;
+                    // offhand attacks use the lower skill level between dual wield and weapon skill
+                    if (dualWield.Current < weaponSkill.Current)
+                        skill = Skill.DualWield;
+                }
             }
             //Console.WriteLine($"{Name}.GetCurrentWeaponSkill - {skill}");
             return skill;
@@ -90,15 +98,43 @@ namespace ACE.Server.WorldObjects
         /// </summary>
         public Skill GetHighestMeleeSkill()
         {
-            var light = GetCreatureSkill(Skill.LightWeapons);
-            var heavy = GetCreatureSkill(Skill.HeavyWeapons);
-            var finesse = GetCreatureSkill(Skill.FinesseWeapons);
+            Entity.CreatureSkill maxMelee;
+            if (ConfigManager.Config.Server.WorldRuleset == Ruleset.EoR)
+            {
+                var light = GetCreatureSkill(Skill.LightWeapons);
+                var heavy = GetCreatureSkill(Skill.HeavyWeapons);
+                var finesse = GetCreatureSkill(Skill.FinesseWeapons);
 
-            var maxMelee = light;
-            if (heavy.Current > maxMelee.Current)
-                maxMelee = heavy;
-            if (finesse.Current > maxMelee.Current)
-                maxMelee = finesse;
+                maxMelee = light;
+                if (heavy.Current > maxMelee.Current)
+                    maxMelee = heavy;
+                if (finesse.Current > maxMelee.Current)
+                    maxMelee = finesse;
+            }
+            else
+            {
+                var axe = GetCreatureSkill(Skill.Axe);
+                var dagger = GetCreatureSkill(Skill.Dagger);
+                var mace = GetCreatureSkill(Skill.Mace);
+                var spear = GetCreatureSkill(Skill.Spear);
+                var staff = GetCreatureSkill(Skill.Staff);
+                var sword = GetCreatureSkill(Skill.Sword);
+                var unarmed = GetCreatureSkill(Skill.UnarmedCombat);
+
+                maxMelee = axe;
+                if (dagger.Current > maxMelee.Current)
+                    maxMelee = dagger;
+                if (mace.Current > maxMelee.Current)
+                    maxMelee = mace;
+                if (spear.Current > maxMelee.Current)
+                    maxMelee = spear;
+                if (staff.Current > maxMelee.Current)
+                    maxMelee = staff;
+                if (sword.Current > maxMelee.Current)
+                    maxMelee = sword;
+                if (unarmed.Current > maxMelee.Current)
+                    maxMelee = unarmed;
+            }
 
             return maxMelee.Skill;
         }
@@ -132,6 +168,9 @@ namespace ACE.Server.WorldObjects
             }
 
             var damageEvent = DamageEvent.CalculateDamage(this, target, damageSource);
+
+            if (!damageEvent.Evaded)
+                TryCastAssessCreatureAndPersonDebuffs(target, (damageSource == null || damageSource.ProjectileSource == null) ? CombatType.Melee : CombatType.Missile);
 
             if (damageEvent.HasDamage)
             {
@@ -355,18 +394,73 @@ namespace ACE.Server.WorldObjects
 
         public BaseDamageMod GetBaseDamageMod(WorldObject damageSource)
         {
-            if (damageSource == this)
+            if (damageSource == this) // no weapon
             {
-                if (AttackType == AttackType.Punch)
-                    damageSource = HandArmor;
-                else if (AttackType == AttackType.Kick)
-                    damageSource = FootArmor;
-
-                // no weapon, no hand or foot armor
-                if (damageSource?.Damage == null)
-                    return HeritageGroup == HeritageGroup.Olthoi ? new BaseDamageMod(new BaseDamage(130, 0.75f)) : new BaseDamageMod(new BaseDamage(2, 0.75f));
+                if (Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.EoR)
+                {
+	                if (AttackType == AttackType.Punch)
+	                    damageSource = HandArmor;
+	                else if (AttackType == AttackType.Kick)
+	                    damageSource = FootArmor;
+	
+	                // no weapon, no hand or foot armor
+	                if (damageSource?.Damage == null)
+	                    return HeritageGroup == HeritageGroup.Olthoi ? new BaseDamageMod(new BaseDamage(130, 0.75f)) : new BaseDamageMod(new BaseDamage(2, 0.75f));
+	                else
+	                    return damageSource.GetDamageMod(this, damageSource);
+                }
                 else
-                    return damageSource.GetDamageMod(this, damageSource);
+                {
+                    /*
+                        Page 148 of Sybex Strategy Guide gives this note:
+
+                        "The base damage done by punching and kicking is calculated using the attacker's
+                        Unarmed Combat skill modified by the type of armor they are wearing:
+
+                        BaseDmg = 1 + ArmorDmg + (Skill/20)
+
+                        _not rounded_, where "Skill" is the attacker's Unarmed Combat skill and "ArmorDmg" is
+                        the amount of damage the armor (or clothing) the character is wearing adds to the equation,
+                        as follows [...]"
+
+                        They continue:
+                        "Note that if you are wielding an unarmed combat weapon such as a Katar or Nekode, this [guantlet/boot] damage bonus does not apply;
+                        the damage and other statistics of the weapon, plus your Unarmed Combat skill, determine the type and amount of damage you do."
+
+                        This implies that the UA skill bonus is also attached to weapons.
+
+                        However, this does mean that the skill bonus _is_ affected by the variance roll because it is part of the base damage before variance
+                        is computed. It's somewhat vague about whether UA damage bonus is applied pre- or post-variance roll when wielding a weapon, but
+                        a rational reading of it would be that it should be pre-variance (i.e. exactly as punching without a weapon), otherwise, wielding
+                        a weapon would essentially get a zero variance damage bonus.
+
+                        An old forum post (not authoritative) also mentions this formula, but of course the official
+                        strategy guide is a better source.
+                        https://forums.penny-arcade.com/discussion/35347/asherons-call-nine-years-of-killing-olthoi/p12
+
+                        Note that "BaseDmg"
+                    */
+                    BaseDamageMod baseDamageMod;
+
+                    if (AttackType == AttackType.Punch)
+                        damageSource = HandArmor;
+                    else if (AttackType == AttackType.Kick)
+                        damageSource = FootArmor;
+
+                    // no weapon, no hand or foot armor
+                    if (damageSource == null)
+                    {
+                        var baseDamage = new BaseDamage(1, 0.75f);
+                        baseDamageMod = new BaseDamageMod(baseDamage);
+                    }
+                    else
+                    {
+                        baseDamageMod = damageSource.GetDamageMod(this, damageSource);
+                        baseDamageMod.BaseDamage.MaxDamage += 1;
+                    }
+
+                    return baseDamageMod;
+                }
             }
             return damageSource.GetDamageMod(this);
         }
@@ -589,7 +683,11 @@ namespace ACE.Server.WorldObjects
             var mainhand = GetEquippedMainHand();
             var offhand = GetEquippedOffHand();
 
-            var mainhandBurden = mainhand?.EncumbranceVal ?? 0;
+            int mainhandBurden;
+            if ((mainhand?.MaxStackSize ?? 0) > 1) // Thrown weapons use the burden of a stack of 30 instead of entire current stack.
+                mainhandBurden = (mainhand?.StackUnitEncumbrance ?? 0) * 30;
+            else
+                mainhandBurden = mainhand?.EncumbranceVal ?? 0;
             var offhandBurden = offhand?.EncumbranceVal ?? 0;
 
             return mainhandBurden + offhandBurden;
@@ -658,6 +756,9 @@ namespace ACE.Server.WorldObjects
         /// <param name="powerAccuracyBar">The 0.0 - 1.0 power/accurary bar</param>
         public float GetRecklessnessMod(/*float powerAccuracyBar*/)
         {
+            if (Common.ConfigManager.Config.Server.WorldRuleset <= Common.Ruleset.Infiltration)
+                return 1.0f;
+
             // ensure melee or missile combat mode
             if (CombatMode != CombatMode.Melee && CombatMode != CombatMode.Missile)
                 return 1.0f;
@@ -824,6 +925,27 @@ namespace ACE.Server.WorldObjects
 
                         switch (currentCombatStance)
                         {
+                            case MotionStance.ThrownWeaponCombat:
+                            case MotionStance.ThrownShieldCombat:
+                                {
+                                    if (missileWeapon.MaterialType != null && missileWeapon.StackSize <= 1)
+                                    {
+                                        animTime = SetCombatMode(newCombatMode, out queueTime);
+
+                                        var actionChain = new ActionChain();
+                                        actionChain.AddDelaySeconds(animTime);
+                                        actionChain.AddAction(this, () =>
+                                        {
+                                            Session.Network.EnqueueSend(new GameEventCommunicationTransientString(Session, $"You refrain from throwing your last {missileWeapon.NameWithMaterial}!"));
+                                            SetCombatMode(CombatMode.NonCombat);
+                                        });
+                                        actionChain.EnqueueChain();
+
+                                        NextUseTime = DateTime.UtcNow.AddSeconds(animTime);
+                                        return;
+                                    }
+                                    break;
+                                }
                             case MotionStance.BowCombat:
                             case MotionStance.CrossbowCombat:
                             case MotionStance.AtlatlCombat:

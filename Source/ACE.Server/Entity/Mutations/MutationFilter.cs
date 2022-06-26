@@ -11,14 +11,14 @@ namespace ACE.Server.Entity.Mutations
 
         // MutationFilter -> Mutation -> MutationOutcome -> EffectList -> Effect
         
-        public bool TryMutate(WorldObject wo, int tier = 1)
+        public bool TryMutate(WorldObject wo, int tier = 1, float qualityMod = 0.0f)
         {
-            var rng = ThreadSafeRandom.Next(0.0f, 1.0f);
+            var rng = ThreadSafeRandom.Next(qualityMod, 1.0f);
 
             var mutated = false;
 
             foreach (var mutation in Mutations)
-                mutated |= mutation.TryMutate(wo, tier, rng);
+                mutated |= mutation.TryMutate(wo, tier, rng, qualityMod);
 
             return mutated;
         }

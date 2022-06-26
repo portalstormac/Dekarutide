@@ -77,6 +77,30 @@ namespace ACE.Server.Factories.Tables
             T5_T6_Chances,
         };
 
+        static WeaponTypeChance()
+        {
+            if (Common.ConfigManager.Config.Server.WorldRuleset <= Common.Ruleset.Infiltration)
+            {
+                RetailChances = new ChanceTable<TreasureWeaponType>()
+                {
+                    // melee: 63%
+                    // missile: 27%
+                    // caster: 10%
+                    ( TreasureWeaponType.Sword,    0.09f ),
+                    ( TreasureWeaponType.Mace,     0.09f ),
+                    ( TreasureWeaponType.Axe,      0.09f ),
+                    ( TreasureWeaponType.Spear,    0.09f ),
+                    ( TreasureWeaponType.Unarmed,  0.09f ),
+                    ( TreasureWeaponType.Staff,    0.09f ),
+                    ( TreasureWeaponType.Dagger,   0.09f ),
+                    ( TreasureWeaponType.Bow,      0.09f ),
+                    ( TreasureWeaponType.Crossbow, 0.09f ),
+                    ( TreasureWeaponType.Atlatl,   0.09f ),
+                    ( TreasureWeaponType.Caster,   0.10f ),
+                };
+            }
+        }
+
         public static TreasureWeaponType Roll(int tier)
         {
             // todo: add unique profiles for t7 / t8?

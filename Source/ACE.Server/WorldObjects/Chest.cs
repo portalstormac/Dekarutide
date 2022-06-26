@@ -47,7 +47,7 @@ namespace ACE.Server.WorldObjects
         {
             get
             {
-                var chestResetInterval = ResetInterval ?? Default_ChestResetInterval;
+                var chestResetInterval = RegenerationInterval;
 
                 if (chestResetInterval < 15)
                     chestResetInterval = Default_ChestResetInterval;

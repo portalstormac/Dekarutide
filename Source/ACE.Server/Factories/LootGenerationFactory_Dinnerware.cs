@@ -48,7 +48,7 @@ namespace ACE.Server.Factories
             wo.GemType = RollGemType(profile.Tier);
 
             // workmanship
-            wo.ItemWorkmanship = WorkmanshipChance.Roll(profile.Tier);
+            wo.ItemWorkmanship = WorkmanshipChance.Roll(profile.Tier, profile.LootQualityMod);
 
             // "Empty Flask" was the only dinnerware that never received spells
             if (isMagical && wo.WeenieClassId != (uint)WeenieClassName.flasksimple)

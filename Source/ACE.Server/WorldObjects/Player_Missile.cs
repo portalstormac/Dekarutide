@@ -277,6 +277,20 @@ namespace ACE.Server.WorldObjects
 
             actionChain.AddDelaySeconds(linkTime);
 
+            if (ammo.MaterialType != null && !ammo.UnlimitedUse && ammo.IsThrownWeapon && ammo.StackSize <= 2)
+            {
+                actionChain.AddAction(this, () =>
+                {
+                    Session.Network.EnqueueSend(new GameEventCommunicationTransientString(Session, $"You refrain from throwing your last {ammo.NameWithMaterial}!"));
+                    SetCombatMode(CombatMode.NonCombat);
+                    Attacking = false;
+                    OnAttackDone();
+                });
+
+                actionChain.EnqueueChain();
+                return;
+            }
+
             actionChain.AddAction(this, () =>
             {
                 Attacking = false;

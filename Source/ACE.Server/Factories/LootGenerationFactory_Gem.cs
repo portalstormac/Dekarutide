@@ -34,7 +34,7 @@ namespace ACE.Server.Factories
         private static void MutateGem(WorldObject wo, TreasureDeath profile, bool isMagical, TreasureRoll roll = null)
         {
             // workmanship
-            wo.ItemWorkmanship = WorkmanshipChance.Roll(profile.Tier);
+            wo.ItemWorkmanship = WorkmanshipChance.Roll(profile.Tier, profile.LootQualityMod);
 
             // item color
             MutateColor(wo);

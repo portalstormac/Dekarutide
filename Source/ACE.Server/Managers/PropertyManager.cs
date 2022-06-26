@@ -624,7 +624,8 @@ namespace ACE.Server.Managers
                 ("rares_max_days_between", new Property<long>(45, "for rares_real_time_v2: the maximum number of days a player can go before a rare is generated on rare eligible creature kills")),
                 ("rares_max_seconds_between", new Property<long>(5256000, "for rares_real_time: the maximum number of seconds a player can go before a second chance at a rare is allowed on rare eligible creature kills that did not generate a rare")),
                 ("summoning_killtask_multicredit_cap", new Property<long>(2, "if allow_summoning_killtask_multicredit is enabled, the maximum # of killtask credits a player can receive from 1 kill")),
-                ("teleport_visibility_fix", new Property<long>(0, "Fixes some possible issues with invisible players and mobs. 0 = default / disabled, 1 = players only, 2 = creatures, 3 = all world objects"))
+                ("teleport_visibility_fix", new Property<long>(0, "Fixes some possible issues with invisible players and mobs. 0 = default / disabled, 1 = players only, 2 = creatures, 3 = all world objects")),
+                ("max_level", new Property<long>(275, "Set the max character level."))
                 );
 
         public static readonly ReadOnlyDictionary<string, Property<double>> DefaultDoubleProperties =
@@ -660,7 +661,20 @@ namespace ACE.Server.Managers
                 ("vitae_penalty", new Property<double>(0.05, "the amount of vitae penalty a player gets per death")),
                 ("vitae_penalty_max", new Property<double>(0.40, "the maximum vitae penalty a player can have")),
                 ("void_pvp_modifier", new Property<double>(0.5, "Scales the amount of damage players take from Void Magic. Defaults to 0.5, as per retail. For earlier content where DRR isn't as readily available, this can be adjusted for balance.")),
-                ("xp_modifier", new Property<double>(1.0, "scales the amount of xp received by players"))
+                ("xp_modifier", new Property<double>(1.0, "Globally scales the amount of xp received by players, note that this multiplies the other xp_modifier options.")),
+                ("xp_modifier_kill_tier1", new Property<double>(1.0, "Scales the amount of xp received by players for killing creatures below level 28.")),
+                ("xp_modifier_kill_tier2", new Property<double>(1.0, "Scales the amount of xp received by players for killing creatures between level 28 and level 65.")),
+                ("xp_modifier_kill_tier3", new Property<double>(1.0, "Scales the amount of xp received by players for killing creatures between level 65 and level 95.")),
+                ("xp_modifier_kill_tier4", new Property<double>(1.0, "Scales the amount of xp received by players for killing creatures between level 95 and level 110.")),
+                ("xp_modifier_kill_tier5", new Property<double>(1.0, "Scales the amount of xp received by players for killing creatures between level 110 and level 135.")),
+                ("xp_modifier_kill_tier6", new Property<double>(1.0, "Scales the amount of xp received by players for killing creatures above level 135.")),
+                ("xp_modifier_reward_tier1", new Property<double>(1.0, "Scales the amount of xp received by players for completing quests of level 28 or below, or for unspecified level quests while being under level 16.")),
+                ("xp_modifier_reward_tier2", new Property<double>(1.0, "Scales the amount of xp received by players for completing quests between level 28 and level 65, or for unspecified level quests while being between level 16 and 36.")),
+                ("xp_modifier_reward_tier3", new Property<double>(1.0, "Scales the amount of xp received by players for completing quests between level 65 and level 95, or for unspecified level quests while being between level 36 and 56.")),
+                ("xp_modifier_reward_tier4", new Property<double>(1.0, "Scales the amount of xp received by players for completing quests between level 95 and level 110, or for unspecified level quests while being between level 56 and 76.")),
+                ("xp_modifier_reward_tier5", new Property<double>(1.0, "Scales the amount of xp received by players for completing quests between level 110 and level 135, or for unspecified level quests while being between level 76 and 96.")),
+                ("xp_modifier_reward_tier6", new Property<double>(1.0, "Scales the amount of xp received by players for completing quests of level 135 and above, or for unspecified level quests while being over level 96.")),
+                ("salvage_amount_multiplier", new Property<double>(1.0, "Scales the amount of salvage a player gets from items."))
                 );
 
         public static readonly ReadOnlyDictionary<string, Property<string>> DefaultStringProperties =
