@@ -30,7 +30,7 @@ namespace ACE.Server.WorldObjects
 
             if (amount > AvailableExperience)
             {
-                log.Error($"{Name}.HandleActionRaiseSkill({skill}, {amount}) - amount > AvailableExperience ({AvailableExperience})");
+                //log.Error($"{Name}.HandleActionRaiseSkill({skill}, {amount}) - amount > AvailableExperience ({AvailableExperience})");
                 return false;
             }
 
@@ -266,7 +266,7 @@ namespace ACE.Server.WorldObjects
 
                 // temple untraining 'always trained' skills:
                 // cannot be untrained, but skill XP can be recovered
-                if (IsSkillUntrainable(skill))
+                if (IsSkillUntrainable(skill, HeritageGroup))
                 {
                     creatureSkill.AdvancementClass = SkillAdvancementClass.Untrained;
                     creatureSkill.InitLevel = 0;
@@ -490,63 +490,66 @@ namespace ACE.Server.WorldObjects
         /// </summary>
         public void HandleDBUpdates()
         {
-            // dirty fighting
-            var dfSkill = GetCreatureSkill(Skill.DirtyFighting);
-            if (dfSkill.AdvancementClass >= SkillAdvancementClass.Trained)
+            if (Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.EoR)
             {
-                foreach (var spellID in SpellExtensions.DirtyFightingSpells)
+                // dirty fighting
+                var dfSkill = GetCreatureSkill(Skill.DirtyFighting);
+                if (dfSkill.AdvancementClass >= SkillAdvancementClass.Trained)
                 {
-                    var spell = new Server.Entity.Spell(spellID);
-                    if (spell.NotFound)
+                    foreach (var spellID in SpellExtensions.DirtyFightingSpells)
+                    {
+                        var spell = new Server.Entity.Spell(spellID);
+                        if (spell.NotFound)
+                        {
+                            var actionChain = new ActionChain();
+                            actionChain.AddDelaySeconds(3.0f);
+                            actionChain.AddAction(this, () =>
+                            {
+                                Session.Network.EnqueueSend(new GameMessageSystemChat("To install Dirty Fighting, please apply the latest patches from https://github.com/ACEmulator/ACE-World-16PY-Patches", ChatMessageType.Broadcast));
+                            });
+                            actionChain.EnqueueChain();
+                        }
+                        break;  // performance improvement: only check first spell
+                    }
+                }
+
+                // void magic
+                var voidSkill = GetCreatureSkill(Skill.VoidMagic);
+                if (voidSkill.AdvancementClass >= SkillAdvancementClass.Trained)
+                {
+                    foreach (var spellID in SpellExtensions.VoidMagicSpells)
+                    {
+                        var spell = new Server.Entity.Spell(spellID);
+                        if (spell.NotFound)
+                        {
+                            var actionChain = new ActionChain();
+                            actionChain.AddDelaySeconds(3.0f);
+                            actionChain.AddAction(this, () =>
+                            {
+                                Session.Network.EnqueueSend(new GameMessageSystemChat("To install Void Magic, please apply the latest patches from https://github.com/ACEmulator/ACE-World-16PY-Patches", ChatMessageType.Broadcast));
+                            });
+                            actionChain.EnqueueChain();
+                        }
+                        break;  // performance improvement: only check first spell (measured 102ms to check 75 uncached void spells)
+                    }
+                }
+
+                // summoning
+                var summoning = GetCreatureSkill(Skill.Summoning);
+                if (summoning.AdvancementClass >= SkillAdvancementClass.Trained)
+                {
+                    uint essenceWCID = 48878;
+                    var weenie = DatabaseManager.World.GetCachedWeenie(essenceWCID);
+                    if (weenie == null)
                     {
                         var actionChain = new ActionChain();
                         actionChain.AddDelaySeconds(3.0f);
                         actionChain.AddAction(this, () =>
                         {
-                            Session.Network.EnqueueSend(new GameMessageSystemChat("To install Dirty Fighting, please apply the latest patches from https://github.com/ACEmulator/ACE-World-16PY-Patches", ChatMessageType.Broadcast));
+                            Session.Network.EnqueueSend(new GameMessageSystemChat("To install Summoning, please apply the latest patches from https://github.com/ACEmulator/ACE-World-16PY-Patches", ChatMessageType.Broadcast));
                         });
                         actionChain.EnqueueChain();
                     }
-                    break;  // performance improvement: only check first spell
-                }
-            }
-
-            // void magic
-            var voidSkill = GetCreatureSkill(Skill.VoidMagic);
-            if (voidSkill.AdvancementClass >= SkillAdvancementClass.Trained)
-            {
-                foreach (var spellID in SpellExtensions.VoidMagicSpells)
-                {
-                    var spell = new Server.Entity.Spell(spellID);
-                    if (spell.NotFound)
-                    {
-                        var actionChain = new ActionChain();
-                        actionChain.AddDelaySeconds(3.0f);
-                        actionChain.AddAction(this, () =>
-                        {
-                            Session.Network.EnqueueSend(new GameMessageSystemChat("To install Void Magic, please apply the latest patches from https://github.com/ACEmulator/ACE-World-16PY-Patches", ChatMessageType.Broadcast));
-                        });
-                        actionChain.EnqueueChain();
-                    }
-                    break;  // performance improvement: only check first spell (measured 102ms to check 75 uncached void spells)
-                }
-            }
-
-            // summoning
-            var summoning = GetCreatureSkill(Skill.Summoning);
-            if (summoning.AdvancementClass >= SkillAdvancementClass.Trained)
-            {
-                uint essenceWCID = 48878;
-                var weenie = DatabaseManager.World.GetCachedWeenie(essenceWCID);
-                if (weenie == null)
-                {
-                    var actionChain = new ActionChain();
-                    actionChain.AddDelaySeconds(3.0f);
-                    actionChain.AddAction(this, () =>
-                    {
-                        Session.Network.EnqueueSend(new GameMessageSystemChat("To install Summoning, please apply the latest patches from https://github.com/ACEmulator/ACE-World-16PY-Patches", ChatMessageType.Broadcast));
-                    });
-                    actionChain.EnqueueChain();
                 }
             }
         }
@@ -608,9 +611,53 @@ namespace ACE.Server.WorldObjects
             Skill.Salvaging
         };
 
-        public static bool IsSkillUntrainable(Skill skill)
+        public static bool IsSkillUntrainable(Skill skill, HeritageGroup heritageGroup)
         {
-            return !AlwaysTrained.Contains(skill);
+            if (Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.EoR)
+                return !AlwaysTrained.Contains(skill);
+            else
+            {
+                if (!AlwaysTrained.Contains(skill))
+                    return true; // this gets the easy ones out of the way.
+
+                if (Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.CustomDM)
+                {
+                    switch (heritageGroup)
+                    {
+                        case HeritageGroup.Aluvian:
+                            if (skill == Skill.Shield)
+                                return false;
+                            break;
+                        case HeritageGroup.Gharundim:
+                            if (skill == Skill.Salvaging)
+                                return false;
+                            break;
+                        case HeritageGroup.Sho:
+                            if (skill == Skill.AssessPerson)
+                                return false;
+                            break;
+                    }
+                }
+                else if (Common.ConfigManager.Config.Server.WorldRuleset <= Common.Ruleset.Infiltration)
+                {
+                    switch (heritageGroup)
+                    {
+                        case HeritageGroup.Aluvian:
+                            if (skill == Skill.Dagger || skill == Skill.AssessPerson)
+                                return false;
+                            break;
+                        case HeritageGroup.Gharundim:
+                            if (skill == Skill.Staff || skill == Skill.ItemTinkering)
+                                return false;
+                            break;
+                        case HeritageGroup.Sho:
+                            if (skill == Skill.UnarmedCombat)
+                                return false;
+                            break;
+                    }
+                }
+                return true;
+            }
         }
 
         public bool IsSkillSpecializedViaAugmentation(Skill skill, out bool playerHasAugmentation)
@@ -645,6 +692,9 @@ namespace ACE.Server.WorldObjects
 
         public override bool GetHeritageBonus(WorldObject weapon)
         {
+            if (Common.ConfigManager.Config.Server.WorldRuleset <= Common.Ruleset.Infiltration)
+                return false;
+
             if (weapon == null || !weapon.IsMasterable)
                 return false;
 
@@ -880,7 +930,7 @@ namespace ACE.Server.WorldObjects
             IsSkillSpecializedViaAugmentation(creatureSkill.Skill, out var skillIsSpecializedViaAugmentation);
 
             var typeOfSkill = creatureSkill.AdvancementClass.ToString().ToLower() + " ";
-            var untrainable = IsSkillUntrainable(skill);
+            var untrainable = IsSkillUntrainable(skill, HeritageGroup);
             var creditRefund = (creatureSkill.AdvancementClass == SkillAdvancementClass.Specialized && !(skillIsSpecializedViaAugmentation && !untrainable)) || untrainable;
 
             if (creatureSkill.AdvancementClass == SkillAdvancementClass.Specialized && !(skillIsSpecializedViaAugmentation && !untrainable))
@@ -918,6 +968,51 @@ namespace ACE.Server.WorldObjects
                 Session.Network.EnqueueSend(updateSkill, new GameMessageSystemChat(msg, ChatMessageType.Broadcast));
 
             return true;
+        }
+        static Player()
+        {
+            if (Common.ConfigManager.Config.Server.WorldRuleset <= Common.Ruleset.Infiltration)
+            {
+                AlwaysTrained.Remove(Skill.ArcaneLore);
+
+                PlayerSkills.Remove(Skill.TwoHandedCombat);
+                PlayerSkills.Remove(Skill.HeavyWeapons);
+                PlayerSkills.Remove(Skill.LightWeapons);
+                PlayerSkills.Remove(Skill.FinesseWeapons);
+                PlayerSkills.Remove(Skill.MissileWeapons);
+                PlayerSkills.Remove(Skill.Shield);
+                PlayerSkills.Remove(Skill.DualWield);
+                PlayerSkills.Remove(Skill.Recklessness);
+                PlayerSkills.Remove(Skill.SneakAttack);
+                PlayerSkills.Remove(Skill.DirtyFighting);
+                PlayerSkills.Remove(Skill.VoidMagic);
+                PlayerSkills.Remove(Skill.Summoning);
+
+                PlayerSkills.Add(Skill.Axe);
+                PlayerSkills.Add(Skill.Bow);
+                PlayerSkills.Add(Skill.Crossbow);
+                PlayerSkills.Add(Skill.Dagger);
+                PlayerSkills.Add(Skill.Mace);
+                PlayerSkills.Add(Skill.Spear);
+                PlayerSkills.Add(Skill.Staff);
+                PlayerSkills.Add(Skill.Sword);
+                PlayerSkills.Add(Skill.ThrownWeapon);
+                PlayerSkills.Add(Skill.UnarmedCombat);
+                PlayerSkills.Add(Skill.Salvaging);
+            }
+
+            if (Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.CustomDM)
+            {
+                AlwaysTrained.Remove(Skill.Salvaging);
+
+                PlayerSkills.Remove(Skill.ItemEnchantment);
+                PlayerSkills.Remove(Skill.CreatureEnchantment);
+                PlayerSkills.Remove(Skill.Crossbow);
+                PlayerSkills.Remove(Skill.Mace);
+                PlayerSkills.Remove(Skill.Staff);
+
+                PlayerSkills.Add(Skill.Shield);
+            }
         }
 
         /// <summary>

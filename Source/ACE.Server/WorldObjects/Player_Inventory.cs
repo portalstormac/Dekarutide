@@ -285,6 +285,9 @@ namespace ACE.Server.WorldObjects
             if (!TryEquipObjectWithBroadcasting(item, wieldedLocation))
                 return false;
 
+            if ((item.WeenieType == WeenieType.Ammunition || item.WeenieType == WeenieType.Missile) && Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.CustomDM)
+                Session.Network.EnqueueSend(new GameMessagePrivateUpdatePropertyInt(this, PropertyInt.EncumbranceVal, EncumbranceVal ?? 0));
+
             Session.Network.EnqueueSend(
                 new GameMessagePublicUpdateInstanceID(item, PropertyInstanceId.Wielder, ObjectGuid.Invalid),
                 new GameMessagePublicUpdatePropertyInt(item, PropertyInt.CurrentWieldedLocation, 0),
@@ -706,7 +709,7 @@ namespace ACE.Server.WorldObjects
         /// <summary>
         /// If you want to subtract from a stack, amount should be negative.
         /// </summary>
-        private bool AdjustStack(WorldObject stack, int amount, Container container, Container rootContainer)
+        private bool AdjustStack(WorldObject stack, int amount, Container container, Container rootContainer, bool itemWasEquipped = false)
         {
             if (stack.StackSize + amount <= 0 || stack.StackSize + amount > stack.MaxStackSize)
             {
@@ -721,13 +724,19 @@ namespace ACE.Server.WorldObjects
             if (container != null)
             {
                 // We add to these values because amount will be negative if we're subtracting from a stack, so we want to add a negative number.
-                container.EncumbranceVal += (stack.StackUnitEncumbrance ?? 0) * amount;
+                if (itemWasEquipped && (stack.WeenieType == WeenieType.Ammunition || stack.WeenieType == WeenieType.Missile) && Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.CustomDM)
+                    container.EncumbranceVal += (int)Math.Ceiling((stack.StackUnitEncumbrance ?? 0) * amount / 2.0f);
+                else
+                    container.EncumbranceVal += (stack.StackUnitEncumbrance ?? 0) * amount;
                 container.Value += (stack.StackUnitValue ?? 0) * amount;
             }
 
             if (rootContainer != null && rootContainer != container)
             {
-                rootContainer.EncumbranceVal += (stack.StackUnitEncumbrance ?? 0) * amount;
+                if (itemWasEquipped && (stack.WeenieType == WeenieType.Ammunition || stack.WeenieType == WeenieType.Missile) && Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.CustomDM)
+                    rootContainer.EncumbranceVal += (int)Math.Ceiling((stack.StackUnitEncumbrance ?? 0) * amount / 2.0f);
+                else
+                    rootContainer.EncumbranceVal += (stack.StackUnitEncumbrance ?? 0) * amount;
                 rootContainer.Value += (stack.StackUnitValue ?? 0) * amount;
             }
 
@@ -1193,7 +1202,15 @@ namespace ACE.Server.WorldObjects
 
         private bool DoHandleActionPutItemInContainer(WorldObject item, Container itemRootOwner, bool itemWasEquipped, Container container, Container containerRootOwner, int placement)
         {
-            //Console.WriteLine($"-> DoHandleActionPutItemInContainer({item.Name}, {itemRootOwner?.Name}, {itemWasEquipped}, {container?.Name}, {containerRootOwner?.Name}, {placement})");
+            //Console.WriteLine($"DoHandleActionPutItemInContainer({item.Name}, {container.Name}, {itemWasEquipped}, {placement})");
+
+            ItemType containerValidTypes = (ItemType)(container.MerchandiseItemTypes ?? 0);
+            if (containerValidTypes != 0 && (item.ItemType & containerValidTypes) == 0)
+            {
+                Session.Network.EnqueueSend(new GameEventCommunicationTransientString(Session, $"The {container.Name} can't hold that type of item!")); // Custom error message
+                Session.Network.EnqueueSend(new GameEventInventoryServerSaveFailed(Session, item.Guid.Full));
+                return false;
+            }
 
             Position prevLocation = null;
             Landblock prevLandblock = null;
@@ -1280,6 +1297,9 @@ namespace ACE.Server.WorldObjects
             // the database must be synced immediately
             if (prevContainer != null && !prevContainer.Stuck && container != prevContainer)
                 item.SaveBiotaToDatabase();
+
+            if(itemWasEquipped && (item.WeenieType == WeenieType.Ammunition || item.WeenieType == WeenieType.Missile) && Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.CustomDM)
+                Session.Network.EnqueueSend(new GameMessagePrivateUpdatePropertyInt(this, PropertyInt.EncumbranceVal, EncumbranceVal ?? 0));
 
             Session.Network.EnqueueSend(
                 new GameMessagePublicUpdateInstanceID(item, PropertyInstanceId.Container, container.Guid),
@@ -1564,6 +1584,12 @@ namespace ACE.Server.WorldObjects
             // Unwield wand/missile launcher/two-handed if dual wielding
             if (wieldedLocation == EquipMask.Shield && !item.IsShield)
             {
+                if (Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.Infiltration)
+                {
+                    Session.Network.EnqueueSend(new GameEventInventoryServerSaveFailed(Session, item.Guid.Full, wieldError));
+                    return false; // No dual wielding allowed in this ruleset.
+                }
+
                 var mainWeapon = GetEquippedMeleeWeapon(true);
 
                 if (mainWeapon != null && !mainWeapon.IsTwoHanded)
@@ -1683,7 +1709,7 @@ namespace ACE.Server.WorldObjects
 
             // verify item slot is valid
             // restricting this to two-handed for now, as without that clamp, it bugs out dual wielding and possibly other things
-            if (item.WeaponSkill == Skill.TwoHandedCombat && (wieldedLocation & item.ValidLocations) == 0)
+            if (item.IsTwoHanded && (wieldedLocation & item.ValidLocations) == 0)
             {
                 Session.Network.EnqueueSend(new GameEventInventoryServerSaveFailed(Session, item.Guid.Full));
                 return false;
@@ -2137,7 +2163,7 @@ namespace ACE.Server.WorldObjects
                 return;
             }
 
-            var stack = FindObject(new ObjectGuid(stackId), SearchLocations.LocationsICanMove, out var stackFoundInContainer, out var stackRootOwner, out _);
+            var stack = FindObject(new ObjectGuid(stackId), SearchLocations.LocationsICanMove, out var stackFoundInContainer, out var stackRootOwner, out var wasEquipped);
             var container = FindObject(new ObjectGuid(containerId), SearchLocations.MyInventory | SearchLocations.Landblock | SearchLocations.LastUsedContainer, out _, out var containerRootOwner, out _) as Container;
 
             if (stack == null)
@@ -2213,6 +2239,14 @@ namespace ACE.Server.WorldObjects
                 Session.Network.EnqueueSend(new GameEventInventoryServerSaveFailed(Session, stackId));
                 return;
             }
+            
+            ItemType containerValidTypes = (ItemType)(container.MerchandiseItemTypes ?? 0);
+            if (containerValidTypes != 0 && (stack.ItemType & containerValidTypes) == 0)
+            {
+                Session.Network.EnqueueSend(new GameEventCommunicationTransientString(Session, $"The {container.Name} can't hold that type of item!")); // Custom error message
+                Session.Network.EnqueueSend(new GameEventInventoryServerSaveFailed(Session, stackId));
+                return;
+            }
 
             if ((stackRootOwner == this && containerRootOwner != this)  || (stackRootOwner != this && containerRootOwner == this)) // Movement is between the player and the world
             {
@@ -2285,7 +2319,7 @@ namespace ACE.Server.WorldObjects
 
                         newStack.SetStackSize(amount);
 
-                        if (DoHandleActionStackableSplitToContainer(stack, stackFoundInContainer, stackRootOwner, container, containerRootOwner, newStack, placementPosition, amount))
+                        if (DoHandleActionStackableSplitToContainer(stack, stackFoundInContainer, stackRootOwner, container, containerRootOwner, newStack, placementPosition, amount, wasEquipped))
                         {
                             Session.Network.EnqueueSend(new GameMessagePrivateUpdatePropertyInt(this, PropertyInt.EncumbranceVal, EncumbranceVal ?? 0));
 
@@ -2318,11 +2352,11 @@ namespace ACE.Server.WorldObjects
 
                 newStack.SetStackSize(amount);
 
-                DoHandleActionStackableSplitToContainer(stack, stackFoundInContainer, stackRootOwner, container, containerRootOwner, newStack, placementPosition, amount);
+                DoHandleActionStackableSplitToContainer(stack, stackFoundInContainer, stackRootOwner, container, containerRootOwner, newStack, placementPosition, amount, wasEquipped);
             }
         }
 
-        private bool DoHandleActionStackableSplitToContainer(WorldObject stack, Container stackFoundInContainer, Container stackRootOwner, Container container, Container containerRootOwner, WorldObject newStack, int placementPosition, int amount)
+        private bool DoHandleActionStackableSplitToContainer(WorldObject stack, Container stackFoundInContainer, Container stackRootOwner, Container container, Container containerRootOwner, WorldObject newStack, int placementPosition, int amount, bool stackWasEquipped)
         {
             //Console.WriteLine($"{Name}.DoHandleActionStackableSplitToContainer({stack?.Name}, {stackFoundInContainer?.Name}, {stackRootOwner?.Name}, {container?.Name}, {containerRootOwner?.Name}, {newStack?.Name}, {placementPosition}, {amount})");
 
@@ -2343,13 +2377,17 @@ namespace ACE.Server.WorldObjects
             Session.Network.EnqueueSend(new GameMessageCreateObject(newStack));
             Session.Network.EnqueueSend(new GameEventItemServerSaysContainId(Session, newStack, container));
 
-            if (!AdjustStack(stack, -amount, stackFoundInContainer, stackRootOwner))
+            if (!AdjustStack(stack, -amount, stackFoundInContainer, stackRootOwner, stackWasEquipped))
                 return false;
 
             if (stackRootOwner == null)
                 EnqueueBroadcast(new GameMessageSetStackSize(stack));
             else
+            {
                 Session.Network.EnqueueSend(new GameMessageSetStackSize(stack));
+                if (stackWasEquipped && (stack.WeenieType == WeenieType.Ammunition || stack.WeenieType == WeenieType.Missile) && Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.CustomDM)
+                    Session.Network.EnqueueSend(new GameMessagePrivateUpdatePropertyInt(this, PropertyInt.EncumbranceVal, EncumbranceVal ?? 0));
+            }
 
             return true;
         }
@@ -2595,6 +2633,13 @@ namespace ACE.Server.WorldObjects
                 return;
             }
 
+            if (sourceStack.StackSize == amount && sourceStack.MaterialType != null)
+            {
+                // Do not allow merging mutated full stacks into non-mutated stacks as the mutated properties would be lost, divert to a non-merge move.
+                HandleActionPutItemInContainer(sourceStack.Guid.Full, targetStack.ContainerId ?? Guid.Full, targetStack.PlacementPosition ?? 0);
+                return;
+            }
+
             if (targetStackRootOwner == this && !CanMergeToInventory(sourceStack, targetStack, amount))
             {
                 Session.Network.EnqueueSend(new GameEventInventoryServerSaveFailed(Session, sourceStack.Guid.Full, WeenieError.None));
@@ -2716,8 +2761,8 @@ namespace ACE.Server.WorldObjects
             var previousSourceStackCheck = sourceStack;
             //var previousTargetStackCheck = targetStack;
 
-            sourceStack = FindObject(sourceStack.Guid, SearchLocations.LocationsICanMove, out _, out var sourceStackRootOwner, out _);
-            targetStack = FindObject(targetStack.Guid, SearchLocations.LocationsICanMove, out var targetStackFoundInContainer, out var targetStackRootOwner, out _);
+            sourceStack = FindObject(sourceStack.Guid, SearchLocations.LocationsICanMove, out _, out var sourceStackRootOwner, out var sourceStackWasEquipped);
+            targetStack = FindObject(targetStack.Guid, SearchLocations.LocationsICanMove, out var targetStackFoundInContainer, out var targetStackRootOwner, out var targetStackWasEquipped);
 
             if (sourceStack == null || targetStack == null)
             {
@@ -2751,13 +2796,18 @@ namespace ACE.Server.WorldObjects
                     sourceStack.Destroy();
 
 
-                if (!AdjustStack(targetStack, amount, targetStackFoundInContainer, targetStackRootOwner))
+                if (!AdjustStack(targetStack, amount, targetStackFoundInContainer, targetStackRootOwner, targetStackWasEquipped))
                     return false;
 
                 if (targetStack.CurrentLandblock != null)
                     targetStack.EnqueueBroadcast(new GameMessageSetStackSize(targetStack));
                 else
+                {
                     Session.Network.EnqueueSend(new GameMessageSetStackSize(targetStack));
+
+                    if (targetStackWasEquipped && (targetStack.WeenieType == WeenieType.Ammunition || targetStack.WeenieType == WeenieType.Missile) && Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.CustomDM)
+                        Session.Network.EnqueueSend(new GameMessagePrivateUpdatePropertyInt(this, PropertyInt.EncumbranceVal, EncumbranceVal ?? 0));
+                }
             }
             else // The merge will reduce the size of the source stack
             {
@@ -2778,7 +2828,7 @@ namespace ACE.Server.WorldObjects
                     return false;
                 }
 
-                if (!AdjustStack(sourceStack, -amount, sourceStackFoundInContainer, sourceStackRootOwner))
+                if (!AdjustStack(sourceStack, -amount, sourceStackFoundInContainer, sourceStackRootOwner, sourceStackWasEquipped))
                 {
                     Session.Network.EnqueueSend(new GameEventInventoryServerSaveFailed(Session, previousSourceStackCheck.Guid.Full));
                     return false;
@@ -2789,15 +2839,19 @@ namespace ACE.Server.WorldObjects
                 else
                     Session.Network.EnqueueSend(new GameMessageSetStackSize(sourceStack));
 
-                if (!AdjustStack(targetStack, amount, targetStackFoundInContainer, targetStackRootOwner))
+                if (!AdjustStack(targetStack, amount, targetStackFoundInContainer, targetStackRootOwner, targetStackWasEquipped))
                     return false;
 
                 if (targetStack.CurrentLandblock != null)
                     targetStack.EnqueueBroadcast(new GameMessageSetStackSize(targetStack));
                 else
+                {
                     Session.Network.EnqueueSend(new GameMessageSetStackSize(targetStack));
-            }
 
+                    if (((sourceStackWasEquipped && (sourceStack.WeenieType == WeenieType.Ammunition || sourceStack.WeenieType == WeenieType.Missile)) || (targetStackWasEquipped && (targetStack.WeenieType == WeenieType.Ammunition || targetStack.WeenieType == WeenieType.Missile))) && Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.CustomDM)
+                        Session.Network.EnqueueSend(new GameMessagePrivateUpdatePropertyInt(this, PropertyInt.EncumbranceVal, EncumbranceVal ?? 0));
+                }
+            }
             var itemFoundOnCorpse = sourceStackRootOwner is Corpse;
 
             var isFromAPlayerCorpse = false;

@@ -2967,10 +2967,16 @@ namespace ACE.Server.Command.Handlers
                     }
                 }
 
+                int correctLength = 240;
+                if (Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.CustomDM)
+                    correctLength = 210;
+                else if (Common.ConfigManager.Config.Server.WorldRuleset <= Common.Ruleset.Infiltration)
+                    correctLength = 230;
+
                 // Check string is correctly formatted before altering stats
                 // correctly formatted return string should have 240 entries
                 // if the construction of the string changes - this will need to be updated to match
-                if (returnState.Split("=").Length != 240)
+                if (returnState.Split("=").Length != correctLength)
                 {
                     ChatPacket.SendServerMessage(session, "Godmode is not available at this time.", ChatMessageType.Broadcast);
                     Console.WriteLine($"Player {session.Player.Name} tried to enter god mode but there was an error with the godString length. (length = {returnState.Split("=").Length}) Godmode not available.");
@@ -3060,9 +3066,15 @@ namespace ACE.Server.Command.Handlers
                 {
                     string[] returnStringArr = returnString.Split("=");
 
+                    int correctLength = 240;
+                    if (Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.CustomDM)
+                        correctLength = 210;
+                    else if (Common.ConfigManager.Config.Server.WorldRuleset <= Common.Ruleset.Infiltration)
+                        correctLength = 230;
+
                     // correctly formatted return string should have 240 entries
                     // if the construction of the string changes - this will need to be updated to match
-                    if (returnStringArr.Length != 240)
+                    if (returnStringArr.Length != correctLength)
                     {
                         Console.WriteLine($"The returnString was not set to the correct length while {currentPlayer.Name} was attempting to return to normal from godmode.");
                         ChatPacket.SendServerMessage(session, "Error returning to mortal state, defaulting to godmode.", ChatMessageType.Broadcast);
@@ -3098,7 +3110,7 @@ namespace ACE.Server.Command.Handlers
                                 currentPlayer.Session.Network.EnqueueSend(new GameMessagePrivateUpdateVital(currentPlayer, playerVital));
                                 i += 5;
                                 break;
-                            case int n when (n <= 238):
+                            case int n when (n <= correctLength - 2):
                                 var playerSkill = currentPlayer.Skills[(Skill)int.Parse(returnStringArr[i])];
                                 playerSkill.Ranks = ushort.Parse(returnStringArr[i + 1]);
 
@@ -3118,7 +3130,7 @@ namespace ACE.Server.Command.Handlers
                                 currentPlayer.Session.Network.EnqueueSend(new GameMessagePrivateUpdateSkill(currentPlayer, playerSkill));
                                 i += 5;
                                 break;
-                            case 239: //end of returnString, this will need to be updated if the length of the string changes
+                            case int n when (n == correctLength - 1): //end of returnString, this will need to be updated if the length of the string changes
                                 GameMessagePrivateUpdatePropertyInt levelMsg = new GameMessagePrivateUpdatePropertyInt(currentPlayer, PropertyInt.Level, (int)currentPlayer.Level);
                                 GameMessagePrivateUpdatePropertyInt skMsg = new GameMessagePrivateUpdatePropertyInt(currentPlayer, PropertyInt.AvailableSkillCredits, (int)currentPlayer.AvailableSkillCredits);
                                 GameMessagePrivateUpdatePropertyInt64 totalExpMsg = new GameMessagePrivateUpdatePropertyInt64(currentPlayer, PropertyInt64.TotalExperience, (long)currentPlayer.TotalExperience);

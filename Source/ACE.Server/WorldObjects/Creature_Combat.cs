@@ -7,6 +7,7 @@ using ACE.Entity.Enum;
 using ACE.Entity.Enum.Properties;
 using ACE.Server.Entity;
 using ACE.Server.Entity.Actions;
+using ACE.Server.Factories.Tables;
 using ACE.Server.Network.GameEvent.Events;
 using ACE.Server.Network.GameMessages.Messages;
 using ACE.Server.Network.Structure;
@@ -411,12 +412,40 @@ namespace ACE.Server.WorldObjects
         /// <param name="attackType">Uses strength for melee, coordination for missile</param>
         public float GetAttributeMod(WorldObject weapon)
         {
+            // The damage done by melee weapons—such as swords, maces, daggers, spears, and so on—is now affected more by the strength of the combatant. Strong warriors will find that they do more damage per hit than before.
+            // This does not affect missile or unarmed combat. Note that this applies to monsters as well, so be careful when facing monsters that wield weapons!
+            // Asheron's Call Release Notes - 2000/02 - Shadows of the Past
+            //if (IsHumanoid && GetCurrentWeaponSkill() == Skill.UnarmedCombat)
+            //    return 1.0f;
+
             var isBow = weapon != null && weapon.IsBow;
 
-            //var attribute = isBow || GetCurrentWeaponSkill() == Skill.FinesseWeapons ? Coordination : Strength;
-            var attribute = isBow || weapon?.WeaponSkill == Skill.FinesseWeapons ? Coordination : Strength;
+            Entity.CreatureAttribute attribute;
+            if (ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.CustomDM)
+                attribute = isBow || weapon?.WeaponSkill == Skill.Dagger || weapon?.WeaponSkill == Skill.Spear || weapon?.WeaponSkill == Skill.Staff ? Coordination : Strength;
+            else if (ConfigManager.Config.Server.WorldRuleset <= Common.Ruleset.Infiltration)
+                attribute = isBow || weapon?.WeaponSkill == Skill.Dagger ? Coordination : Strength;
+            else
+                attribute = isBow || weapon?.WeaponSkill == Skill.FinesseWeapons ? Coordination : Strength;
 
-            return SkillFormula.GetAttributeMod((int)attribute.Current, isBow);
+            Skill skill = GetCurrentWeaponSkill();
+            if (isBow)
+                skill = Skill.Bow; // Group up bows and crossbows while excluding thrown weapons.
+            else if (skill == Skill.UnarmedCombat && !IsHumanoid)
+                skill = Skill.None; // Non humanoids(creatures that aren't able to wield weapons) use unarmed combat but still have the regular weapon factor.
+
+            return SkillFormula.GetAttributeMod((int)attribute.Current, skill);
+        }
+        public virtual int GetUnarmedSkillDamageBonus()
+        {
+            if (IsHumanoid && ConfigManager.Config.Server.WorldRuleset <= Common.Ruleset.Infiltration && GetCurrentWeaponSkill() == Skill.UnarmedCombat) // Non humanoids(creatures that aren't able to wield weapons) do not get a damage bonus based on skill.
+            {
+                var skill = GetCreatureSkill(Skill.UnarmedCombat).Current;
+
+                return (int)skill / 20;
+            }
+            else
+                return 0;
         }
 
         /// <summary>
@@ -437,19 +466,22 @@ namespace ACE.Server.WorldObjects
 
             var skill = weapon != null ? weapon.WeaponSkill : Skill.UnarmedCombat;
 
-            var creatureSkill = GetCreatureSkill(skill);
-
-            if (creatureSkill.InitLevel == 0)
+            if (ConfigManager.Config.Server.WorldRuleset == Ruleset.EoR)
             {
-                // convert to post-MoA skill
-                if (weapon != null && weapon.IsRanged)
-                    skill = Skill.MissileWeapons;
-                else if (skill == Skill.Sword)
-                    skill = Skill.HeavyWeapons;
-                else if (skill == Skill.Dagger)
-                    skill = Skill.FinesseWeapons;
-                else
-                    skill = Skill.LightWeapons;
+                var creatureSkill = GetCreatureSkill(skill);
+
+                if (creatureSkill.InitLevel == 0)
+                {
+                    // convert to post-MoA skill
+                    if (weapon != null && weapon.IsRanged)
+                        skill = Skill.MissileWeapons;
+                    else if (skill == Skill.Sword)
+                        skill = Skill.HeavyWeapons;
+                    else if (skill == Skill.Dagger)
+                        skill = Skill.FinesseWeapons;
+                    else
+                        skill = Skill.LightWeapons;
+                }
             }
 
             //Console.WriteLine("Monster weapon skill: " + skill);
@@ -696,16 +728,19 @@ namespace ACE.Server.WorldObjects
 
             var effectiveLevel = effectiveSL * effectiveRL;
 
-            // SL cap:
-            // Trained / untrained: 1/2 shield skill
-            // Spec: shield skill
-            // SL cap is applied *after* item enchantments
-            var shieldSkill = GetCreatureSkill(Skill.Shield);
-            var shieldCap = shieldSkill.Current;
-            if (shieldSkill.AdvancementClass != SkillAdvancementClass.Specialized)
-                shieldCap = (uint)Math.Round(shieldCap / 2.0f);
+            if (Common.ConfigManager.Config.Server.WorldRuleset != Common.Ruleset.Infiltration)
+            {
+                // SL cap:
+                // Trained / untrained: 1/2 shield skill
+                // Spec: shield skill
+                // SL cap is applied *after* item enchantments
+                var shieldSkill = GetCreatureSkill(Skill.Shield);
+                var shieldCap = shieldSkill.Current;
+                if (shieldSkill.AdvancementClass != SkillAdvancementClass.Specialized)
+                    shieldCap = (uint)Math.Round(shieldCap / 2.0f);
 
-            effectiveLevel = Math.Min(effectiveLevel, shieldCap);
+                effectiveLevel = Math.Min(effectiveLevel, shieldCap);
+            }
 
             var ignoreShieldMod = attacker.GetIgnoreShieldMod(weapon);
             //Console.WriteLine($"IgnoreShieldMod: {ignoreShieldMod}");
@@ -717,6 +752,28 @@ namespace ACE.Server.WorldObjects
             //Console.WriteLine("ShieldMod: " + shieldMod);
             return shieldMod;
         }
+        public static double GetThrownWeaponMaxVelocity(WorldObject throwed)
+        {
+            Creature thrower = throwed.Wielder as Creature;
+
+            if (thrower == null || throwed == null)
+                return 0;
+
+            return GetThrownWeaponMaxVelocity((int)thrower.Strength.Current, ((throwed.StackUnitEncumbrance ?? throwed.EncumbranceVal) ?? 1));
+        }
+
+        public static double GetEstimatedThrownWeaponMaxVelocity(WorldObject throwed)
+        {
+            if (throwed == null)
+                return 0;
+
+            return GetThrownWeaponMaxVelocity(100, ((throwed.StackUnitEncumbrance ?? throwed.EncumbranceVal) ?? 1));
+        }
+
+        public static double GetThrownWeaponMaxVelocity(int throwerStrength, int throwedEncumbrance)
+        {
+            return Math.Clamp(16 - 0.06 * throwerStrength + 0.0009 * Math.Pow(throwerStrength, 2) - (Math.Sqrt(throwedEncumbrance) - Math.Sqrt(5)), 5.45, 27.3); // Custom formula - Asheron's Call Strategies and Secrets has some info on the original formula on pages 150 and 151.
+        }
 
         /// <summary>
         /// Returns the total applicable Recklessness modifier,
@@ -724,6 +781,9 @@ namespace ACE.Server.WorldObjects
         /// </summary>
         public static float GetRecklessnessMod(Creature attacker, Creature defender)
         {
+            if (Common.ConfigManager.Config.Server.WorldRuleset <= Common.Ruleset.Infiltration)
+                return 1.0f;
+
             var playerAttacker = attacker as Player;
             var playerDefender = defender as Player;
 
@@ -744,6 +804,9 @@ namespace ACE.Server.WorldObjects
 
         public float GetSneakAttackMod(WorldObject target)
         {
+            if (Common.ConfigManager.Config.Server.WorldRuleset <= Common.Ruleset.Infiltration)
+                return 1.0f;
+
             // ensure trained
             var sneakAttack = GetCreatureSkill(Skill.SneakAttack);
             if (sneakAttack.AdvancementClass < SkillAdvancementClass.Trained)
@@ -997,6 +1060,127 @@ namespace ACE.Server.WorldObjects
                 playerSource.SendMessage(msg, ChatMessageType.Combat, this);
             if (playerTarget != null)
                 playerTarget.SendMessage(msg, ChatMessageType.Combat, this);
+        }
+
+        public void TryCastAssessCreatureAndPersonDebuffs(Creature target, CombatType combatType)
+        {
+            if (Common.ConfigManager.Config.Server.WorldRuleset != Common.Ruleset.CustomDM)
+                return;
+
+            Player sourceAsPlayer = this as Player;
+            Player targetAsPlayer = target as Player;
+
+            Entity.CreatureSkill skill;
+            if (target.CreatureType == ACE.Entity.Enum.CreatureType.Human)
+                skill = GetCreatureSkill(Skill.AssessPerson);
+            else
+                skill = GetCreatureSkill(Skill.AssessCreature);
+
+            var activationChance = ThreadSafeRandom.Next(0.0f, 1.0f);
+            if (skill.AdvancementClass == SkillAdvancementClass.Specialized && activationChance > 0.25)
+                return;
+            else if (skill.AdvancementClass == SkillAdvancementClass.Trained && activationChance > 0.10)
+                return;
+            else if (skill.AdvancementClass == SkillAdvancementClass.Untrained || skill.AdvancementClass == SkillAdvancementClass.Inactive)
+                return;
+
+            Entity.CreatureSkill defenseSkill = GetCreatureSkill(Skill.Deception);
+
+            var avoidChance = 1.0f - SkillCheck.GetSkillChance(skill.Current, defenseSkill.Current);
+
+            if (avoidChance > ThreadSafeRandom.Next(0.0f, 1.0f))
+            {
+                if (sourceAsPlayer != null)
+                    sourceAsPlayer.Session.Network.EnqueueSend(new GameMessageSystemChat($"{target.Name}'s deception stops you from finding a vulnerability!", ChatMessageType.Magic));
+
+                if (targetAsPlayer != null)
+                {
+                    Proficiency.OnSuccessUse(targetAsPlayer, defenseSkill, skill.Current);
+                    targetAsPlayer.Session.Network.EnqueueSend(new GameMessageSystemChat($"Your deception stops {Name} from finding a vulnerability!", ChatMessageType.Magic));
+                }
+
+                return;
+            }
+            else if(sourceAsPlayer != null)
+                Proficiency.OnSuccessUse(sourceAsPlayer, skill, defenseSkill.Current);
+
+            string spellType;
+            // 2/3 chance of the vulnerability being explicity of the type of attack that was used, otherwise random 1/3 for each type
+            SpellId spellId;
+            if (ThreadSafeRandom.Next(1, 3) != 3)
+            {
+                switch (combatType)
+                {
+                    default:
+                    case CombatType.Melee:
+                        spellId = SpellId.VulnerabilityOther1;
+                        spellType = "melee";
+                        break;
+                    case CombatType.Missile:
+                        spellId = SpellId.DefenselessnessOther1;
+                        spellType = "missile";
+                        break;
+                    case CombatType.Magic:
+                        spellId = SpellId.MagicYieldOther1;
+                        spellType = "magic";
+                        break;
+                }
+            }
+            else
+            {
+                var spellRNG = ThreadSafeRandom.Next(1, 3);
+                switch (spellRNG)
+                {
+                    default:
+                    case 1:
+                        spellId = SpellId.VulnerabilityOther1;
+                        spellType = "melee";
+                        break;
+                    case 2:
+                        spellId = SpellId.DefenselessnessOther1;
+                        spellType = "missile";
+                        break;
+                    case 3:
+                        spellId = SpellId.MagicYieldOther1;
+                        spellType = "magic";
+                        break;
+                }
+            }
+
+            var spellLevels = SpellLevelProgression.GetSpellLevels(spellId);
+            int maxUsableSpellLevel = Math.Min(spellLevels.Count, 5);
+
+            if (spellLevels.Count == 0)
+                return;
+
+            int minSpellLevel = Math.Min(Math.Max(0, (int)Math.Floor(((float)skill.Current - 150) / 50.0)), maxUsableSpellLevel);
+            int maxSpellLevel = Math.Max(0, Math.Min((int)Math.Floor(((float)skill.Current - 50) / 50.0), maxUsableSpellLevel));
+
+            int spellLevel = ThreadSafeRandom.Next(minSpellLevel, maxSpellLevel);
+            var spell = new Spell(spellLevels[spellLevel]);
+
+            if (spell.NonComponentTargetType == ItemType.None)
+                TryCastSpell(spell, null, this, null, false, false, false);
+            else
+                TryCastSpell(spell, target, this, null, false, false, false);
+
+            string spellTypePrefix;
+            switch(spellLevel + 1)
+            {
+                case 1: spellTypePrefix = "a minor"; break;
+                default:
+                case 2: spellTypePrefix = "a"; break;
+                case 3: spellTypePrefix = "a moderate"; break;
+                case 4: spellTypePrefix = "a severe"; break;
+                case 5: spellTypePrefix = "a major"; break;
+                case 6: spellTypePrefix = "a crippling"; break;
+            }
+
+            string skillMessage = skill.Skill == Skill.AssessCreature ? "creature" : "person";
+            if (sourceAsPlayer != null)
+                sourceAsPlayer.Session.Network.EnqueueSend(new GameMessageSystemChat($"Your assess {skillMessage} knowledge allows you to expose {spellTypePrefix} {spellType} vulnerability on {target.Name}!", ChatMessageType.Magic));
+            if (targetAsPlayer != null)
+                targetAsPlayer.Session.Network.EnqueueSend(new GameMessageSystemChat($"{Name}'s assess {skillMessage} knowledge exposes {spellTypePrefix} {spellType} vulnerability on you!", ChatMessageType.Magic));
         }
 
         /// <summary>

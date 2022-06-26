@@ -310,6 +310,9 @@ namespace ACE.Server.WorldObjects
 
             if (damage != null)
             {
+				if(sourceCreature != null)
+                    sourceCreature.TryCastAssessCreatureAndPersonDebuffs(creatureTarget, CombatType.Magic);
+                    
                 if (Spell.MetaSpellType == ACE.Entity.Enum.SpellType.EnchantmentProjectile)
                 {
                     // handle EnchantmentProjectile successfully landing on target
@@ -535,6 +538,12 @@ namespace ACE.Server.WorldObjects
                     }
                 }
                 baseDamage = ThreadSafeRandom.Next(Spell.MinDamage, Spell.MaxDamage);
+                
+                if (Common.ConfigManager.Config.Server.WorldRuleset <= Common.Ruleset.Infiltration)
+                {
+                    if (sourcePlayer == null)
+                        baseDamage /= 2; // Monsters do half projectile spell damage.
+                }
 
                 weaponResistanceMod = GetWeaponResistanceModifier(weapon, sourceCreature, attackSkill, Spell.DamageType);
 
@@ -578,7 +587,12 @@ namespace ACE.Server.WorldObjects
                     // does target have shield equipped?
                     var shield = target.GetEquippedShield();
                     if (shield != null && shield.GetAbsorbMagicDamage() != null)
-                        return GetShieldMod(target, shield);
+                 	{
+                        if (Common.ConfigManager.Config.Server.WorldRuleset != Common.Ruleset.Infiltration)
+                            return GetShieldMod(target, shield);
+                        else
+                            return AbsorbMagic(target, shield);
+                    }
 
                     break;
 

@@ -190,9 +190,41 @@ namespace ACE.Server.Factories.Tables
             heritageProfile23,
             heritageProfile24,
         };
+        static HeritageChance()
+        {
+            if (Common.ConfigManager.Config.Server.WorldRuleset <= Common.Ruleset.Infiltration)
+            {
+                heritageProfiles = new List<ChanceTable<TreasureHeritageGroup>>()
+                {
+                    heritageProfile1,
+                    heritageProfile2,
+                    heritageProfile3,
+                    heritageProfile4,
+                    heritageProfile5,
+                    heritageProfile6,
+                    heritageProfile7,
+                    heritageProfile8,
+                    heritageProfile9,
+                    heritageProfile10,
+                    heritageProfile11,
+                    heritageProfile12,
+                    heritageProfile13,
+                    heritageProfile14,
+                    heritageProfile15,
+                    heritageProfile16,
+                    heritageProfile17,
+                    heritageProfile18,
+                    heritageProfile19,
+                    heritageProfile20
+                };
+            }
+        }
 
         public static TreasureHeritageGroup Roll(int heritageProfile, bool addViamontian = false)
         {
+            if (Common.ConfigManager.Config.Server.WorldRuleset <= Common.Ruleset.Infiltration)
+                addViamontian = false;
+
             if (heritageProfile < 1 || heritageProfile > heritageProfiles.Count)
             {
                 // fallback method - fix the treasure_death.heritage_chances data for new rows

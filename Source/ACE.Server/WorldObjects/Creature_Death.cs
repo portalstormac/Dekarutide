@@ -19,7 +19,7 @@ namespace ACE.Server.WorldObjects
 {
     partial class Creature
     {
-        public TreasureDeath DeathTreasure { get => DeathTreasureType.HasValue ? DatabaseManager.World.GetCachedDeathTreasure(DeathTreasureType.Value) : null; }
+        public TreasureDeath DeathTreasure { get => DeathTreasureType.HasValue ? LootGenerationFactory.GetTweakedDeathTreasureProfile(DeathTreasureType.Value, this) : null; }
 
         private bool onDeathEntered = false;
 
@@ -190,9 +190,14 @@ namespace ACE.Server.WorldObjects
 
                 var damagePercent = totalDamage / totalHealth;
 
-                var totalXP = (XpOverride ?? 0) * damagePercent;
+                float totalXP;
 
-                playerDamager.EarnXP((long)Math.Round(totalXP), XpType.Kill);
+                if(Common.ConfigManager.Config.Server.WorldRuleset != Common.Ruleset.CustomDM)
+                    totalXP = (XpOverride ?? 0) * damagePercent;
+                else
+                    totalXP = GetCreatureDeathXP(Level ?? 0, (int)Health.MaxValue, Biota.PropertiesSpellBook?.Count ?? 0) * damagePercent;
+
+                playerDamager.EarnXP((long)Math.Round(totalXP), XpType.Kill, Level);
 
                 // handle luminance
                 if (LuminanceAward != null)
@@ -201,6 +206,37 @@ namespace ACE.Server.WorldObjects
                     playerDamager.EarnLuminance(totalLuminance, XpType.Kill);
                 }
             }
+        }
+        public static int GetCreatureDeathXP(int level, int hitpoints = 0, int numSpellInSpellbook = 0, int formulaVersion = 0)
+        {
+            double baseXp = Math.Min((1.75 * Math.Pow(level, 2)) + (20 * level), 30000);
+
+            switch (formulaVersion)
+            {
+                case 1:
+                    baseXp *= 10;
+                    break;
+                case 2:
+                    baseXp *= 15;
+                    break;
+                case 3:
+                    baseXp = (baseXp * level / 2) + 5000;
+                    break;
+                case 4:
+                    baseXp = (baseXp * level) + 10000;
+                    break;
+                case 5:
+                    baseXp = (baseXp * level * 3) + 15000;
+                    break;
+                default:
+                    break;
+            }
+
+            double hitpointsXp = hitpoints / 10 * baseXp / 35;
+
+            double casterXp = baseXp * (numSpellInSpellbook / 20);
+
+            return (int)Math.Round(baseXp + hitpointsXp + casterXp);
         }
 
         /// <summary>
@@ -581,8 +617,11 @@ namespace ACE.Server.WorldObjects
 
             corpse.RemoveProperty(PropertyInt.Value);
 
-            if (CanGenerateRare && killer != null)
-                corpse.TryGenerateRare(killer);
+            if (Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.EoR)
+            {
+                if (CanGenerateRare && killer != null)
+                    corpse.TryGenerateRare(killer);
+            }
 
             corpse.InitPhysicsObj();
 
@@ -677,6 +716,56 @@ namespace ACE.Server.WorldObjects
                         else
                             droppedItems.Add(wo);
                     }
+                }
+            }
+
+            // Drop the ammo we've been hit with.
+            if (ammoHitWith.Count > 0)
+            {
+                List<WorldObject> items = new List<WorldObject>();
+                foreach (var entry in ammoHitWith)
+                {
+                    uint wcid = entry.Key;
+                    int amount = entry.Value;
+                    while (amount > 0)
+                    {
+                        WorldObject wo = WorldObjectFactory.CreateNewWorldObject(wcid);
+
+                        if (wo.MaxStackSize.HasValue)
+                        {
+                            if ((wo.MaxStackSize.Value != 0) & (amount > wo.MaxStackSize.Value))
+                            {
+                                // fit what we can in this stack and move on to a new stack
+                                wo.SetStackSize(wo.MaxStackSize.Value);
+                                items.Add(wo);
+                                amount = amount - wo.MaxStackSize.Value;
+                            }
+                            else
+                            {
+                                // we can fit all the remaining amount in this stack
+                                wo.SetStackSize(amount);
+                                items.Add(wo);
+                                amount = 0;
+                            }
+                        }
+                        else
+                        {
+                            if (amount > 0)
+                            {
+                                amount--;
+                                items.Add(wo);
+                            }
+                        }
+                    }
+                }
+                ammoHitWith.Clear();
+
+                foreach (WorldObject wo in items)
+                {
+                    if (corpse != null)
+                        corpse.TryAddToInventory(wo);
+                    else
+                        droppedItems.Add(wo);
                 }
             }
 

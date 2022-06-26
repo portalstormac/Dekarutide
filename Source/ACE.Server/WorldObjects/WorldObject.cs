@@ -74,13 +74,24 @@ namespace ACE.Server.WorldObjects
         public bool IsShield { get => CombatUse != null && CombatUse == ACE.Entity.Enum.CombatUse.Shield; }
         // ValidLocations is bugged for some older two-handed weapons, still contains MeleeWeapon instead of TwoHanded?
         //public bool IsTwoHanded { get => CurrentWieldedLocation != null && CurrentWieldedLocation == EquipMask.TwoHanded; }
-        public bool IsTwoHanded => WeaponSkill == Skill.TwoHandedCombat;
+        public bool IsTwoHanded { get => DefaultCombatStyle != null && (DefaultCombatStyle == CombatStyle.TwoHanded ); }
         public bool IsBow { get => DefaultCombatStyle != null && (DefaultCombatStyle == CombatStyle.Bow || DefaultCombatStyle == CombatStyle.Crossbow); }
         public bool IsAtlatl { get => DefaultCombatStyle != null && DefaultCombatStyle == CombatStyle.Atlatl; }
         public bool IsAmmoLauncher { get => IsBow || IsAtlatl; }
         public bool IsThrownWeapon { get => DefaultCombatStyle != null && DefaultCombatStyle == CombatStyle.ThrownWeapon; }
         public bool IsRanged { get => IsAmmoLauncher || IsThrownWeapon; }
         public bool IsCaster { get => DefaultCombatStyle != null && (DefaultCombatStyle == CombatStyle.Magic); }
+
+        public bool IsCreature
+        {
+            get
+            {
+                return WeenieType == WeenieType.Creature || WeenieType == WeenieType.Cow ||
+                       WeenieType == WeenieType.Sentinel || WeenieType == WeenieType.Admin ||
+                       WeenieType == WeenieType.Vendor ||
+                       WeenieType == WeenieType.CombatPet || WeenieType == WeenieType.Pet;
+            }
+        }
 
         public EmoteManager EmoteManager;
         public EnchantmentManagerWithCaching EnchantmentManager;
@@ -715,6 +726,11 @@ namespace ACE.Server.WorldObjects
             EmoteManager.OnGeneration();
         }
 
+        public virtual void BeforeEnterWorld()
+        {
+            // empty base
+        }
+
         public virtual bool EnterWorld()
         {
             if (Location == null)
@@ -1018,6 +1034,19 @@ namespace ACE.Server.WorldObjects
 
         public Skill ConvertToMoASkill(Skill skill)
         {
+            if (ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.CustomDM)
+            {
+                switch(skill)
+                {
+                    case Skill.Mace: return Skill.Axe;
+                    case Skill.Staff: return Skill.Spear;
+                    case Skill.Crossbow: return Skill.Bow;
+                    default: return skill;
+                }
+            }
+            else if (ConfigManager.Config.Server.WorldRuleset <= Common.Ruleset.Infiltration)
+                return skill;
+
             if (this is Player player)
             {
                 if (SkillExtensions.RetiredMelee.Contains(skill))

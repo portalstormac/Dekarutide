@@ -35,8 +35,21 @@ namespace ACE.DatLoader
                     CellDat = new CellDatDatabase(datFile, keepOpen);
                     count = CellDat.AllFiles.Count;
                     log.Info($"Successfully opened {datFile} file, containing {count} records, iteration {CellDat.Iteration}");
-                    if (CellDat.Iteration != ITERATION_CELL)
-                        log.Warn($"{datFile} iteration does not match expected end-of-retail version of {ITERATION_CELL}.");
+                    if (Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.EoR)
+                    {
+                        if (CellDat.Iteration != ITERATION_CELL)
+                            log.Warn($"{datFile} iteration {CellDat.Iteration} not match expected end-of-retail version of {ITERATION_CELL}.");
+                    }
+                    else if (Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.Infiltration)
+                    {
+                        if (CellDat.Iteration != 10000)
+                            log.Warn($"{datFile} iteration {CellDat.Iteration} does not match expected version of 10000.");
+                    }
+                    else if (Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.CustomDM)
+                    {
+                        if (CellDat.Iteration != 20000)
+                            log.Warn($"{datFile} iteration {CellDat.Iteration} does not match expected version of 20000.");
+                    }
                 }
                 catch (FileNotFoundException ex)
                 {
@@ -49,11 +62,25 @@ namespace ACE.DatLoader
             {
                 datFile = Path.Combine(datDir, "client_portal.dat");
                 PortalDat = new PortalDatDatabase(datFile, keepOpen);
-                PortalDat.SkillTable.AddRetiredSkills();
                 count = PortalDat.AllFiles.Count;
                 log.Info($"Successfully opened {datFile} file, containing {count} records, iteration {PortalDat.Iteration}");
-                if (PortalDat.Iteration != ITERATION_PORTAL)
-                    log.Warn($"{datFile} iteration does not match expected end-of-retail version of {ITERATION_PORTAL}.");
+                if (Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.EoR)
+                {
+                    PortalDat.SkillTable.AddRetiredSkills();
+
+                    if (PortalDat.Iteration != ITERATION_PORTAL)
+                        log.Warn($"{datFile} iteration {PortalDat.Iteration} does not match expected end-of-retail version of {ITERATION_PORTAL}.");
+                }
+                else if (Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.Infiltration)
+                {
+                    if (PortalDat.Iteration != 10000)
+                        log.Warn($"{datFile} iteration {PortalDat.Iteration} does not match expected version of 10000.");
+                }
+                else if (Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.CustomDM)
+                {
+                    if (PortalDat.Iteration != 20000)
+                        log.Warn($"{datFile} iteration {PortalDat.Iteration} does not match expected version of 20000.");
+                }
             }
             catch (FileNotFoundException ex)
             {

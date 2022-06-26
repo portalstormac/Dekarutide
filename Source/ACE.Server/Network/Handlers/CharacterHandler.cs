@@ -69,6 +69,14 @@ namespace ACE.Server.Network.Handlers
                 }
             });
 
+            // Only allow era appropriate heritages.
+            if (ConfigManager.Config.Server.WorldRuleset <= Common.Ruleset.Infiltration && characterCreateInfo.Heritage != HeritageGroup.Aluvian && characterCreateInfo.Heritage != HeritageGroup.Gharundim && characterCreateInfo.Heritage != HeritageGroup.Sho)
+            {
+                SendCharacterCreateResponse(session, CharacterGenerationVerificationResponse.Pending);
+                session.Network.EnqueueSend(new GameEvent.Events.GameEventPopupString(session, "Only Aluvian, Gharu'ndim and Sho heritages are allowed on this server."));
+                return;
+            }
+
             // Disable OlthoiPlay characters for now. They're not implemented yet.
             // FIXME: Restore OlthoiPlay characters when properly handled.
             if ((characterCreateInfo.Heritage == HeritageGroup.Olthoi || characterCreateInfo.Heritage == HeritageGroup.OlthoiAcid) && !PropertyManager.GetBool("olthoi_play_enabled").Item)

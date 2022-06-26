@@ -554,6 +554,9 @@ namespace ACE.Server.WorldObjects
 
             var destroyCoins = PropertyManager.GetBool("corpse_destroy_pyreals").Item;
 
+            if (Common.ConfigManager.Config.Server.WorldRuleset <= Common.Ruleset.Infiltration)
+                destroyCoins = false; // Let's override the setting for now.
+
             // add items to corpse
             foreach (var dropItem in dropItems)
             {
@@ -642,7 +645,11 @@ namespace ACE.Server.WorldObjects
                 return ThreadSafeRandom.Next(0, 1);
 
             // level 21+
-            var numItemsDropped = (level / 20) + ThreadSafeRandom.Next(0, 2);
+            int numItemsDropped;
+            if (ConfigManager.Config.Server.WorldRuleset == Ruleset.EoR)
+                numItemsDropped = (level / 20) + ThreadSafeRandom.Next(0, 2);
+            else
+                numItemsDropped = (level / 10) + ThreadSafeRandom.Next(0, 2);
 
             numItemsDropped = Math.Min(numItemsDropped, MaxItemsDropped);   // is this really a max cap?
 

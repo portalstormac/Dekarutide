@@ -221,6 +221,11 @@ namespace ACE.Server.WorldObjects
 
                 //Console.WriteLine($"{Name}.FindNextTarget = {AttackTarget.Name}");
 
+				//Is this fix still necessary? Reenable if players complain of being attacked by invisible monsters.
+                //Player player = AttackTarget as Player;
+                //if (player != null && player.AddTrackedObject(this))
+                //    log.Error($"Fixed invisible attacker on player {player.Name}. (Landblock:{CurrentLandblock.Id} - {Name} ({Guid})");
+
                 if (AttackTarget != null && AttackTarget != prevAttackTarget)
                     EmoteManager.OnNewEnemy(AttackTarget);
 

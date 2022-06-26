@@ -13,6 +13,8 @@ using ACE.Entity.Enum.Properties;
 using ACE.Entity.Models;
 using ACE.Server.WorldObjects;
 using ACE.Server.Managers;
+using ACE.Server.Entity;
+using ACE.Database.Models.Shard;
 
 namespace ACE.Server.Factories
 {
@@ -160,8 +162,21 @@ namespace ACE.Server.Factories
                 player.SetProperty(PropertyInt.AvailableSkillCredits, (int)heritageGroup.SkillCredits);
                 player.SetProperty(PropertyInt.TotalSkillCredits, (int)heritageGroup.SkillCredits);
 
-                if (characterCreateInfo.SkillAdvancementClasses.Count != 55)
-                    return CreateResult.ClientServerSkillsMismatch;
+                if (Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.EoR)
+                {
+                    if (characterCreateInfo.SkillAdvancementClasses.Count != 55)
+                        return CreateResult.ClientServerSkillsMismatch;
+                }
+                if (Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.CustomDM)
+                {
+                    if (characterCreateInfo.SkillAdvancementClasses.Count != 49) // Not really 49 but shield skill is id 48 so we get a few empty slots. The client doesn't seem to mind at all.
+                        return CreateResult.ClientServerSkillsMismatch;
+                }
+                else
+                {
+                    if (characterCreateInfo.SkillAdvancementClasses.Count != 41)
+                        return CreateResult.ClientServerSkillsMismatch;
+                }
 
                 for (int i = 0; i < characterCreateInfo.SkillAdvancementClasses.Count; i++)
                 {
@@ -207,21 +222,42 @@ namespace ACE.Server.Factories
                         player.UntrainSkill((Skill)i, 0);
                 }
 
-                // Set Heritage based Melee and Ranged Masteries
-                GetMasteries(player.HeritageGroup, out WeaponType meleeMastery, out WeaponType rangedMastery);
+                var isDualWieldTrainedOrSpecialized = false;
+                if (Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.EoR)
+                {
+                    isDualWieldTrainedOrSpecialized = player.Skills.TryGetValue(Skill.DualWield, out var dualWield) && dualWield.AdvancementClass > SkillAdvancementClass.Untrained;
 
-                player.SetProperty(PropertyInt.MeleeMastery, (int)meleeMastery);
-                player.SetProperty(PropertyInt.RangedMastery, (int)rangedMastery);
+                    // Set Heritage based Melee and Ranged Masteries
+                    GetMasteries(player.HeritageGroup, out WeaponType meleeMastery, out WeaponType rangedMastery);
 
-                // Set innate augs
-                SetInnateAugmentations(player);
+                    player.SetProperty(PropertyInt.MeleeMastery, (int)meleeMastery);
+                    player.SetProperty(PropertyInt.RangedMastery, (int)rangedMastery);
 
-                var isDualWieldTrainedOrSpecialized = player.Skills.TryGetValue(Skill.DualWield, out var dualWield) && dualWield.AdvancementClass > SkillAdvancementClass.Untrained;
+                    // Set innate augs
+                    SetInnateAugmentations(player);
+                }
+                else
+                {
+                    // Quick check to confirm if the player has all their racial skills.
+                    foreach (var skillGroup in heritageGroup.Skills)
+                    {
+                        var skill = player.GetCreatureSkill((Skill)skillGroup.SkillNum);
+                        if (skillGroup.PrimaryCost == 0)
+                        {
+                            if (skill.AdvancementClass != SkillAdvancementClass.Specialized)
+                                return CreateResult.FailedToSpecializeSkill;
+                        }
+                        else if (skillGroup.NormalCost == 0 && skill.AdvancementClass != SkillAdvancementClass.Trained && skill.AdvancementClass != SkillAdvancementClass.Specialized)
+                            return CreateResult.FailedToTrainSkill;
+                    }
+                }
+
 
                 // grant starter items based on skills
                 var starterGearConfig = StarterGearFactory.GetStarterGearConfiguration();
                 var grantedWeenies = new List<uint>();
 
+                Container container = null;
                 foreach (var skillGear in starterGearConfig.Skills)
                 {
                     //var charSkill = player.Skills[(Skill)skillGear.SkillId];
@@ -232,6 +268,9 @@ namespace ACE.Server.Factories
                     {
                         foreach (var item in skillGear.Gear)
                         {
+                            if (charSkill.AdvancementClass == SkillAdvancementClass.Trained && item.SpecializedOnly == true)
+                                continue;
+
                             if (grantedWeenies.Contains(item.WeenieId))
                             {
                                 var existingItem = player.Inventory.Values.FirstOrDefault(i => i.WeenieClassId == item.WeenieId);
@@ -245,6 +284,9 @@ namespace ACE.Server.Factories
                             var loot = WorldObjectFactory.CreateNewWorldObject(item.WeenieId);
                             if (loot != null)
                             {
+                                if (container == null && loot.WeenieType == WeenieType.Container)
+                                    container = (Container)loot;
+
                                 if (loot.StackSize.HasValue && loot.MaxStackSize.HasValue)
                                     loot.SetStackSize((item.StackSize <= loot.MaxStackSize) ? item.StackSize : loot.MaxStackSize);
                             }
@@ -253,8 +295,20 @@ namespace ACE.Server.Factories
                                 player.TryAddToInventory(CreateIOU(item.WeenieId));
                             }
 
-                            if (loot != null && player.TryAddToInventory(loot))
-                                grantedWeenies.Add(item.WeenieId);
+                            if (loot != null)
+                            {
+                                bool added = false;
+                                if (container != null && loot.WeenieType == WeenieType.SpellComponent) // try to stash spell components on a secondary pack
+                                    if (container.TryAddToInventory(loot))
+                                        added = true;
+
+                                if (!added)
+                                    if (player.TryAddToInventory(loot))
+                                        added = true;
+
+                                if (added)
+                                    grantedWeenies.Add(item.WeenieId);
+                            }
 
                             if (isDualWieldTrainedOrSpecialized && loot != null)
                             {
@@ -278,6 +332,9 @@ namespace ACE.Server.Factories
                         {
                             foreach (var item in heritageLoot.Gear)
                             {
+                                if (charSkill.AdvancementClass == SkillAdvancementClass.Trained && item.SpecializedOnly == true)
+                                    continue;
+
                                 if (grantedWeenies.Contains(item.WeenieId))
                                 {
                                     var existingItem = player.Inventory.Values.FirstOrDefault(i => i.WeenieClassId == item.WeenieId);
@@ -322,10 +379,28 @@ namespace ACE.Server.Factories
 
                         foreach (var spell in skillGear.Spells)
                         {
+                            bool spellAdded = false;
                             if (charSkill.AdvancementClass == SkillAdvancementClass.Trained && spell.SpecializedOnly == false)
                                 player.AddKnownSpell(spell.SpellId);
                             else if (charSkill.AdvancementClass == SkillAdvancementClass.Specialized)
-                                player.AddKnownSpell(spell.SpellId);
+                                spellAdded = player.AddKnownSpell(spell.SpellId);
+
+                            if (spellAdded && Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.CustomDM)
+                            {
+                                // Quality of life: set the entries for the player's /fillcomps
+                                Spell spellEntity = new Spell(spell.SpellId);
+                                foreach (var componentId in spellEntity.Formula.Components)
+                                {
+                                    uint amount = 10;
+                                    if (SpellFormula.SpellComponentsTable.SpellComponents.TryGetValue(componentId, out var spellComponent))
+                                    {
+                                        if (spellComponent.Type == (int)SpellComponentsTable.Type.Scarab || spellComponent.Type == (int)SpellComponentsTable.Type.Talisman)
+                                            amount = 3;
+
+                                        player.Character.AddFillComponent(Spell.GetComponentWCID(componentId), amount, player.CharacterDatabaseLock, out _);
+                                    }
+                                }
+                            }
                         }
                     }
                 }
@@ -354,53 +429,76 @@ namespace ACE.Server.Factories
 
             var starterArea = DatManager.PortalDat.CharGen.StarterAreas[(int)startArea];
 
-            player.Location = new Position(starterArea.Locations[0].ObjCellID,
-                starterArea.Locations[0].Frame.Origin.X, starterArea.Locations[0].Frame.Origin.Y, starterArea.Locations[0].Frame.Origin.Z,
-                starterArea.Locations[0].Frame.Orientation.X, starterArea.Locations[0].Frame.Orientation.Y, starterArea.Locations[0].Frame.Orientation.Z, starterArea.Locations[0].Frame.Orientation.W);
-
             var instantiation = new Position(0xA9B40019, 84, 7.1f, 94, 0, 0, -0.0784591f, 0.996917f); // ultimate fallback.
-            var spellFreeRide = new Database.Models.World.Spell();
-            switch (starterArea.Name)
+
+            if (Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.EoR)
             {
-                case "OlthoiLair": //todo: check this when olthoi play is allowed in ace
-                    spellFreeRide = null; // no training area for olthoi, so they start and fall back to same place.
-                    instantiation = new Position(player.Location);
-                    break;
-                case "Shoushi":
-                    spellFreeRide = DatabaseManager.World.GetCachedSpell(3813); // Free Ride to Shoushi
-                    break;
-                case "Yaraq":
-                    spellFreeRide = DatabaseManager.World.GetCachedSpell(3814); // Free Ride to Yaraq
-                    break;
-                case "Sanamar":
-                    spellFreeRide = DatabaseManager.World.GetCachedSpell(3535); // Free Ride to Sanamar
-                    break;
-                case "Holtburg":
-                default:
-                    spellFreeRide = DatabaseManager.World.GetCachedSpell(3815); // Free Ride to Holtburg
-                    break;
+                player.Location = new Position(starterArea.Locations[0].ObjCellID,
+                    starterArea.Locations[0].Frame.Origin.X, starterArea.Locations[0].Frame.Origin.Y, starterArea.Locations[0].Frame.Origin.Z,
+                    starterArea.Locations[0].Frame.Orientation.X, starterArea.Locations[0].Frame.Orientation.Y, starterArea.Locations[0].Frame.Orientation.Z, starterArea.Locations[0].Frame.Orientation.W);
+
+                var spellFreeRide = new ACE.Database.Models.World.Spell();
+                switch (starterArea.Name)
+                {
+                    case "OlthoiLair": //todo: check this when olthoi play is allowed in ace
+                        spellFreeRide = null; // no training area for olthoi, so they start and fall back to same place.
+                        instantiation = new Position(player.Location);
+                        break;
+                    case "Shoushi":
+                        spellFreeRide = DatabaseManager.World.GetCachedSpell(3813); // Free Ride to Shoushi
+                        break;
+                    case "Yaraq":
+                        spellFreeRide = DatabaseManager.World.GetCachedSpell(3814); // Free Ride to Yaraq
+                        break;
+                    case "Sanamar":
+                        spellFreeRide = DatabaseManager.World.GetCachedSpell(3535); // Free Ride to Sanamar
+                        break;
+                    case "Holtburg":
+                    default:
+                        spellFreeRide = DatabaseManager.World.GetCachedSpell(3815); // Free Ride to Holtburg
+                        break;
+                }
+                if (spellFreeRide != null && spellFreeRide.Name != "")
+                    instantiation = new Position(spellFreeRide.PositionObjCellId.Value, spellFreeRide.PositionOriginX.Value, spellFreeRide.PositionOriginY.Value, spellFreeRide.PositionOriginZ.Value, spellFreeRide.PositionAnglesX.Value, spellFreeRide.PositionAnglesY.Value, spellFreeRide.PositionAnglesZ.Value, spellFreeRide.PositionAnglesW.Value);
+
+                player.SetProperty(PropertyBool.RecallsDisabled, true);
             }
-            if (spellFreeRide != null && spellFreeRide.Name != "")
-                instantiation = new Position(spellFreeRide.PositionObjCellId.Value, spellFreeRide.PositionOriginX.Value, spellFreeRide.PositionOriginY.Value, spellFreeRide.PositionOriginZ.Value, spellFreeRide.PositionAnglesX.Value, spellFreeRide.PositionAnglesY.Value, spellFreeRide.PositionAnglesZ.Value, spellFreeRide.PositionAnglesW.Value);
+            else
+            {
+                switch (starterArea.Name)
+                {
+                    case "Shoushi":
+                        player.Location = new Position(0xDE51001D, 87.350517f, 114.857246f, 16.004999f, 0, 0, 0.537665f, 0.843159f);
+                        break;
+                    case "Yaraq":
+                        player.Location = new Position(0x7D680012, 56.949219f, 29.860384f, 14.981730f, 0, 0, -0.879578f, 0.475755f);
+                        break;
+                    case "Holtburg":
+                    default: //redirect Sanamar to Holtburg as Sanamar is post-ToD.
+                        player.Location = new Position(0xA9B00015, 53.780079f, 105.814995f, 64.005005f, 0, 0, -0.359575f, -0.933116f);
+                        break;
+                }
+
+                instantiation = new Position(player.Location);
+            }
 
             player.Instantiation = new Position(instantiation);
 
             if (!player.IsOlthoiPlayer)
             {
-                player.Sanctuary = new Position(player.Location);
-                player.SetProperty(PropertyBool.RecallsDisabled, true);
-
-                if (PropertyManager.GetBool("pk_server").Item)
-                    player.SetProperty(PropertyInt.PlayerKillerStatus, (int)PlayerKillerStatus.PK);
-                else if (PropertyManager.GetBool("pkl_server").Item)
-                    player.SetProperty(PropertyInt.PlayerKillerStatus, (int)PlayerKillerStatus.NPK);
-
-                if ((PropertyManager.GetBool("pk_server").Item || PropertyManager.GetBool("pkl_server").Item) && PropertyManager.GetBool("pk_server_safe_training_academy").Item)
-                {
-                    player.SetProperty(PropertyFloat.MinimumTimeSincePk, -PropertyManager.GetDouble("pk_new_character_grace_period").Item);
-                    player.SetProperty(PropertyInt.PlayerKillerStatus, (int)PlayerKillerStatus.NPK);
-                }
-            }
+	            player.Sanctuary = new Position(player.Location);
+	
+	            if (PropertyManager.GetBool("pk_server").Item)
+	                player.SetProperty(PropertyInt.PlayerKillerStatus, (int)PlayerKillerStatus.PK);
+	            else if (PropertyManager.GetBool("pkl_server").Item)
+	                player.SetProperty(PropertyInt.PlayerKillerStatus, (int)PlayerKillerStatus.NPK);
+	
+	            if ((PropertyManager.GetBool("pk_server").Item || PropertyManager.GetBool("pkl_server").Item) && PropertyManager.GetBool("pk_server_safe_training_academy").Item)
+	            {
+	                player.SetProperty(PropertyFloat.MinimumTimeSincePk, -PropertyManager.GetDouble("pk_new_character_grace_period").Item);
+	                player.SetProperty(PropertyInt.PlayerKillerStatus, (int)PlayerKillerStatus.NPK);
+	            }
+	        }
 
             if (player is Sentinel || player is Admin)
             {

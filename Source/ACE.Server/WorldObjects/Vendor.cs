@@ -178,12 +178,18 @@ namespace ACE.Server.WorldObjects
             // add to existing stack?
             if (existing.Count > 0)
             {
-                var stackLeft = existing.FirstOrDefault(i => (i.StackSize ?? 1) < (i.MaxStackSize ?? 1));
-                if (stackLeft != null)
-                {
-                    stackLeft.SetStackSize((stackLeft.StackSize ?? 1) + 1);
-                    return;
-                }
+                // vendors do not respect MaxStackSize, this fixes items such as mortar and pestles having a lot of entries.
+                var stack = existing.First();
+                stack.MaxStackSize = (ushort)((stack.StackSize ?? 1) + (item.StackSize ?? 1));
+                stack.SetStackSize((stack.StackSize ?? 1) + (item.StackSize ?? 1));
+                return;
+
+                //var stackLeft = existing.FirstOrDefault(i => (i.StackSize ?? 1) < (i.MaxStackSize ?? 1));
+                //if (stackLeft != null)
+                //{
+                //    stackLeft.SetStackSize((stackLeft.StackSize ?? 1) + 1);
+                //    return;
+                //}
             }
 
             // create new item

@@ -142,7 +142,7 @@ namespace ACE.Server.WorldObjects.Managers
                 case EmoteType.AwardNoShareXP:
 
                     if (player != null)
-                        player.EarnXP(emote.Amount64 ?? emote.Amount ?? 0, XpType.Quest, ShareType.None);
+                        player.EarnXP(emote.Amount64 ?? emote.Amount ?? 0, XpType.Quest, player.Level, ShareType.None);
 
                     break;
 
@@ -172,9 +172,9 @@ namespace ACE.Server.WorldObjects.Managers
                     if (player != null)
                     {
                         var amt = emote.Amount64 ?? emote.Amount ?? 0;
-                        if (amt > 0)
+                        if (amt > 0 || Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.CustomDM)
                         {
-                            player.EarnXP(amt, XpType.Quest, ShareType.All);
+                            player.EarnXP(amt, XpType.Quest, player.Level, ShareType.All);
                         }
                         else if (amt < 0)
                         {

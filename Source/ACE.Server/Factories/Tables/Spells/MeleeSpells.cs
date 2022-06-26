@@ -38,6 +38,16 @@ namespace ACE.Server.Factories.Tables
 
         static MeleeSpells()
         {
+            if(Common.ConfigManager.Config.Server.WorldRuleset == Ruleset.CustomDM)
+            {
+                weaponMeleeSpells = new List<(SpellId, float)>()
+                {
+                    ( SpellId.DefenderSelf1,     0.25f ),
+                    //( SpellId.BloodDrinkerSelf1, 1.00f ),
+                    ( SpellId.SwiftKillerSelf1,  0.30f ),
+                    ( SpellId.HeartSeekerSelf1,  0.25f ),
+                };
+            }
             // takes ~0.3ms
             BuildSpells();
         }
