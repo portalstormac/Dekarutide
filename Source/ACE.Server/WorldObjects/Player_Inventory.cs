@@ -2805,8 +2805,13 @@ namespace ACE.Server.WorldObjects
                 {
                     Session.Network.EnqueueSend(new GameMessageSetStackSize(targetStack));
 
-                    if (targetStackWasEquipped && (targetStack.WeenieType == WeenieType.Ammunition || targetStack.WeenieType == WeenieType.Missile) && Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.CustomDM)
-                        Session.Network.EnqueueSend(new GameMessagePrivateUpdatePropertyInt(this, PropertyInt.EncumbranceVal, EncumbranceVal ?? 0));
+                    if (Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.CustomDM)
+                    {
+                        if (targetStackWasEquipped && (targetStack.WeenieType == WeenieType.Ammunition || targetStack.WeenieType == WeenieType.Missile))
+                            Session.Network.EnqueueSend(new GameMessagePrivateUpdatePropertyInt(this, PropertyInt.EncumbranceVal, EncumbranceVal ?? 0));
+                        else if (sourceStackWasEquipped && (sourceStack.WeenieType == WeenieType.Ammunition || sourceStack.WeenieType == WeenieType.Missile))
+                            Session.Network.EnqueueSend(new GameMessagePrivateUpdatePropertyInt(this, PropertyInt.EncumbranceVal, EncumbranceVal ?? 0));
+                    }
                 }
             }
             else // The merge will reduce the size of the source stack
