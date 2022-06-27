@@ -43,6 +43,12 @@ namespace ACE.Server.Network.Handlers
                             break;
                     }
                 }
+
+                if (session.DatWarnPortal || session.DatWarnCell || session.DatWarnLanguage)
+                {
+                    session.Terminate(SessionTerminationReason.ClientOutOfDate, new GameMessageBootAccount(" because you do not have the correct data files for this server"));
+                    return;
+                }
             }
 
             GameMessageDDDEndDDD patchStatusMessage = new GameMessageDDDEndDDD();
