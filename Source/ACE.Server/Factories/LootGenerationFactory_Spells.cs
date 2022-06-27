@@ -51,13 +51,16 @@ namespace ACE.Server.Factories
                 roll.ItemDifficulty += RollEnchantmentDifficulty(enchantments);
             }
 
-            var cantrips = RollCantrips(wo, profile, roll);
-
-            if (cantrips != null)
+            if (Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.EoR || (!roll.IsJewelry && !roll.IsClothing))
             {
-                spells.AddRange(cantrips);
+                var cantrips = RollCantrips(wo, profile, roll);
 
-                roll.ItemDifficulty += RollCantripDifficulty(cantrips);
+                if (cantrips != null)
+                {
+                    spells.AddRange(cantrips);
+
+                    roll.ItemDifficulty += RollCantripDifficulty(cantrips);
+                }
             }
 
             return spells;
