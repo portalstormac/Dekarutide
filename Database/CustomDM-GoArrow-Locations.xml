@@ -10821,7 +10821,7 @@
     <id>678</id>
     <latitude>36.7</latitude>
     <longitude>75.8</longitude>
-    <name>SE Shoushi Outpost</name>
+    <name>Shoushi Outpost Lifestone</name>
     <type>Lifestone</type>
     <arrival_latitude>0</arrival_latitude>
     <arrival_longitude>0</arrival_longitude>
@@ -15161,7 +15161,7 @@
     <id>950</id>
     <latitude>36.6</latitude>
     <longitude>75.9</longitude>
-    <name>Shoushi East Outpost</name>
+    <name>Shoushi Southeast Outpost</name>
     <type>Outpost</type>
     <arrival_latitude>0</arrival_latitude>
     <arrival_longitude>0</arrival_longitude>

@@ -190,9 +190,9 @@ namespace ACE.Server.WorldObjects
             var maxLevel = GetMaxLevel();
             var maxLevelXp = xpTable.CharacterLevelXPList[(int)maxLevel];
 
-            bool allowXpAtMaxLevel = Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.Infiltration;
-            var totalXpCap = (Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.EoR ? 0 : maxLevelXp); // 0 disables the xp cap
-            var availableXpCap = (Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.EoR ? 0 : uint.MaxValue); // 0 disables the xp cap
+            bool allowXpAtMaxLevel = PropertyManager.GetBool("allow_xp_at_max_level").Item;
+            var totalXpCap = (Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.EoR ? long.MaxValue : maxLevelXp); // 0 disables the xp cap
+            var availableXpCap = (Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.EoR ? long.MaxValue : uint.MaxValue); // 0 disables the xp cap
 
             if (Level != maxLevel || allowXpAtMaxLevel)
             {
