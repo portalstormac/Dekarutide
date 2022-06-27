@@ -496,6 +496,7 @@ namespace ACE.Server.Managers
                 PropertyManager.ModifyBool("item_dispel", true);
                 PropertyManager.ModifyBool("vendor_shop_uses_generator", true);
                 PropertyManager.ModifyBool("allow_xp_at_max_level", true);
+                PropertyManager.ModifyBool("show_dat_warning", true);
 
                 PropertyManager.ModifyLong("max_level", 126);                
             }
@@ -504,6 +505,7 @@ namespace ACE.Server.Managers
                 PropertyManager.ModifyBool("item_dispel", true);
                 PropertyManager.ModifyBool("vendor_shop_uses_generator", true);
                 PropertyManager.ModifyBool("allow_xp_at_max_level", true);
+                PropertyManager.ModifyBool("show_dat_warning", true);
 
                 PropertyManager.ModifyLong("max_level", 126);
             }
