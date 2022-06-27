@@ -1412,10 +1412,7 @@ namespace ACE.Server.Factories
         public static WorldObject CreateAndMutateWcid(TreasureDeath treasureDeath, TreasureRoll treasureRoll, bool isMagical)
         {
             WorldObject wo = null;
-
-            if (treasureRoll.WeaponType == TreasureWeaponType.Thrown)
-                wo.SetStackSize(30);
-                
+              
             if (treasureRoll.ItemType != TreasureItemType_Orig.Scroll)
             {
                 wo = WorldObjectFactory.CreateNewWorldObject((uint)treasureRoll.Wcid);
@@ -1425,6 +1422,9 @@ namespace ACE.Server.Factories
                     log.Error($"CreateAndMutateWcid({treasureDeath.TreasureType}, {(int)treasureRoll.Wcid} - {treasureRoll.Wcid}, {treasureRoll.GetItemType()}, {isMagical}) - failed to create item");
                     return null;
                 }
+
+                if (treasureRoll.WeaponType == TreasureWeaponType.Thrown)
+                    wo.SetStackSize(30);
 
                 treasureRoll.BaseArmorLevel = wo.ArmorLevel ?? 0;
             }
