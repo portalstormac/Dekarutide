@@ -116,6 +116,18 @@ namespace ACE.Server.WorldObjects
             }
         }
 
+        public bool ToggleTauntSetting()
+        {
+            if (Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.CustomDM)
+            {
+                bool newtSetting = !GetCharacterOptions2(CharacterOptions2.NotUsed1);
+                SetCharacterOptions2(CharacterOptions2.NotUsed1, newtSetting);
+
+                return newtSetting;
+            }
+            return false;
+        }
+
 
         // =====================================
         // CharacterPropertiesContract

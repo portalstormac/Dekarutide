@@ -717,11 +717,11 @@ namespace ACE.Server.WorldObjects
             set { if (value) RemoveProperty(PropertyBool.OpenForBusiness); else SetProperty(PropertyBool.OpenForBusiness, value); }
         }
 
-        public int? MerchandiseItemTypes
-        {
-            get => GetProperty(PropertyInt.MerchandiseItemTypes);
-            set { if (!value.HasValue) RemoveProperty(PropertyInt.MerchandiseItemTypes); else SetProperty(PropertyInt.MerchandiseItemTypes, value.Value); }
-        }
+        //public int? MerchandiseItemTypes
+        //{
+        //    get => GetProperty(PropertyInt.MerchandiseItemTypes);
+        //    set { if (!value.HasValue) RemoveProperty(PropertyInt.MerchandiseItemTypes); else SetProperty(PropertyInt.MerchandiseItemTypes, value.Value); }
+        //}
 
         public int? MerchandiseMinValue
         {
