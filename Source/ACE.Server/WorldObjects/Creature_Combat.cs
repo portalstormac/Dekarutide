@@ -1084,7 +1084,7 @@ namespace ACE.Server.WorldObjects
             else if (skill.AdvancementClass == SkillAdvancementClass.Untrained || skill.AdvancementClass == SkillAdvancementClass.Inactive)
                 return;
 
-            Entity.CreatureSkill defenseSkill = GetCreatureSkill(Skill.Deception);
+            Entity.CreatureSkill defenseSkill = target.GetCreatureSkill(Skill.Deception);
 
             var avoidChance = 1.0f - SkillCheck.GetSkillChance(skill.Current, defenseSkill.Current);
 

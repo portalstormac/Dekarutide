@@ -210,6 +210,11 @@ namespace ACE.Server.WorldObjects
         {
             return Inventory.Values.Count(wo => wo.UseBackpackSlot);
         }
+        public int? MerchandiseItemTypes
+        {
+            get => GetProperty(PropertyInt.MerchandiseItemTypes);
+            set { if (!value.HasValue) RemoveProperty(PropertyInt.MerchandiseItemTypes); else SetProperty(PropertyInt.MerchandiseItemTypes, value.Value); }
+        }
 
         public int GetFreeInventorySlots(bool includeSidePacks = true)
         {
