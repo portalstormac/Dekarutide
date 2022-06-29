@@ -650,7 +650,8 @@ namespace ACE.Server.WorldObjects
                         {
                             foreach (var obj in CurrentLandblock.GetAllWorldObjectsForDiagnostics())
                             {
-                                if ((obj.ItemType == ItemType.LifeStone || obj.ItemType == ItemType.Portal) && PhysicsObj.get_distance_to_object(obj.PhysicsObj, true) < 50)
+                                PlayerKillerStatus pkStatus = (PlayerKillerStatus)(obj.GetProperty(ACE.Entity.Enum.Properties.PropertyInt.PlayerKillerStatus) ?? 0);
+                                if ((obj.ItemType == ItemType.LifeStone || obj.ItemType == ItemType.Portal || pkStatus == PlayerKillerStatus.Vendor || pkStatus == PlayerKillerStatus.RubberGlue) && PhysicsObj.get_distance_to_object(obj.PhysicsObj, true) < 50)
                                 {
                                     GeneratorDisabled = true;
                                     GeneratorEnteredWorld = true;
