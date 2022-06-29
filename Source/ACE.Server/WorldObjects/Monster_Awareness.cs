@@ -157,6 +157,12 @@ namespace ACE.Server.WorldObjects
                         target.Session.Network.EnqueueSend(new GameMessageSystemChat($"You falter in your attempt at taunting {Name}.", ChatMessageType.CombatSelf));
                         targetDistances.Remove(targetDistances.Single(r => r.Target == AttackTarget));
                     }
+                    else if (target.attacksReceivedPerSecond >= skill.Current / 50.0f)
+                    {
+                        // We're too busy to keep this taunt going, remove from targetDistances to incentivize the monster to switch targets.
+                        target.Session.Network.EnqueueSend(new GameMessageSystemChat($"You're too busy to keep taunting {Name}!", ChatMessageType.CombatSelf));
+                        targetDistances.Remove(targetDistances.Single(r => r.Target == AttackTarget));
+                    }
                     else
                     {
                         Entity.CreatureSkill defenseSkill;
@@ -204,6 +210,12 @@ namespace ACE.Server.WorldObjects
                         continue;
                     else if (skill.AdvancementClass == SkillAdvancementClass.Untrained || skill.AdvancementClass == SkillAdvancementClass.Inactive)
                         continue;
+
+                    if (target.attacksReceivedPerSecond >= skill.Current / 50.0f)
+                    {
+                        target.Session.Network.EnqueueSend(new GameMessageSystemChat($"You're too busy with your current targets to attempt to taunt any others!", ChatMessageType.CombatSelf));
+                        continue;
+                    }
 
                     Entity.CreatureSkill defenseSkill;
                     if (target.CreatureType == ACE.Entity.Enum.CreatureType.Human)
@@ -333,10 +345,9 @@ namespace ACE.Server.WorldObjects
 
                 //Console.WriteLine($"{Name}.FindNextTarget = {AttackTarget.Name}");
 
-				//Is this fix still necessary? Reenable if players complain of being attacked by invisible monsters.
-                //Player player = AttackTarget as Player;
-                //if (player != null && player.AddTrackedObject(this))
-                //    log.Error($"Fixed invisible attacker on player {player.Name}. (Landblock:{CurrentLandblock.Id} - {Name} ({Guid})");
+                Player player = AttackTarget as Player;
+                if (player != null && player.AddTrackedObject(this))
+                    log.Error($"Fixed invisible attacker on player {player.Name}. (Landblock:{CurrentLandblock.Id} - {Name} ({Guid})");
 
                 if (AttackTarget != null && AttackTarget != prevAttackTarget)
                     EmoteManager.OnNewEnemy(AttackTarget);

@@ -101,6 +101,8 @@ namespace ACE.Server.WorldObjects
                     if (!damageEvent.Evaded)
                         TryCastAssessCreatureAndPersonDebuffs(target, CombatType.Melee);
 
+                    target.OnAttackReceived(this, CombatType.Melee, damageEvent.IsCritical);
+
                     //var damage = CalculateDamage(ref damageType, maneuver, bodyPart, ref critical, ref shieldMod);
 
                     if (damageEvent.HasDamage)
