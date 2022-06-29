@@ -66,7 +66,8 @@ namespace ACE.Server.WorldObjects
                 actionChain.EnqueueChain();
             }
 
-            HandlePreOrderItems();
+            if (Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.EoR)
+                HandlePreOrderItems();
 
             // SendSelf will trigger the entrance into portal space
             SendSelf();
