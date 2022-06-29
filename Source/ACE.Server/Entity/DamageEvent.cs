@@ -249,6 +249,18 @@ namespace ACE.Server.Entity
             var attackSkill = attacker.GetCreatureSkill(attacker.GetCurrentWeaponSkill());
             CriticalChance = WorldObject.GetWeaponCriticalChance(Weapon, attacker, attackSkill, defender);
 
+            if (Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.CustomDM)
+            {
+                if (playerAttacker != null)
+                {
+                    // A full power/accuracy bar gives an extra 6% critical chance
+                    if (Weapon == null || !Weapon.IsAmmoLauncher)
+                        CriticalChance += playerAttacker.PowerLevel * 0.06f; // Power bar
+                    else
+                        CriticalChance += playerAttacker.AccuracyLevel * 0.06f; // Accuracy bar
+                }
+            }
+
             // https://asheron.fandom.com/wiki/Announcements_-_2002/08_-_Atonement
             // It should be noted that any time a character is logging off, PK or not, all physical attacks against them become automatically critical.
             // (Note that spells do not share this behavior.) We hope this will stress the need to log off in a safe place.
