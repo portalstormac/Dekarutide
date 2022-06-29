@@ -27852,7 +27852,7 @@
     <latitude>-43.7</latitude>
     <longitude>-67</longitude>
     <name>Hea Toneawa</name>
-    <type>Landmark</type>
+    <type>NPC</type>
     <arrival_latitude>0</arrival_latitude>
     <arrival_longitude>0</arrival_longitude>
     <description>Hea Toneawa tells you, Greetings! Could you do me a favor, please? I planned to meet my beloved, Aun Mariona, but I am afraid that my Hea brethren have learned of our romance and are watching over me. Could you take her this note? I dare not go meet her myself, lest they slay us together. You will find her in the redwood groves almost directly north from the city your kind calls Bluespire. I have written the directions to our meeting place on the note.
@@ -52977,6 +52977,22 @@ This tree grows atop the large cataracts overlooking the Chapel on Xi Ru's Islan
     </description>
     <date_added>2021-01-31T19:00:00.0000000-03:00</date_added>
     <last_update>2021-01-31T19:00:00.0000000-03:00</last_update>
+    <dungeon_id>
+    </dungeon_id>
+    <retired>N</retired>
+    <tod_req>0</tod_req>
+  </location>
+  <location>
+    <id>3165</id>
+    <latitude>-41.1</latitude>
+    <longitude>-74.4</longitude>
+    <name>Aun Bernawa</name>
+    <type>NPC</type>
+    <arrival_latitude>0</arrival_latitude>
+    <arrival_longitude>0</arrival_longitude>
+    <description></description>
+    <date_added>2004-06-13T18:19:54.0200000-07:00</date_added>
+    <last_update>2005-02-16T17:14:19.0970000-08:00</last_update>
     <dungeon_id>
     </dungeon_id>
     <retired>N</retired>
