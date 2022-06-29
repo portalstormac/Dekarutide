@@ -308,11 +308,13 @@ namespace ACE.Server.WorldObjects
 
             var damage = CalculateDamage(ProjectileSource, creatureTarget, ref critical, ref critDefended, ref overpower);
 
+            creatureTarget.OnAttackReceived(sourceCreature, CombatType.Magic, critical);
+
             if (damage != null)
             {
 				if(sourceCreature != null)
                     sourceCreature.TryCastAssessCreatureAndPersonDebuffs(creatureTarget, CombatType.Magic);
-                    
+
                 if (Spell.MetaSpellType == ACE.Entity.Enum.SpellType.EnchantmentProjectile)
                 {
                     // handle EnchantmentProjectile successfully landing on target

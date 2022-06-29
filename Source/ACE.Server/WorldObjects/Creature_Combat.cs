@@ -570,6 +570,14 @@ namespace ACE.Server.WorldObjects
         }
 
         /// <summary>
+        /// Called when a creature receives an attack, evaded or not
+        /// </summary>
+        public virtual void OnAttackReceived(WorldObject attacker, CombatType attackType, bool critical)
+        {
+            numRecentAttacksReceived++;
+        }
+
+        /// <summary>
         /// Returns the current attack height as an enumerable string
         /// </summary>
         public string GetAttackHeight()

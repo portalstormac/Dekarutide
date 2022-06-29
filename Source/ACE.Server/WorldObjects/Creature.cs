@@ -54,6 +54,12 @@ namespace ACE.Server.WorldObjects
         public Dictionary<uint, int> ammoHitWith;
 
         /// <summary>
+        /// A decaying count of attacks this creature has received recently.
+        /// </summary>
+        public int numRecentAttacksReceived;
+        public float attacksReceivedPerSecond;
+
+        /// <summary>
         /// Currently used to handle some edge cases for faction mobs
         /// DamageHistory.HasDamager() has the following issues:
         /// - if a player attacks a same-factioned mob but is evaded, the mob would quickly de-aggro
@@ -148,6 +154,9 @@ namespace ACE.Server.WorldObjects
             selectedTargets = new Dictionary<uint, WorldObjectInfo>();
 
             ammoHitWith = new Dictionary<uint, int>();
+
+            numRecentAttacksReceived = 0;
+            attacksReceivedPerSecond = 0.0f;
         }
 
         public override void BeforeEnterWorld()
