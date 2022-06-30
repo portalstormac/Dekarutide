@@ -858,6 +858,28 @@ namespace ACE.Server.Factories.Tables.Wcids
                     ( WeenieClassName.buckler,                 1.0f ),
 
                     ( WeenieClassName.capleather,              1.0f ),
+
+                    ( WeenieClassName.cowlleather,             1.0f ),
+                    ( WeenieClassName.basinetleather,          1.0f ),
+
+                    ( WeenieClassName.gauntletsleather,        2.0f ),
+                    ( WeenieClassName.bootsleather,            2.0f ),
+
+                    ( WeenieClassName.coatleather,             1.0f ),
+                    ( WeenieClassName.cuirassleather,          1.0f ),
+                    ( WeenieClassName.shirtleather,            1.0f ),
+                    ( WeenieClassName.breastplateleather,      1.0f ),
+
+                    ( WeenieClassName.girthleather,            1.0f ),
+
+                    ( WeenieClassName.leggingsleather,         1.0f ),
+                    ( WeenieClassName.tassetsleather,          1.0f ),
+                    ( WeenieClassName.greavesleather,          1.0f ),
+
+                    ( WeenieClassName.sleevesleather,          1.0f ),
+                    ( WeenieClassName.pauldronsleather,        1.0f ),
+                    ( WeenieClassName.bracersleather,          1.0f ),
+
                     ( WeenieClassName.cowlleathernew,          1.0f ),
                     ( WeenieClassName.basinetleathernew,       1.0f ),
 
@@ -946,6 +968,7 @@ namespace ACE.Server.Factories.Tables.Wcids
                     ( WeenieClassName.helmhorned,           1.0f ),
                     ( WeenieClassName.helmet,               1.0f ),
                     ( WeenieClassName.armet,                1.0f ),
+                    ( WeenieClassName.heaume,               1.0f ),
                     ( WeenieClassName.heaumenew,            1.0f ),
 
                     ( WeenieClassName.gauntletsplatemail,   2.0f ),
@@ -974,6 +997,7 @@ namespace ACE.Server.Factories.Tables.Wcids
                     ( WeenieClassName.baigha,               1.0f ),
                     ( WeenieClassName.helmet,               1.0f ),
                     ( WeenieClassName.armet,                1.0f ),
+                    ( WeenieClassName.heaume,               1.0f ),
                     ( WeenieClassName.heaumenew,            1.0f ),
                     ( WeenieClassName.basinetscalemail,     1.0f ),
 
@@ -1004,6 +1028,7 @@ namespace ACE.Server.Factories.Tables.Wcids
                     ( WeenieClassName.kabuton,            1.0f ),
                     ( WeenieClassName.helmet,             1.0f ),
                     ( WeenieClassName.armet,              1.0f ),
+                    ( WeenieClassName.heaume,             1.0f ),
                     ( WeenieClassName.heaumenew,          1.0f ),
 
                     ( WeenieClassName.gauntletsplatemail, 2.0f ),

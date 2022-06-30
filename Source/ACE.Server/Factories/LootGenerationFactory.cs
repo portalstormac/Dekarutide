@@ -1425,6 +1425,14 @@ namespace ACE.Server.Factories
 
                 if (treasureRoll.WeaponType == TreasureWeaponType.Thrown)
                     wo.SetStackSize(30);
+                else if (wo.ItemType == ItemType.SpellComponents)
+                {
+                    uint componentId = wo.GetProperty(PropertyDataId.SpellComponent) ?? 0;
+                    if ((componentId > 6 && componentId < 49) || (componentId > 62 && componentId < 75)) // herbs, powders, potions and tapers
+                        wo.SetStackSize(2 * treasureDeath.Tier);
+                    else if((wo.GetProperty(PropertyDataId.SpellComponent) ?? 0) < 63) // scarabs and talismans
+                        wo.SetStackSize(treasureDeath.Tier);
+                }
 
                 treasureRoll.BaseArmorLevel = wo.ArmorLevel ?? 0;
             }

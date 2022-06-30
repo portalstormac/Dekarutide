@@ -133,11 +133,18 @@ namespace ACE.Server.Factories.Tables.Wcids
             {
                 StaffWcids_Aluvian_T1 = new ChanceTable<WeenieClassName>(ChanceTableType.Weight)
                 {
+                    ( WeenieClassName.quarterstaff,             1.0f ),
                     ( WeenieClassName.quarterstaffnew,          1.0f ),
                 };
 
                 StaffWcids_Aluvian = new ChanceTable<WeenieClassName>(ChanceTableType.Weight)
                 {
+                    ( WeenieClassName.quarterstaff,           16.0f ),
+                    ( WeenieClassName.quarterstaffacid,        1.0f ),
+                    ( WeenieClassName.quarterstaffelectric,    1.0f ),
+                    ( WeenieClassName.quarterstaffflame,       1.0f ),
+                    ( WeenieClassName.quarterstafffrost,       1.0f ),
+
                     ( WeenieClassName.quarterstaffnew,        16.0f ),
                     ( WeenieClassName.quarterstaffacidnew,     1.0f ),
                     ( WeenieClassName.quarterstaffelectricnew, 1.0f ),
@@ -147,11 +154,18 @@ namespace ACE.Server.Factories.Tables.Wcids
 
                 StaffWcids_Gharundim_T1 = new ChanceTable<WeenieClassName>(ChanceTableType.Weight)
                 {
+                    ( WeenieClassName.nabut,                  1.0f ),
                     ( WeenieClassName.nabutnew,               1.0f ),
                 };
 
                 StaffWcids_Gharundim = new ChanceTable<WeenieClassName>(ChanceTableType.Weight)
                 {
+                    ( WeenieClassName.nabut,           16.0f ),
+                    ( WeenieClassName.nabutacid,        1.0f ),
+                    ( WeenieClassName.nabutelectric,    1.0f ),
+                    ( WeenieClassName.nabutfire,        1.0f ),
+                    ( WeenieClassName.nabutfrost,       1.0f ),
+
                     ( WeenieClassName.nabutnew,        16.0f ),
                     ( WeenieClassName.nabutacidnew,     1.0f ),
                     ( WeenieClassName.nabutelectricnew, 1.0f ),
@@ -161,11 +175,18 @@ namespace ACE.Server.Factories.Tables.Wcids
 
                 StaffWcids_Sho_T1 = new ChanceTable<WeenieClassName>(ChanceTableType.Weight)
                 {
+                    ( WeenieClassName.jo,                  1.0f ),
                     ( WeenieClassName.jonew,               1.0f ),
                 };
 
                 StaffWcids_Sho = new ChanceTable<WeenieClassName>(ChanceTableType.Weight)
                 {
+                    ( WeenieClassName.jo,           16.0f ),
+                    ( WeenieClassName.joacid,        1.0f ),
+                    ( WeenieClassName.joelectric,    1.0f ),
+                    ( WeenieClassName.jofire,        1.0f ),
+                    ( WeenieClassName.jofrost,       1.0f ),
+
                     ( WeenieClassName.jonew,        16.0f ),
                     ( WeenieClassName.joacidnew,     1.0f ),
                     ( WeenieClassName.joelectricnew, 1.0f ),
