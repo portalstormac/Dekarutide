@@ -31,6 +31,9 @@ namespace ACE.Server.Factories
 
         private static void MutateDinnerware(WorldObject wo, TreasureDeath profile, bool isMagical, TreasureRoll roll = null)
         {
+            if (wo.WeenieType != WeenieType.Missile) 
+                return; // If we're not a throwable dinnerware we don't need mutating
+
             // dinnerware did not have its Damage / DamageVariance / WeaponSpeed mutated
 
             // material type

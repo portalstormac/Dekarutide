@@ -78,6 +78,68 @@ namespace ACE.Server.Factories.Tables.Wcids
 
         static GenericWcids()
         {
+            if (Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.CustomDM)
+            {
+                T1_T2_Chances = new ChanceTable<WeenieClassName>(ChanceTableType.Weight)
+                {
+                    ( WeenieClassName.bowl,              9.0f ),
+                    ( WeenieClassName.cup,              14.0f ),
+                    ( WeenieClassName.ewer,              3.0f ),
+                    ( WeenieClassName.flagon,            8.0f ),
+                    ( WeenieClassName.flasksimple,      13.0f ),
+                    ( WeenieClassName.goblet,            7.0f ),
+                    ( WeenieClassName.mug,              12.0f ),
+                    ( WeenieClassName.dinnerplate,       8.0f ),
+                    ( WeenieClassName.stoup,            13.0f ),
+                    ( WeenieClassName.tankard,          13.0f ),
+
+                    ( WeenieClassName.longsticks,       15.0f ),
+                    ( WeenieClassName.shortsticks,      15.0f ),
+                };
+
+                T3_T4_Chances = new ChanceTable<WeenieClassName>(ChanceTableType.Weight)
+                {
+                    ( WeenieClassName.bowl,              8.0f ),
+                    ( WeenieClassName.chalice,           6.0f ),
+                    ( WeenieClassName.cup,               5.0f ),
+                    ( WeenieClassName.ewer,             11.0f ),
+                    ( WeenieClassName.flagon,           11.0f ),
+                    ( WeenieClassName.flasksimple,       5.0f ),
+                    ( WeenieClassName.goblet,           14.0f ),
+                    ( WeenieClassName.mug,              14.0f ),
+                    ( WeenieClassName.ornamentalbowl,    8.0f ),
+                    ( WeenieClassName.dinnerplate,       8.0f ),
+                    ( WeenieClassName.stoup,             5.0f ),
+                    ( WeenieClassName.tankard,           5.0f ),
+
+                    ( WeenieClassName.longsticks,       15.0f ),
+                    ( WeenieClassName.shortsticks,      15.0f ),
+                };
+
+                T5_T6_Chances = new ChanceTable<WeenieClassName>(ChanceTableType.Weight)
+                {
+                    ( WeenieClassName.chalice,          23.0f ),
+                    ( WeenieClassName.ewer,             13.0f ),
+                    ( WeenieClassName.flagon,            9.0f ),
+                    ( WeenieClassName.goblet,           23.0f ),
+                    ( WeenieClassName.ornamentalbowl,   19.0f ),
+                    ( WeenieClassName.dinnerplate,      13.0f ),
+
+                    ( WeenieClassName.longsticks,       15.0f ),
+                    ( WeenieClassName.shortsticks,      15.0f ),
+                };
+
+                tierChances = new List<ChanceTable<WeenieClassName>>()
+                {
+                    T1_T2_Chances,
+                    T1_T2_Chances,
+                    T3_T4_Chances,
+                    T3_T4_Chances,
+                    T5_T6_Chances,
+                    T5_T6_Chances,
+                };
+            }
+
             foreach (var tierChance in tierChances)
             {
                 foreach (var entry in tierChance)
