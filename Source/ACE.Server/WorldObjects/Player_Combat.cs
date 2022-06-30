@@ -172,6 +172,8 @@ namespace ACE.Server.WorldObjects
             if (!damageEvent.Evaded)
                 TryCastAssessCreatureAndPersonDebuffs(target, (damageSource == null || damageSource.ProjectileSource == null) ? CombatType.Melee : CombatType.Missile);
 
+            target.OnAttackReceived(this, CombatType.Melee, damageEvent.IsCritical);
+
             if (damageEvent.HasDamage)
             {
                 OnDamageTarget(target, damageEvent.CombatType, damageEvent.IsCritical);
