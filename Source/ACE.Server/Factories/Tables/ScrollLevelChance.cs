@@ -57,6 +57,9 @@ namespace ACE.Server.Factories.Tables
 
         public static int Roll(TreasureDeath profile)
         {
+            if (Common.ConfigManager.Config.Server.WorldRuleset <= Common.Ruleset.Infiltration && profile.TreasureType == 338) // Steel Chest
+                return 7;
+
             var table = scrollLevelChances[profile.Tier - 1];
 
             return table.Roll(profile.LootQualityMod);

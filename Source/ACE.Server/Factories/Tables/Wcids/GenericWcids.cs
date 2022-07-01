@@ -93,8 +93,46 @@ namespace ACE.Server.Factories.Tables.Wcids
                     ( WeenieClassName.stoup,            13.0f ),
                     ( WeenieClassName.tankard,          13.0f ),
 
-                    ( WeenieClassName.longsticks,       15.0f ),
-                    ( WeenieClassName.shortsticks,      15.0f ),
+                    ( WeenieClassName.tinkeringtool,       5.0f ),
+                    ( WeenieClassName.toolsplitting,       5.0f ),
+
+                    ( WeenieClassName.bakingpan,           5.0f ),
+                    ( WeenieClassName.cookingpot,          5.0f ),
+                    ( WeenieClassName.whittlingknife,      5.0f ),
+                    ( WeenieClassName.heavygrinder,        5.0f ),
+                    ( WeenieClassName.carvingknife,        5.0f ),
+                    ( WeenieClassName.fryingpan,           5.0f ),
+                    ( WeenieClassName.metalpress,          5.0f ),
+                    ( WeenieClassName.noodlecutter,        5.0f ),
+                    ( WeenieClassName.skewer,              5.0f ),
+                    ( WeenieClassName.toolfletchingbarbed, 5.0f ),
+
+                    ( WeenieClassName.longsticks,         15.0f ),
+                    ( WeenieClassName.shortsticks,        15.0f ),
+
+                    ( WeenieClassName.arrowshaft,             5.0f ),
+                    ( WeenieClassName.quarrelshaft,           5.0f ),
+                    ( WeenieClassName.atlatldartshaft,        5.0f ),
+                    ( WeenieClassName.arrowhead,              5.0f ),
+                    ( WeenieClassName.arrowhead,              5.0f ),
+                    ( WeenieClassName.arrowheadblunt,         5.0f ),
+                    ( WeenieClassName.arrowheadbroad,         5.0f ),
+                    ( WeenieClassName.arrowheadfrogcrotch,    5.0f ),
+                    ( WeenieClassName.arrowheadarmorpiercing, 5.0f ),
+
+                    ( WeenieClassName.dart,                   5.0f ),
+                    ( WeenieClassName.axethrowing,            5.0f ),
+                    ( WeenieClassName.clubthrowing,           5.0f ),
+                    ( WeenieClassName.daggerthrowing,         5.0f ),
+                    ( WeenieClassName.javelin,                5.0f ),
+                    ( WeenieClassName.shuriken,               5.0f ),
+                    ( WeenieClassName.djarid,                 5.0f ),
+
+                    ( WeenieClassName.alembic,                5.0f ),
+                    ( WeenieClassName.eyedropper,             5.0f ),
+                    ( WeenieClassName.mortarandpestle,        5.0f ),
+                    ( WeenieClassName.aquaincanta,            5.0f ),
+                    ( WeenieClassName.neutralbalm,            5.0f ),
                 };
 
                 T3_T4_Chances = new ChanceTable<WeenieClassName>(ChanceTableType.Weight)
@@ -112,8 +150,46 @@ namespace ACE.Server.Factories.Tables.Wcids
                     ( WeenieClassName.stoup,             5.0f ),
                     ( WeenieClassName.tankard,           5.0f ),
 
-                    ( WeenieClassName.longsticks,       15.0f ),
-                    ( WeenieClassName.shortsticks,      15.0f ),
+                    ( WeenieClassName.tinkeringtool,       5.0f ),
+                    ( WeenieClassName.toolsplitting,       5.0f ),
+
+                    ( WeenieClassName.bakingpan,           5.0f ),
+                    ( WeenieClassName.cookingpot,          5.0f ),
+                    ( WeenieClassName.whittlingknife,      5.0f ),
+                    ( WeenieClassName.heavygrinder,        5.0f ),
+                    ( WeenieClassName.carvingknife,        5.0f ),
+                    ( WeenieClassName.fryingpan,           5.0f ),
+                    ( WeenieClassName.metalpress,          5.0f ),
+                    ( WeenieClassName.noodlecutter,        5.0f ),
+                    ( WeenieClassName.skewer,              5.0f ),
+                    ( WeenieClassName.toolfletchingbarbed, 5.0f ),
+
+                    ( WeenieClassName.longsticks,         15.0f ),
+                    ( WeenieClassName.shortsticks,        15.0f ),
+
+                    ( WeenieClassName.arrowshaft,             5.0f ),
+                    ( WeenieClassName.quarrelshaft,           5.0f ),
+                    ( WeenieClassName.atlatldartshaft,        5.0f ),
+                    ( WeenieClassName.arrowhead,              5.0f ),
+                    ( WeenieClassName.arrowhead,              5.0f ),
+                    ( WeenieClassName.arrowheadblunt,         5.0f ),
+                    ( WeenieClassName.arrowheadbroad,         5.0f ),
+                    ( WeenieClassName.arrowheadfrogcrotch,    5.0f ),
+                    ( WeenieClassName.arrowheadarmorpiercing, 5.0f ),
+
+                    ( WeenieClassName.dart,                   5.0f ),
+                    ( WeenieClassName.axethrowing,            5.0f ),
+                    ( WeenieClassName.clubthrowing,           5.0f ),
+                    ( WeenieClassName.daggerthrowing,         5.0f ),
+                    ( WeenieClassName.javelin,                5.0f ),
+                    ( WeenieClassName.shuriken,               5.0f ),
+                    ( WeenieClassName.djarid,                 5.0f ),
+
+                    ( WeenieClassName.alembic,                5.0f ),
+                    ( WeenieClassName.eyedropper,             5.0f ),
+                    ( WeenieClassName.mortarandpestle,        5.0f ),
+                    ( WeenieClassName.aquaincanta,            5.0f ),
+                    ( WeenieClassName.neutralbalm,            5.0f ),
                 };
 
                 T5_T6_Chances = new ChanceTable<WeenieClassName>(ChanceTableType.Weight)
@@ -125,8 +201,46 @@ namespace ACE.Server.Factories.Tables.Wcids
                     ( WeenieClassName.ornamentalbowl,   19.0f ),
                     ( WeenieClassName.dinnerplate,      13.0f ),
 
-                    ( WeenieClassName.longsticks,       15.0f ),
-                    ( WeenieClassName.shortsticks,      15.0f ),
+                    ( WeenieClassName.tinkeringtool,       5.0f ),
+                    ( WeenieClassName.toolsplitting,       5.0f ),
+
+                    ( WeenieClassName.bakingpan,           5.0f ),
+                    ( WeenieClassName.cookingpot,          5.0f ),
+                    ( WeenieClassName.whittlingknife,      5.0f ),
+                    ( WeenieClassName.heavygrinder,        5.0f ),
+                    ( WeenieClassName.carvingknife,        5.0f ),
+                    ( WeenieClassName.fryingpan,           5.0f ),
+                    ( WeenieClassName.metalpress,          5.0f ),
+                    ( WeenieClassName.noodlecutter,        5.0f ),
+                    ( WeenieClassName.skewer,              5.0f ),
+                    ( WeenieClassName.toolfletchingbarbed, 5.0f ),
+
+                    ( WeenieClassName.longsticks,         15.0f ),
+                    ( WeenieClassName.shortsticks,        15.0f ),
+
+                    ( WeenieClassName.arrowshaft,             5.0f ),
+                    ( WeenieClassName.quarrelshaft,           5.0f ),
+                    ( WeenieClassName.atlatldartshaft,        5.0f ),
+                    ( WeenieClassName.arrowhead,              5.0f ),
+                    ( WeenieClassName.arrowhead,              5.0f ),
+                    ( WeenieClassName.arrowheadblunt,         5.0f ),
+                    ( WeenieClassName.arrowheadbroad,         5.0f ),
+                    ( WeenieClassName.arrowheadfrogcrotch,    5.0f ),
+                    ( WeenieClassName.arrowheadarmorpiercing, 5.0f ),
+
+                    ( WeenieClassName.dart,                   5.0f ),
+                    ( WeenieClassName.axethrowing,            5.0f ),
+                    ( WeenieClassName.clubthrowing,           5.0f ),
+                    ( WeenieClassName.daggerthrowing,         5.0f ),
+                    ( WeenieClassName.javelin,                5.0f ),
+                    ( WeenieClassName.shuriken,               5.0f ),
+                    ( WeenieClassName.djarid,                 5.0f ),
+
+                    ( WeenieClassName.alembic,                5.0f ),
+                    ( WeenieClassName.eyedropper,             5.0f ),
+                    ( WeenieClassName.mortarandpestle,        5.0f ),
+                    ( WeenieClassName.aquaincanta,            5.0f ),
+                    ( WeenieClassName.neutralbalm,            5.0f ),
                 };
 
                 tierChances = new List<ChanceTable<WeenieClassName>>()
