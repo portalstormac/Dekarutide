@@ -4,6 +4,7 @@ using System.Linq;
 using ACE.Common;
 using ACE.Database.Models.World;
 using ACE.Entity.Enum;
+using ACE.Entity.Enum.Properties;
 using ACE.Server.Entity;
 using ACE.Server.Factories.Entity;
 using ACE.Server.Factories.Tables;
@@ -31,9 +32,6 @@ namespace ACE.Server.Factories
 
         private static void MutateDinnerware(WorldObject wo, TreasureDeath profile, bool isMagical, TreasureRoll roll = null)
         {
-            if (wo.WeenieType != WeenieType.Missile) 
-                return; // If we're not a throwable dinnerware we don't need mutating
-
             // dinnerware did not have its Damage / DamageVariance / WeaponSpeed mutated
 
             // material type

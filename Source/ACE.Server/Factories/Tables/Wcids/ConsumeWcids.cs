@@ -104,7 +104,7 @@ namespace ACE.Server.Factories.Tables.Wcids
         
         static ConsumeWcids()
         {
-            if (Common.ConfigManager.Config.Server.WorldRuleset <= Common.Ruleset.Infiltration)
+            if (Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.Infiltration)
             {
                 T1_Chances = new ChanceTable<WeenieClassName>()
                 {
@@ -124,6 +124,102 @@ namespace ACE.Server.Factories.Tables.Wcids
                     ( WeenieClassName.healthpotion,    0.04f ),
                     ( WeenieClassName.manapotion,      0.04f ),
                     ( WeenieClassName.staminatincture, 0.04f ),
+                };
+
+                consumeTiers = new List<ChanceTable<WeenieClassName>>()
+                {
+                    T1_Chances,
+                    T2_Chances,
+                    T3_Chances,
+                    T4_Chances,
+                    T5_Chances,
+                    T6_T8_Chances,
+                    T6_T8_Chances,
+                    T6_T8_Chances,
+                };
+            }
+            else if (Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.CustomDM)
+            {
+                T1_Chances = new ChanceTable<WeenieClassName>(ChanceTableType.Weight)
+                {
+                    ( WeenieClassName.apple,              2.0f ),
+                    ( WeenieClassName.bread,              2.0f ),
+                    ( WeenieClassName.cabbage,            2.0f ),
+                    ( WeenieClassName.cheese,             2.0f ),
+                    ( WeenieClassName.chicken,            2.0f ),
+                    ( WeenieClassName.egg,                2.0f ),
+                    ( WeenieClassName.fish,               2.0f ),
+                    ( WeenieClassName.grapes,             2.0f ),
+                    ( WeenieClassName.beefside,           2.0f ),
+                    ( WeenieClassName.mushroom,           2.0f ),
+                    ( WeenieClassName.healthdraught,      3.0f ),
+                    ( WeenieClassName.manadraught,        3.0f ),
+                    ( WeenieClassName.staminadraught,     3.0f ),
+                    ( WeenieClassName.healthpotion,       1.0f ),
+                    ( WeenieClassName.manapotion,         1.0f ),
+                    ( WeenieClassName.staminapotion,      1.0f ),
+                };
+
+                T2_Chances = new ChanceTable<WeenieClassName>(ChanceTableType.Weight)
+                {
+                    ( WeenieClassName.healthdraught,      1.0f ),
+                    ( WeenieClassName.manadraught,        1.0f ),
+                    ( WeenieClassName.staminapotion,      1.0f ),
+                    ( WeenieClassName.healthpotion,       2.0f ),
+                    ( WeenieClassName.manapotion,         2.0f ),
+                    ( WeenieClassName.staminapotion,      2.0f ),
+                    ( WeenieClassName.healthtincture,     1.0f ),
+                    ( WeenieClassName.manatincture,       1.0f ),
+                    ( WeenieClassName.staminatincture,    1.0f ),
+                };
+
+                T3_Chances = new ChanceTable<WeenieClassName>(ChanceTableType.Weight)
+                {
+                    ( WeenieClassName.healthpotion,       1.0f ),
+                    ( WeenieClassName.manapotion,         1.0f ),
+                    ( WeenieClassName.staminapotion,      1.0f ),
+                    ( WeenieClassName.healthtincture,     2.0f ),
+                    ( WeenieClassName.manatincture,       2.0f ),
+                    ( WeenieClassName.staminatincture,    2.0f ),
+                    ( WeenieClassName.healthelixir,       1.0f ),
+                    ( WeenieClassName.manaelixir,         1.0f ),
+                    ( WeenieClassName.staminaelixir,      1.0f ),
+                };
+
+                T4_Chances = new ChanceTable<WeenieClassName>(ChanceTableType.Weight)
+                {
+                    ( WeenieClassName.healthtincture,     1.0f ),
+                    ( WeenieClassName.manatincture,       1.0f ),
+                    ( WeenieClassName.staminatincture,    1.0f ),
+                    ( WeenieClassName.healthelixir,       2.0f ),
+                    ( WeenieClassName.manaelixir,         2.0f ),
+                    ( WeenieClassName.staminaelixir,      2.0f ),
+                    ( WeenieClassName.healthtonic,        1.0f ),
+                    ( WeenieClassName.manatonic,          1.0f ),
+                    ( WeenieClassName.staminatonic,       1.0f ),
+                };
+
+                T5_Chances = new ChanceTable<WeenieClassName>(ChanceTableType.Weight)
+                {
+                    ( WeenieClassName.healthelixir,       1.0f ),
+                    ( WeenieClassName.manaelixir,         1.0f ),
+                    ( WeenieClassName.staminaelixir,      1.0f ),
+                    ( WeenieClassName.healthtonic,        2.0f ),
+                    ( WeenieClassName.manatonic,          2.0f ),
+                    ( WeenieClassName.staminatonic,       2.0f ),
+                    ( WeenieClassName.healthphiltre,      1.0f ),
+                    ( WeenieClassName.manaphiltre,        1.0f ),
+                    ( WeenieClassName.staminaphiltre,     1.0f ),
+                };
+
+                T6_T8_Chances = new ChanceTable<WeenieClassName>(ChanceTableType.Weight)
+                {
+                    ( WeenieClassName.healthtonic,        1.0f ),
+                    ( WeenieClassName.manatonic,          1.0f ),
+                    ( WeenieClassName.staminatonic,       1.0f ),
+                    ( WeenieClassName.healthphiltre,      3.0f ),
+                    ( WeenieClassName.manaphiltre,        3.0f ),
+                    ( WeenieClassName.staminaphiltre,     3.0f ),
                 };
 
                 consumeTiers = new List<ChanceTable<WeenieClassName>>()

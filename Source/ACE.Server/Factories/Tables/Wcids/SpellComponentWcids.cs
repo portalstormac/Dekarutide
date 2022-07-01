@@ -418,11 +418,7 @@ namespace ACE.Server.Factories.Tables.Wcids
             {
                 T1_Chances = new ChanceTable<WeenieClassName>(ChanceTableType.Weight)
                 {
-                    ( WeenieClassName.scarablead,     10.0f ),
-                    ( WeenieClassName.peascarablead,   1.0f ),
-
-                    ( WeenieClassName.aquaincanta,     5.0f ),
-                    ( WeenieClassName.neutralbalm,     5.0f ),
+                    ( WeenieClassName.scarablead,      1.0f ),
                 };
 
                 T2_Chances = new ChanceTable<WeenieClassName>(ChanceTableType.Weight)
@@ -432,10 +428,6 @@ namespace ACE.Server.Factories.Tables.Wcids
 
                     ( WeenieClassName.peascarablead,   1.0f ),
                     ( WeenieClassName.peascarabiron,   1.0f ),
-
-                    ( WeenieClassName.aquaincanta,     5.0f ),
-                    ( WeenieClassName.concentratedaquaincanta,     0.5f ),
-                    ( WeenieClassName.neutralbalm,     5.0f ),
                 };
 
                 T3_Chances = new ChanceTable<WeenieClassName>(ChanceTableType.Weight)
@@ -447,10 +439,6 @@ namespace ACE.Server.Factories.Tables.Wcids
                     ( WeenieClassName.peascarablead,   1.0f ),
                     ( WeenieClassName.peascarabiron,   2.0f ),
                     ( WeenieClassName.peascarabcopper, 1.0f ),
-
-                    ( WeenieClassName.aquaincanta,     5.0f ),
-                    ( WeenieClassName.concentratedaquaincanta,     0.5f ),
-                    ( WeenieClassName.neutralbalm,     5.0f ),
                 };
 
                 T4_Chances = new ChanceTable<WeenieClassName>(ChanceTableType.Weight)
@@ -462,10 +450,6 @@ namespace ACE.Server.Factories.Tables.Wcids
                     ( WeenieClassName.peascarabiron,   1.0f ),
                     ( WeenieClassName.peascarabcopper, 2.0f ),
                     ( WeenieClassName.peascarabsilver, 1.0f ),
-
-                    ( WeenieClassName.aquaincanta,     5.0f ),
-                    ( WeenieClassName.concentratedaquaincanta,     0.5f ),
-                    ( WeenieClassName.neutralbalm,     5.0f ),
                 };
 
                 T5_Chances = new ChanceTable<WeenieClassName>(ChanceTableType.Weight)
@@ -477,10 +461,6 @@ namespace ACE.Server.Factories.Tables.Wcids
                     ( WeenieClassName.peascarabcopper, 1.0f ),
                     ( WeenieClassName.peascarabsilver, 2.0f ),
                     ( WeenieClassName.peascarabgold,   1.0f ),
-
-                    ( WeenieClassName.aquaincanta,     5.0f ),
-                    ( WeenieClassName.concentratedaquaincanta,     0.5f ),
-                    ( WeenieClassName.neutralbalm,     5.0f ),
                 };
 
                 T6_T8_Chances = new ChanceTable<WeenieClassName>(ChanceTableType.Weight)
@@ -492,10 +472,6 @@ namespace ACE.Server.Factories.Tables.Wcids
                     ( WeenieClassName.peascarabsilver, 1.0f ),
                     ( WeenieClassName.peascarabgold,   2.0f ),
                     ( WeenieClassName.peascarabpyreal, 1.0f ),
-
-                    ( WeenieClassName.aquaincanta,     5.0f ),
-                    ( WeenieClassName.concentratedaquaincanta,     0.5f ),
-                    ( WeenieClassName.neutralbalm,     5.0f ),
                 };
 
                 peaTiers = new List<ChanceTable<WeenieClassName>>()
