@@ -195,7 +195,7 @@ namespace ACE.Server.Factories
 
                 if (tweakedFor is Chest)
                 {
-                    //some overrides to make chests more interesting, ideally this should be done in the data but as a quick tweak this will do.
+                    // Some overrides to make chests more interesting, ideally this should be done in the data but as a quick tweak this will do.
                     tweakedDeathTreasure = new Database.Models.World.TreasureDeath(deathTreasure);
                     if (tweakedDeathTreasure.LootQualityMod < 0.2f)
                         tweakedDeathTreasure.LootQualityMod = 0.2f;
@@ -209,6 +209,21 @@ namespace ACE.Server.Factories
                     if (tweakedDeathTreasure.MagicItemMaxAmount == 1)
                         tweakedDeathTreasure.MagicItemMaxAmount = 3;
                     tweakedDeathTreasure.MagicItemMaxAmount = (int)Math.Ceiling(tweakedDeathTreasure.MagicItemMaxAmount * 1.5);
+
+                    // Add some scrolls to chest loot.
+                    var treasureRoll = new TreasureRoll(TreasureItemType_Orig.Scroll);
+                    Chest chest = tweakedFor as Chest;
+                    int numScrolls = ThreadSafeRandom.Next(1, 3);
+                    for (var i = 0; i < numScrolls; i++)
+                    {
+                        treasureRoll.Wcid = ScrollWcids.Roll();
+                        var scroll = CreateAndMutateWcid(tweakedDeathTreasure, treasureRoll, true);
+                        if (scroll != null)
+                        {
+                            if (!chest.TryAddToInventory(scroll))
+                                scroll.Destroy();
+                        }
+                    }
 
                     return tweakedDeathTreasure;
                 }
