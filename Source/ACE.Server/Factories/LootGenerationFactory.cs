@@ -210,18 +210,23 @@ namespace ACE.Server.Factories
                         tweakedDeathTreasure.MagicItemMaxAmount = 3;
                     tweakedDeathTreasure.MagicItemMaxAmount = (int)Math.Ceiling(tweakedDeathTreasure.MagicItemMaxAmount * 1.5);
 
-                    // Add some scrolls to chest loot.
-                    var treasureRoll = new TreasureRoll(TreasureItemType_Orig.Scroll);
-                    Chest chest = tweakedFor as Chest;
-                    int numScrolls = ThreadSafeRandom.Next(1, 3);
-                    for (var i = 0; i < numScrolls; i++)
+                    if (Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.CustomDM)
                     {
-                        treasureRoll.Wcid = ScrollWcids.Roll();
-                        var scroll = CreateAndMutateWcid(tweakedDeathTreasure, treasureRoll, true);
-                        if (scroll != null)
+                        // Add some scrolls to chest loot.
+                        var treasureRoll = new TreasureRoll(TreasureItemType_Orig.Scroll);
+                        Chest chest = tweakedFor as Chest;
+                        int numScrolls = 1;
+                        if (ThreadSafeRandom.Next(1, 10) > 8)
+                            numScrolls = 2;
+                        for (var i = 0; i < numScrolls; i++)
                         {
-                            if (!chest.TryAddToInventory(scroll))
-                                scroll.Destroy();
+                            treasureRoll.Wcid = ScrollWcids.Roll();
+                            var scroll = CreateAndMutateWcid(tweakedDeathTreasure, treasureRoll, true);
+                            if (scroll != null)
+                            {
+                                if (!chest.TryAddToInventory(scroll))
+                                    scroll.Destroy();
+                            }
                         }
                     }
 
