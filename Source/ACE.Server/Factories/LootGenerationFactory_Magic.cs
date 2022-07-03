@@ -646,6 +646,26 @@ namespace ACE.Server.Factories
             return spellcraft;
         }
 
+        public static int GetSpellPower(Server.Entity.Spell spell)
+        {
+            if (Common.ConfigManager.Config.Server.WorldRuleset <= Common.Ruleset.Infiltration)
+            {
+                switch (spell.Formula.Level)
+                {
+                    case 1: return 20; // EoR is 1
+                    case 2: return 50; // EoR is 50
+                    case 3: return 75; // EoR is 100
+                    case 4: return 125; // EoR is 150
+                    case 5: return 150; // EoR is 200
+                    case 6: return 180; // EoR is 250
+                    default:
+                    case 7: return 200; // EoR is 300
+                }
+            }
+            else
+                return (int)spell.Power;
+        }
+
         /// <summary>
         /// Returns the maximum power from the spells in item's SpellDID / spellbook
         /// </summary>
@@ -657,8 +677,9 @@ namespace ACE.Server.Factories
             {
                 var spell = new Server.Entity.Spell(wo.SpellDID.Value);
 
-                if (spell.Power > maxSpellPower)
-                    maxSpellPower = (int)spell.Power;
+                int spellPower = GetSpellPower(spell);
+                if (spellPower > maxSpellPower)
+                    maxSpellPower = spellPower;
             }
 
             if (wo.Biota.PropertiesSpellBook != null)
@@ -667,12 +688,11 @@ namespace ACE.Server.Factories
                 {
                     var spell = new Server.Entity.Spell(spellId);
 
-                    if (spell.Power > maxSpellPower)
-                        maxSpellPower = (int)spell.Power;
+                    int spellPower = GetSpellPower(spell);
+                    if (spellPower > maxSpellPower)
+                        maxSpellPower = spellPower;
                 }
             }
-
-            maxSpellPower = Math.Max(maxSpellPower, 20); // Balance to make level I spell items have non-trivial arcane lore requirements.
 
             return maxSpellPower;
         }
