@@ -1785,6 +1785,12 @@ namespace ACE.Server.WorldObjects
             set { if (!value.HasValue) RemoveProperty(PropertyInt.UseCreatesContractId); else SetProperty(PropertyInt.UseCreatesContractId, value.Value); }
         }
 
+        public int? TacticAndTechniqueId
+        {
+            get => GetProperty(PropertyInt.TacticAndTechniqueId);
+            set { if (!value.HasValue) RemoveProperty(PropertyInt.TacticAndTechniqueId); else SetProperty(PropertyInt.TacticAndTechniqueId, value.Value); }
+        }
+
         /// <summary>
         /// Unix time this object was created
         /// </summary>

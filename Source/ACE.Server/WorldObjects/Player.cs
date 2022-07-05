@@ -202,6 +202,8 @@ namespace ACE.Server.WorldObjects
             if (!PlayerKillsPkl.HasValue)
                 PlayerKillsPkl = 0;
 
+            AttackType = AttackType.Punch;
+
             return; // todo
 
             // =======================================

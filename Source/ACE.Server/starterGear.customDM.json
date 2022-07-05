@@ -26,7 +26,14 @@
         },
         {
             "id": "20",
-            "name": "Deception"
+            "name": "Deception",
+            "gear": [
+                {
+                    "weenieId": "50046",
+                    "name": "Combat Tactic: Taunt",
+                    "stacksize": "1"
+                }
+            ]
         },
         {
             "id": "21",
@@ -61,6 +68,11 @@
                 {
                     "weenieId": "5084",
                     "name": "Calling Stone",
+                    "stacksize": "1"
+                },
+                {
+                    "weenieId": "50045",
+                    "name": "Combat Manual",
                     "stacksize": "1"
                 }
             ],

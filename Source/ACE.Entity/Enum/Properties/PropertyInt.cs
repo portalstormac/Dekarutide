@@ -629,6 +629,10 @@ namespace ACE.Entity.Enum.Properties
         /// </summary>
         [ServerOnly]
         InventoryOrder                          = 9015,
+
+        // CustomDM
+        [ServerOnly]
+        TacticAndTechniqueId                     = 10000,
     }
 
     public static class PropertyIntExtensions

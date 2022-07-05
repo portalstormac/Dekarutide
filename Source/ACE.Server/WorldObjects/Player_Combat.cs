@@ -93,6 +93,24 @@ namespace ACE.Server.WorldObjects
         }
 
         /// <summary>
+        /// Called when a player receives an attack, evaded or not
+        /// </summary>
+        public override void OnAttackReceived(WorldObject attacker, CombatType attackType, bool critical, bool avoided)
+        {
+            if (Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.CustomDM && CombatMode == CombatMode.Melee && avoided && AttackTarget == attacker)
+            {
+                Creature creatureAttacker = attacker as Creature;
+                if (creatureAttacker != null && 0.3f > ThreadSafeRandom.Next(0.0f, 1.0f)) // 30% chance of striking back at the target when successfully evading an attack while using the Riposte technique.
+                {
+                    var techniqueTrinket = GetEquippedTrinket();
+                    if (techniqueTrinket != null && techniqueTrinket.TacticAndTechniqueId == (int)TacticAndTechniqueType.Riposte)
+                        DamageTarget(creatureAttacker, GetEquippedMeleeWeapon());
+                }
+            }
+            base.OnAttackReceived(attacker, attackType, critical, avoided);
+        }
+
+        /// <summary>
         /// Returns the highest melee skill for the player
         /// (light / heavy / finesse)
         /// </summary>
@@ -169,10 +187,7 @@ namespace ACE.Server.WorldObjects
 
             var damageEvent = DamageEvent.CalculateDamage(this, target, damageSource);
 
-            if (!damageEvent.Evaded)
-                TryCastAssessCreatureAndPersonDebuffs(target, (damageSource == null || damageSource.ProjectileSource == null) ? CombatType.Melee : CombatType.Missile);
-
-            target.OnAttackReceived(this, CombatType.Melee, damageEvent.IsCritical);
+            target.OnAttackReceived(this, (damageSource == null || damageSource.ProjectileSource == null) ? CombatType.Melee : CombatType.Missile, damageEvent.IsCritical, damageEvent.Evaded);
 
             if (damageEvent.HasDamage)
             {
@@ -201,7 +216,12 @@ namespace ACE.Server.WorldObjects
                 var intDamage = (uint)Math.Round(damageEvent.Damage);
 
                 if (!SquelchManager.Squelches.Contains(this, ChatMessageType.CombatSelf))
-                    Session.Network.EnqueueSend(new GameEventAttackerNotification(Session, target.Name, damageEvent.DamageType, (float)intDamage / target.Health.MaxValue, intDamage, damageEvent.IsCritical, damageEvent.AttackConditions));
+                {
+                    if(this != target)
+                        Session.Network.EnqueueSend(new GameEventAttackerNotification(Session, target.Name, damageEvent.DamageType, (float)intDamage / target.Health.MaxValue, intDamage, damageEvent.IsCritical, damageEvent.AttackConditions));
+                    else
+                        Session.Network.EnqueueSend(new GameEventAttackerNotification(Session, "yourself", damageEvent.DamageType, (float)intDamage / target.Health.MaxValue, intDamage, damageEvent.IsCritical, damageEvent.AttackConditions));
+                }
 
                 // splatter effects
                 if (targetPlayer == null)
@@ -634,9 +654,9 @@ namespace ACE.Server.WorldObjects
             // send network messages
             if (source is Creature creature)
             {
-                if (!SquelchManager.Squelches.Contains(source, ChatMessageType.CombatEnemy))
+                if (!SquelchManager.Squelches.Contains(source, ChatMessageType.CombatEnemy) && this != creature)
                     Session.Network.EnqueueSend(new GameEventDefenderNotification(Session, creature.Name, damageType, percent, amount, damageLocation, crit, attackConditions));
-
+    
                 var hitSound = new GameMessageSound(Guid, GetHitSound(source, bodyPart), 1.0f);
                 var splatter = new GameMessageScript(Guid, (PlayScript)Enum.Parse(typeof(PlayScript), "Splatter" + creature.GetSplatterHeight() + creature.GetSplatterDir(this)));
                 EnqueueBroadcast(hitSound, splatter);
