@@ -682,19 +682,5 @@ namespace ACE.Server.Command.Handlers
 
             return false;
         }
-
-        [CommandHandler("taunt", AccessLevel.Player, CommandHandlerFlag.RequiresWorld, "Toggles taunting opponents.")]
-        public static void HandleTaunt(Session session, params string[] parameters)
-        {
-            if (Common.ConfigManager.Config.Server.WorldRuleset != Common.Ruleset.CustomDM)
-                session.Network.EnqueueSend(new GameMessageSystemChat($"Unknown command: taunt", ChatMessageType.Help));
-            else
-            {
-                if (session.Player.ToggleTauntSetting())
-                    session.Network.EnqueueSend(new GameMessageSystemChat($"You will now start attempting to taunt opponents into attacking you.", ChatMessageType.Broadcast));
-                else
-                    session.Network.EnqueueSend(new GameMessageSystemChat($"You will no longer attempt to taunt opponents.", ChatMessageType.Broadcast));
-            }
-        }
     }
 }

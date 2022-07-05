@@ -572,8 +572,11 @@ namespace ACE.Server.WorldObjects
         /// <summary>
         /// Called when a creature receives an attack, evaded or not
         /// </summary>
-        public virtual void OnAttackReceived(WorldObject attacker, CombatType attackType, bool critical)
+        public virtual void OnAttackReceived(WorldObject attacker, CombatType attackType, bool critical, bool avoided)
         {
+            if(avoided)
+                TryCastAssessCreatureAndPersonDebuffs(this, attackType);
+
             numRecentAttacksReceived++;
         }
 
@@ -694,12 +697,23 @@ namespace ACE.Server.WorldObjects
             if (weapon != null && weapon.HasImbuedEffect(ImbuedEffectType.IgnoreAllArmor))
                 return 1.0f;
 
-            // is monster in front of player,
-            // within shield effectiveness area?
-            var effectiveAngle = 180.0f;
-            var angle = GetAngle(attacker);
-            if (Math.Abs(angle) > effectiveAngle / 2.0f)
-                return 1.0f;
+            bool bypassShieldAngleCheck = false;
+            if (Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.CustomDM)
+            {
+                var techniqueTrinket = GetEquippedTrinket();
+                if (techniqueTrinket != null && techniqueTrinket.TacticAndTechniqueId == (int)TacticAndTechniqueType.Defensive)
+                    bypassShieldAngleCheck = true; // Shields cover all angles while using the Defensive technique.
+            }
+
+            if (!bypassShieldAngleCheck)
+            {
+                // is monster in front of player,
+                // within shield effectiveness area?
+                var effectiveAngle = 180.0f;
+                var angle = GetAngle(attacker);
+                if (Math.Abs(angle) > effectiveAngle / 2.0f)
+                    return 1.0f;
+            }
 
             // get base shield AL
             var baseSL = shield.GetProperty(PropertyInt.ArmorLevel) ?? 0.0f;

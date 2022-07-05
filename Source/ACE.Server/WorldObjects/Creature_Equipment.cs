@@ -196,6 +196,11 @@ namespace ACE.Server.WorldObjects
             return EquippedObjects.Values.FirstOrDefault(e => e.CurrentWieldedLocation == EquipMask.MissileAmmo);
         }
 
+        public WorldObject GetEquippedTrinket()
+        {
+            return EquippedObjects.Values.FirstOrDefault(e => e.CurrentWieldedLocation == EquipMask.TrinketOne);
+        }
+
         /// <summary>
         /// Returns the ammo slot item for bows / atlatls,
         /// or the missile weapon for thrown weapons
