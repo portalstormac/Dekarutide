@@ -126,8 +126,17 @@ namespace ACE.Server.Factories
             wo.ItemMaxMana = RollItemMaxMana_New(wo, roll, castableMana);
             wo.ItemCurMana = wo.ItemMaxMana;
 
-            // verified
-            wo.ItemManaCost = castableMana;
+            if (Common.ConfigManager.Config.Server.WorldRuleset != Common.Ruleset.CustomDM)
+            {
+                // verified
+                wo.ItemManaCost = castableMana;
+            }
+            else
+            {
+                wo.ItemManaCost = (int)_spell.BaseMana;
+
+                AddActivationRequirements(wo, profile, roll);
+            }
 
             return true;
         }

@@ -191,7 +191,27 @@ namespace ACE.Server.WorldObjects
             if (UseSound > 0)
                 player.Session.Network.EnqueueSend(new GameMessageSound(player.Guid, UseSound));
 
-            if ((GetProperty(PropertyBool.UnlimitedUse) ?? false) == false)
+            if (Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.CustomDM)
+            {
+                if (GetProperty(PropertyBool.UnlimitedUse) ?? false)
+                    return;
+
+                int manaCost;
+
+                var manaConversion = player.GetCreatureSkill(Skill.ManaConversion);
+                if (manaConversion.AdvancementClass < SkillAdvancementClass.Trained)
+                    manaCost = (int)ItemManaCost;
+                else
+                    manaCost = (int)Player.GetManaCost((uint)ItemSpellcraft, (uint)ItemManaCost, manaConversion.Current);
+
+                ItemCurMana -= manaCost;
+
+                if (ItemCurMana <= 0)
+                    player.TryConsumeFromInventoryWithNetworking(this, 1);
+                else
+                    player.Session.Network.EnqueueSend(new GameMessagePublicUpdatePropertyInt(this, PropertyInt.ItemCurMana, (int)ItemCurMana));
+            }
+            else if ((GetProperty(PropertyBool.UnlimitedUse) ?? false) == false)
                 player.TryConsumeFromInventoryWithNetworking(this, 1);
         }
 

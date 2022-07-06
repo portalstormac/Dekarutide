@@ -201,7 +201,10 @@ namespace ACE.Server.WorldObjects
 
                 var addedValue = (int)Math.Round((item.Value ?? 0) * valueFactor);
 
-                salvageBag.Value = Math.Min((salvageBag.Value ?? 0) + addedValue, 75000);
+                if (Common.ConfigManager.Config.Server.WorldRuleset != Common.Ruleset.CustomDM)
+                    salvageBag.Value = Math.Min((salvageBag.Value ?? 0) + addedValue, 75000);
+                else
+                    salvageBag.Value = 0;
 
                 // a bit different here, since ACE handles overages
                 if (message != null)
