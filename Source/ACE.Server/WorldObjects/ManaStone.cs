@@ -197,11 +197,16 @@ namespace ACE.Server.WorldObjects
                     {
                         player.Session.Network.EnqueueSend(new GameMessageSystemChat($"The {target.Name} is already full of mana.", ChatMessageType.Broadcast));
                     }
-                    else
+                    else if(Common.ConfigManager.Config.Server.WorldRuleset != Common.Ruleset.CustomDM || target.WeenieType != WeenieType.Gem)
                     {
                         // The Mana Stone gives 3,502 points of mana to the Focusing Stone.
 
                         // The Mana Stone gives 3,267 points of mana to the Protective Drudge Charm.
+
+                        if (Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.CustomDM)
+                        {
+
+                        }
 
                         var targetManaNeeded = target.ItemMaxMana.Value - targetItemCurMana;
                         var manaToPour = Math.Min(targetManaNeeded, ItemCurMana.Value);
@@ -222,6 +227,8 @@ namespace ACE.Server.WorldObjects
                             SetUiEffect(player, ACE.Entity.Enum.UiEffects.Undef);
                         }
                     }
+                    else
+                        player.Session.Network.EnqueueSend(new GameMessageSystemChat($"The {target.Name} cannot be recharged.", ChatMessageType.Broadcast));
                 }
                 else
                 {
