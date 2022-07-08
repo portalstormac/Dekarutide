@@ -458,6 +458,63 @@ namespace ACE.Server.WorldObjects
                             // verify z-pos
                             if (blockDist == 0 && LastGroundPos != null && newPosition.PositionZ - LastGroundPos.PositionZ > 10 && DateTime.UtcNow - LastJumpTime > TimeSpan.FromSeconds(1) && GetCreatureSkill(Skill.Jump).Current < 1000)
                                 verifyContact = true;
+
+                            if (PropertyManager.GetBool("enforce_player_movement").Item)
+                            {
+                                // Check for illegal player movements.
+                                var loggingHasJumpedSinceLastMovementUpdate = HasJumpedSinceLastMovementUpdate;
+                                var loggingPrevMaxMovementSpeed = PrevMovementUpdateMaxSpeed;
+                                var loggingInertia = false;
+
+                                float deltaTime = (float)(DateTime.UtcNow - LastUpdatePosition).TotalSeconds;
+
+                                var dist = Location.DistanceTo(newPosition);
+                                float velocity = PhysicsObj.CachedVelocity.Length();
+                                float currentMaxSpeed;
+                                if (FastTick && velocity != 0.0f)
+                                {
+                                    var runRate = GetRunRate();
+                                    currentMaxSpeed = (1.8f * runRate * deltaTime * (1.0f + velocity / 8.0f)) + 5.0f;
+                                    if (runRate < 1.9f && PhysicsObj.CachedVelocity.Z < -20.0f) // Very slow characters can still fall pretty quickly.
+                                        currentMaxSpeed *= 2.5f;
+                                }
+                                else
+                                    currentMaxSpeed = (5.5f * GetRunRate() * deltaTime * (1.0f + velocity / 5.0f)) + 2.0f;
+
+                                var isPlayerInitiatedMovement = (CurrentMoveToState.RawMotionState.Flags & (RawMotionFlags.ForwardCommand | RawMotionFlags.SideStepCommand)) != 0;
+                                if (IsJumping || HasJumpedSinceLastMovementUpdate || isPlayerInitiatedMovement) // If we're jumping we're moving even if we're not pressing any keys.
+                                    LastPlayerInitiatedMovementTime = DateTime.UtcNow;
+
+                                if (!IsJumping)
+                                    HasJumpedSinceLastMovementUpdate = false; // Delay disabling this if we're jumping
+
+                                float timeSincePlayerInitiatedMovement = (float)(DateTime.UtcNow - LastPlayerInitiatedMovementTime).TotalSeconds;
+                                if (timeSincePlayerInitiatedMovement > 3.0f) // Give it a few seconds to resolve any inertia.
+                                    currentMaxSpeed = 3.0f; // We are standing still and we're not requesting any movements.
+                                else if (currentMaxSpeed < PrevMovementUpdateMaxSpeed && PrevMovementUpdateMaxSpeed > 25.0f)
+                                {
+                                    // We were going really fast and now we are slowing down but we might still have some inertia.
+                                    loggingInertia = true;
+                                    currentMaxSpeed = PrevMovementUpdateMaxSpeed * 0.5f;
+                                }
+                                PrevMovementUpdateMaxSpeed = currentMaxSpeed;
+
+                                if (dist > currentMaxSpeed)
+                                {
+                                    Session.Network.EnqueueSend(new GameMessageSystemChat("Invalid movement update detected. Rolling back to last good position.", ChatMessageType.Help));
+                                    Session.Network.EnqueueSend(new GameMessageSystemChat($"Speed: {dist.ToString("0.00")}/{currentMaxSpeed.ToString("0.00")} PrevMaxSpeed: {loggingPrevMaxMovementSpeed.ToString("0.00")}({loggingInertia}) FastTick: {FastTick} TimeSpam: {deltaTime.ToString("0.00")} Velocity: {velocity.ToString("0.00")} timeSincePlayerInitiatedMovement: {timeSincePlayerInitiatedMovement.ToString("0.00")} HasJumped: {loggingHasJumpedSinceLastMovementUpdate} IsJumping: {IsJumping}", ChatMessageType.Help));
+                                    log.Warn($"INVALID MOVEMENT DETECTED: {Name} - Speed: {dist.ToString("0.00")}/{currentMaxSpeed.ToString("0.00")} PrevMaxSpeed: {loggingPrevMaxMovementSpeed.ToString("0.00")}({loggingInertia}) FastTick: {FastTick} TimeSpam: {deltaTime.ToString("0.00")} Velocity: {velocity.ToString("0.00")} timeSincePlayerInitiatedMovement: {timeSincePlayerInitiatedMovement.ToString("0.00")} HasJumped: {loggingHasJumpedSinceLastMovementUpdate} IsJumping: {IsJumping}");
+                                    Location = new ACE.Entity.Position(SnapPos);
+                                    Sequences.GetNextSequence(SequenceType.ObjectForcePosition);
+                                    SendUpdatePosition();
+                                    return false;
+                                }
+                                //else
+                                //    Session.Network.EnqueueSend(new GameMessageSystemChat($"Speed: {dist.ToString("0.00")}/{currentMaxSpeed.ToString("0.00")} PrevMaxSpeed: {loggingPrevMaxMovementSpeed.ToString("0.00")}({loggingInertia}) FastTick: {FastTick} TimeSpam: {deltaTime.ToString("0.00")} Velocity: {velocity.ToString("0.00")} timeSincePlayerInitiatedMovement: {timeSincePlayerInitiatedMovement.ToString("0.00")} HasJumped: {loggingHasJumpedSinceLastMovementUpdate} IsJumping: {IsJumping}", ChatMessageType.Broadcast));
+
+                                if (!IsJumping && PhysicsObj.TransientState.HasFlag(TransientStateFlags.OnWalkable))
+                                    SnapPos = Location;
+                            }
                         }
 
                         var curCell = LScape.get_landcell(newPosition.Cell);
