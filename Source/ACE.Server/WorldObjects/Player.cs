@@ -45,6 +45,18 @@ namespace ACE.Server.WorldObjects
 
         public bool LastContact = true;
 
+        protected CampManager _campManager;
+
+        public CampManager CampManager
+        {
+            get
+            {
+                if (_campManager == null)
+                    _campManager = new CampManager(this);
+                return _campManager;
+            }
+        }
+
         public bool IsJumping
         {
             get

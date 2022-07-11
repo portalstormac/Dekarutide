@@ -597,6 +597,7 @@ namespace ACE.Database
             query.Include(r => r.CharacterPropertiesSpellBar).Load();
             query.Include(r => r.CharacterPropertiesSquelch).Load();
             query.Include(r => r.CharacterPropertiesTitleBook).Load();
+            query.Include(r => r.CharacterPropertiesCampRegistry).Load();
 
             foreach (var result in results)
                 CharacterContexts.Add(result, context);

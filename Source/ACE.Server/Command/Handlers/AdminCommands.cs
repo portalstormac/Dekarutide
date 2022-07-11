@@ -1928,6 +1928,9 @@ namespace ACE.Server.Command.Handlers
                             foreach (var entry in existingCharacter.CharacterPropertiesTitleBook)
                                 newCharacter.CharacterPropertiesTitleBook.Add(new Database.Models.Shard.CharacterPropertiesTitleBook { CharacterId = newPlayerGuid.Full, TitleId = entry.TitleId });
 
+                            foreach (var entry in existingCharacter.CharacterPropertiesCampRegistry)
+                                newCharacter.CharacterPropertiesCampRegistry.Add(new Database.Models.Shard.CharacterPropertiesCampRegistry { CharacterId = newPlayerGuid.Full, LastDecayTime = entry.LastDecayTime, NumInteractions = entry.NumInteractions, CampId = entry.CampId });
+
                             var idSwaps = new ConcurrentDictionary<uint, uint>();
 
                             var newPlayerBiota = Database.Adapter.BiotaConverter.ConvertToEntityBiota(existingPlayerBiota);

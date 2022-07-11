@@ -198,7 +198,6 @@ namespace ACE.Server.WorldObjects
 
                     // charge attack
                     MoveTo(target);
-                    HasJumpedOrChargedSinceLastMovementUpdate = true;
                 }
                 else
                 {
