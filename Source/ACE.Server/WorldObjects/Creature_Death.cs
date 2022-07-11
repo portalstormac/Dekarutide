@@ -192,10 +192,33 @@ namespace ACE.Server.WorldObjects
 
                 float totalXP;
 
-                if(Common.ConfigManager.Config.Server.WorldRuleset != Common.Ruleset.CustomDM)
+                if (Common.ConfigManager.Config.Server.WorldRuleset != Common.Ruleset.CustomDM)
                     totalXP = (XpOverride ?? 0) * damagePercent;
                 else
+                {
                     totalXP = GetCreatureDeathXP(Level ?? 0, (int)Health.MaxValue, Biota.PropertiesSpellBook?.Count ?? 0) * damagePercent;
+
+                    float typeCampBonus;
+                    float areaCampBonus;
+                    float restCampBonus;
+                    playerDamager.CampManager.HandleCampInteraction(this, out typeCampBonus, out areaCampBonus, out restCampBonus);
+
+                    //float halfXP = totalXP / 2.0f;
+                    //totalXP = halfXP + (halfXP / 3.0f * creatureTypeCampBonus) + (halfXP / 3.0f * areaCampBonus) + (halfXP / 3.0f * restCampBonus);
+
+                    float thirdXP = totalXP / 3.0f;
+                    totalXP = (thirdXP * typeCampBonus) + (thirdXP * areaCampBonus) + (thirdXP * restCampBonus);
+
+                    // Delay sending this message for one tick to make it appear after the kill message.
+                    var sendRestMessageChain = new ActionChain();
+                    sendRestMessageChain.AddDelayForOneTick();
+                    sendRestMessageChain.AddAction(this, () =>
+                    {
+                        playerDamager.Session.Network.EnqueueSend(new GameEventKillerNotification(playerDamager.Session, $"You've earned {(long)Math.Round(totalXP)} experience! T: {(typeCampBonus * 100).ToString("0")}% A: {(areaCampBonus * 100).ToString("0")}% R: {(restCampBonus * 100).ToString("0")}%"));
+                    });
+
+                    sendRestMessageChain.EnqueueChain();
+                }
 
                 playerDamager.EarnXP((long)Math.Round(totalXP), XpType.Kill, Level);
 

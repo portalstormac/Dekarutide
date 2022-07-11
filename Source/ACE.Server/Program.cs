@@ -173,6 +173,13 @@ namespace ACE.Server
                 log.Info($"Purged {numberOfBiotasPurged:N0} biotas.");
             }
 
+            if (ConfigManager.Config.Offline.PurgeExpiredCampEntries)
+            {
+                log.Info($"Purging expired camp entries...");
+                ShardDatabaseOfflineTools.PurgeExpiredCampEntries(out var numberOfEntriesPurged);
+                log.Info($"Purged {numberOfEntriesPurged:N0} camp entries.");
+            }
+
             if (ConfigManager.Config.Offline.PruneDeletedCharactersFromFriendLists)
             {
                 log.Info($"Pruning invalid friends from all friend lists...");

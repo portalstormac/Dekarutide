@@ -52,6 +52,7 @@ namespace ACE.Database.Models.Shard
         public virtual DbSet<CharacterPropertiesSpellBar> CharacterPropertiesSpellBar { get; set; }
         public virtual DbSet<CharacterPropertiesSquelch> CharacterPropertiesSquelch { get; set; }
         public virtual DbSet<CharacterPropertiesTitleBook> CharacterPropertiesTitleBook { get; set; }
+        public virtual DbSet<CharacterPropertiesCampRegistry> CharacterPropertiesCampRegistry { get; set; }
         public virtual DbSet<ConfigPropertiesBoolean> ConfigPropertiesBoolean { get; set; }
         public virtual DbSet<ConfigPropertiesDouble> ConfigPropertiesDouble { get; set; }
         public virtual DbSet<ConfigPropertiesLong> ConfigPropertiesLong { get; set; }
@@ -1454,6 +1455,38 @@ namespace ACE.Database.Models.Shard
                     .WithMany(p => p.CharacterPropertiesTitleBook)
                     .HasForeignKey(d => d.CharacterId)
                     .HasConstraintName("wcid_titlebook");
+            });
+
+            modelBuilder.Entity<CharacterPropertiesCampRegistry>(entity =>
+            {
+                entity.HasKey(e => new { e.CharacterId, e.CampId })
+                    .HasName("PRIMARY")
+                    .HasAnnotation("MySql:IndexPrefixLength", new[] { 0, 0 });
+
+                entity.ToTable("character_properties_camp_registry");
+
+                entity.HasComment("Camp Properties of Weenies");
+
+                entity.Property(e => e.CharacterId)
+                    .HasColumnName("character_Id")
+                    .HasComment("Id of the character this property belongs to");
+
+                entity.Property(e => e.CampId)
+                    .HasColumnName("camp_Id")
+                    .HasComment("Unique Id of Camp");
+
+                entity.Property(e => e.NumInteractions)
+                    .HasColumnName("num_Interactions")
+                    .HasComment("Number of interactions with this camp");
+
+                entity.Property(e => e.LastDecayTime)
+                    .HasColumnName("last_Decay_Time")
+                    .HasComment("Timestamp of last decay of the number of interactions in this camp");
+
+                entity.HasOne(d => d.Character)
+                    .WithMany(p => p.CharacterPropertiesCampRegistry)
+                    .HasForeignKey(d => d.CharacterId)
+                    .HasConstraintName("wcid_campRegistry");
             });
 
             modelBuilder.Entity<ConfigPropertiesBoolean>(entity =>

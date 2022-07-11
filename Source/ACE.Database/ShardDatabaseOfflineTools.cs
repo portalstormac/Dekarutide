@@ -264,6 +264,30 @@ namespace ACE.Database
                 PurgePlayer(context, playerId, out charactersPurged, out playerBiotasPurged, out possessionsPurged, reason);
         }
 
+        public static void PurgeExpiredCampEntries(out int entriesPurged)
+        {
+            entriesPurged = 0;
+
+            var context = new ShardDbContext();
+
+            var camps = context.CharacterPropertiesCampRegistry.ToList();
+            foreach (var camp in camps)
+            {
+                float decayRate = 60.0f; // The amount of seconds it takes for a kill to decay, make sure this matches the value used in CampManager
+
+                double secondsSinceLastCheck = Time.GetUnixTime() - camp.LastDecayTime;
+                uint amountToDecay = (uint)Math.Max(Math.Floor(secondsSinceLastCheck / decayRate), 0);
+                if (camp.NumInteractions < amountToDecay)
+                {
+                    context.CharacterPropertiesCampRegistry.Remove(camp);
+                    entriesPurged++;
+                }
+            }
+
+            // Save
+            context.SaveChanges();
+        }
+
 
         //public static readonly HashSet<WeenieType> NonPurgeableWeenieTypes = new HashSet<WeenieType>
         //{

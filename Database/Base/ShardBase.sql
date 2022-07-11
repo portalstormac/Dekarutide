@@ -687,6 +687,19 @@ CREATE TABLE `character_properties_quest_registry` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='QuestBook Properties of Weenies';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
+DROP TABLE IF EXISTS `character_properties_camp_registry`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `character_properties_camp_registry` (
+  `character_Id` int unsigned NOT NULL DEFAULT '0' COMMENT 'Id of the character this property belongs to',
+  `camp_Id` int unsigned  NOT NULL COMMENT 'Unique Id of Camp',
+  `num_Interactions` int NOT NULL DEFAULT '0' COMMENT 'Number of interactions with this camp',
+  `last_Decay_Time` int unsigned NOT NULL DEFAULT '0' COMMENT 'Timestamp of last decay of the number of interactions in this camp',
+  PRIMARY KEY (`character_Id`,`camp_Id`),
+  CONSTRAINT `wcid_campRegistry` FOREIGN KEY (`character_Id`) REFERENCES `character` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Camp Properties of Weenies';
+/*!40101 SET character_set_client = @saved_cs_client */;
+
 --
 -- Table structure for table `character_properties_shortcut_bar`
 --
