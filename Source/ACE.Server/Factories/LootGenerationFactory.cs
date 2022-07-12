@@ -1274,7 +1274,7 @@ namespace ACE.Server.Factories
 
         // new methods
 
-        public static TreasureRoll RollWcid(TreasureDeath treasureDeath, TreasureItemCategory category, TreasureItemType_Orig treasureItemType = TreasureItemType_Orig.Undef)
+        public static TreasureRoll RollWcid(TreasureDeath treasureDeath, TreasureItemCategory category, TreasureItemType_Orig treasureItemType = TreasureItemType_Orig.Undef, TreasureArmorType armorType = TreasureArmorType.Undef, TreasureWeaponType weaponType = TreasureWeaponType.Undef)
         {
             if (treasureItemType == TreasureItemType_Orig.Undef)
                 treasureItemType = RollItemType(treasureDeath, category);
@@ -1286,6 +1286,12 @@ namespace ACE.Server.Factories
             }
 
             var treasureRoll = new TreasureRoll(treasureItemType);
+
+            if (armorType != TreasureArmorType.Undef)
+                treasureRoll.ArmorType = armorType;
+
+            if (weaponType != TreasureWeaponType.Undef)
+                treasureRoll.WeaponType = weaponType;
 
             switch (treasureItemType)
             {
@@ -1314,13 +1320,15 @@ namespace ACE.Server.Factories
 
                 case TreasureItemType_Orig.Weapon:
 
-                    treasureRoll.WeaponType = WeaponTypeChance.Roll(treasureDeath.Tier);
+                    if(treasureRoll.WeaponType == TreasureWeaponType.Undef)
+                        treasureRoll.WeaponType = WeaponTypeChance.Roll(treasureDeath.Tier);
                     treasureRoll.Wcid = WeaponWcids.Roll(treasureDeath, ref treasureRoll.WeaponType);
                     break;
 
                 case TreasureItemType_Orig.Armor:
 
-                    treasureRoll.ArmorType = ArmorTypeChance.Roll(treasureDeath.Tier);
+                    if (treasureRoll.ArmorType == TreasureArmorType.Undef)
+                        treasureRoll.ArmorType = ArmorTypeChance.Roll(treasureDeath.Tier);
                     treasureRoll.Wcid = ArmorWcids.Roll(treasureDeath, ref treasureRoll.ArmorType);
                     break;
 
@@ -1420,9 +1428,9 @@ namespace ACE.Server.Factories
             return TreasureItemType_Orig.Undef;
         }
 
-        public static WorldObject CreateRandomLootObjects_New(TreasureDeath treasureDeath, TreasureItemCategory category, TreasureItemType_Orig treasureItemType = TreasureItemType_Orig.Undef)
+        public static WorldObject CreateRandomLootObjects_New(TreasureDeath treasureDeath, TreasureItemCategory category, TreasureItemType_Orig treasureItemType = TreasureItemType_Orig.Undef, TreasureArmorType armorType = TreasureArmorType.Undef, TreasureWeaponType weaponType = TreasureWeaponType.Undef)
         {
-            var treasureRoll = RollWcid(treasureDeath, category, treasureItemType);
+            var treasureRoll = RollWcid(treasureDeath, category, treasureItemType, armorType, weaponType);
 
             if (treasureRoll == null) return null;
 

@@ -2334,11 +2334,14 @@ namespace ACE.Server.Command.Handlers
             session.Player.TryCreateInInventoryWithNetworking(wo);
         }
 
-        [CommandHandler("lootgentype", AccessLevel.Developer, CommandHandlerFlag.RequiresWorld, 1, "Generate a piece of loot from the LootGenerationFactory.", "<TreasureItemType_Orig> <tier>")]
+        [CommandHandler("lootgentype", AccessLevel.Developer, CommandHandlerFlag.RequiresWorld, 1, "Generate a piece of loot from the LootGenerationFactory.", "<TreasureItemType_Orig> <tier> <TreasureArmorType|TreasureWeaponType>")]
         public static void HandleLootGenType(Session session, params string[] parameters)
         {
             TreasureItemType_Orig treasureType = TreasureItemType_Orig.Undef;
-            if (!Enum.TryParse(parameters[0], out treasureType))
+            TreasureArmorType armorType = TreasureArmorType.Undef;
+            TreasureWeaponType weaponType = TreasureWeaponType.Undef;
+
+            if (!Enum.TryParse(parameters[0], true, out treasureType))
             {
                 session.Network.EnqueueSend(new GameMessageSystemChat($"Couldn't find {parameters[0]}", ChatMessageType.Broadcast));
                 return;
@@ -2354,13 +2357,25 @@ namespace ACE.Server.Command.Handlers
                 return;
             }
 
+            if (parameters.Length > 2)
+            {
+                if (!Enum.TryParse(parameters[2], true, out armorType))
+                {
+                    if (!Enum.TryParse(parameters[2], true, out weaponType))
+                    {
+                        session.Network.EnqueueSend(new GameMessageSystemChat($"Couldn't find {parameters[2]}", ChatMessageType.Broadcast));
+                        return;
+                    }
+                }
+            }
+
             var profile = new TreasureDeath()
             {
                 Tier = tier,
-                LootQualityMod = 0,
+                LootQualityMod = 0
             };
 
-            var wo = LootGenerationFactory.CreateRandomLootObjects_New(profile, TreasureItemCategory.MagicItem, treasureType);
+            var wo = LootGenerationFactory.CreateRandomLootObjects_New(profile, TreasureItemCategory.MagicItem, treasureType, armorType, weaponType);
             if (wo != null)
                 session.Player.TryCreateInInventoryWithNetworking(wo);
             else
