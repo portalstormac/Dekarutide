@@ -2334,6 +2334,39 @@ namespace ACE.Server.Command.Handlers
             session.Player.TryCreateInInventoryWithNetworking(wo);
         }
 
+        [CommandHandler("lootgentype", AccessLevel.Developer, CommandHandlerFlag.RequiresWorld, 1, "Generate a piece of loot from the LootGenerationFactory.", "<TreasureItemType_Orig> <tier>")]
+        public static void HandleLootGenType(Session session, params string[] parameters)
+        {
+            TreasureItemType_Orig treasureType = TreasureItemType_Orig.Undef;
+            if (!Enum.TryParse(parameters[0], out treasureType))
+            {
+                session.Network.EnqueueSend(new GameMessageSystemChat($"Couldn't find {parameters[0]}", ChatMessageType.Broadcast));
+                return;
+            }
+
+            int tier = 1;
+            if (parameters.Length > 1)
+                int.TryParse(parameters[1], out tier);
+
+            if (tier < 1 || tier > 8)
+            {
+                session.Network.EnqueueSend(new GameMessageSystemChat($"Loot Tier must be a number between 1 and 8", ChatMessageType.Broadcast));
+                return;
+            }
+
+            var profile = new TreasureDeath()
+            {
+                Tier = tier,
+                LootQualityMod = 0,
+            };
+
+            var wo = LootGenerationFactory.CreateRandomLootObjects_New(profile, TreasureItemCategory.MagicItem, treasureType);
+            if (wo != null)
+                session.Player.TryCreateInInventoryWithNetworking(wo);
+            else
+                session.Network.EnqueueSend(new GameMessageSystemChat($"Failed to generate item.", ChatMessageType.Broadcast));
+        }
+
         [CommandHandler("ciloot", AccessLevel.Developer, CommandHandlerFlag.RequiresWorld, 1, "Generates randomized loot in player's inventory", "<tier> optional: <# items>")]
         public static void HandleCILoot(Session session, params string[] parameters)
         {
