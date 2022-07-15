@@ -1274,8 +1274,12 @@ namespace ACE.Server.Factories
 
         // new methods
 
-        public static TreasureRoll RollWcid(TreasureDeath treasureDeath, TreasureItemCategory category, TreasureItemType_Orig treasureItemType = TreasureItemType_Orig.Undef, TreasureArmorType armorType = TreasureArmorType.Undef, TreasureWeaponType weaponType = TreasureWeaponType.Undef)
+        public static TreasureRoll RollWcid(TreasureDeath treasureDeath, TreasureItemCategory category)
         {
+            TreasureDeathExtended treasureDeathExtended = treasureDeath as TreasureDeathExtended;
+
+            TreasureItemType_Orig treasureItemType = treasureDeathExtended != null ? treasureDeathExtended.ForceTreasureItemType : TreasureItemType_Orig.Undef;
+
             if (treasureItemType == TreasureItemType_Orig.Undef)
                 treasureItemType = RollItemType(treasureDeath, category);
 
@@ -1287,11 +1291,11 @@ namespace ACE.Server.Factories
 
             var treasureRoll = new TreasureRoll(treasureItemType);
 
-            if (armorType != TreasureArmorType.Undef)
-                treasureRoll.ArmorType = armorType;
-
-            if (weaponType != TreasureWeaponType.Undef)
-                treasureRoll.WeaponType = weaponType;
+            if (treasureDeathExtended != null)
+            {
+                treasureRoll.ArmorType = treasureDeathExtended.ForceArmorType;
+                treasureRoll.WeaponType = treasureDeathExtended.ForceWeaponType;
+            }
 
             switch (treasureItemType)
             {
@@ -1322,6 +1326,8 @@ namespace ACE.Server.Factories
 
                     if(treasureRoll.WeaponType == TreasureWeaponType.Undef)
                         treasureRoll.WeaponType = WeaponTypeChance.Roll(treasureDeath.Tier);
+                    else if(treasureRoll.WeaponType == TreasureWeaponType.MeleeWeapon || treasureRoll.WeaponType == TreasureWeaponType.MissileWeapon)
+                        treasureRoll.WeaponType = WeaponTypeChance.Roll(treasureDeath.Tier, treasureRoll.WeaponType);
                     treasureRoll.Wcid = WeaponWcids.Roll(treasureDeath, ref treasureRoll.WeaponType);
                     break;
 
@@ -1428,9 +1434,46 @@ namespace ACE.Server.Factories
             return TreasureItemType_Orig.Undef;
         }
 
-        public static WorldObject CreateRandomLootObjects_New(TreasureDeath treasureDeath, TreasureItemCategory category, TreasureItemType_Orig treasureItemType = TreasureItemType_Orig.Undef, TreasureArmorType armorType = TreasureArmorType.Undef, TreasureWeaponType weaponType = TreasureWeaponType.Undef)
+        public static WorldObject CreateRandomLootObjects_New(int tier, TreasureItemCategory category, TreasureItemType_Orig treasureItemType = TreasureItemType_Orig.Undef, TreasureArmorType armorType = TreasureArmorType.Undef, TreasureWeaponType weaponType = TreasureWeaponType.Undef)
         {
-            var treasureRoll = RollWcid(treasureDeath, category, treasureItemType, armorType, weaponType);
+            return CreateRandomLootObjects_New(tier, 0.0f, category, treasureItemType, armorType, weaponType);
+        }
+
+        public static WorldObject CreateRandomLootObjects_New(int tier, float lootQualityMod, TreasureItemCategory category, TreasureItemType_Orig treasureItemType = TreasureItemType_Orig.Undef, TreasureArmorType armorType = TreasureArmorType.Undef, TreasureWeaponType weaponType = TreasureWeaponType.Undef, TreasureHeritageGroup heritageGroup = TreasureHeritageGroup.Invalid)
+        {
+            var treasureDeath = new TreasureDeathExtended()
+            {
+                Tier = tier,
+                LootQualityMod = lootQualityMod,
+                ForceTreasureItemType = treasureItemType,
+                ForceArmorType = armorType,
+                ForceWeaponType = weaponType,
+                ForceHeritage = heritageGroup,
+
+                ItemChance = 100,
+                ItemMinAmount = 1,
+                ItemMaxAmount = 1,
+                ItemTreasureTypeSelectionChances = 8,
+
+                MagicItemChance = 100,
+                MagicItemMinAmount = 1,
+                MagicItemMaxAmount = 1,
+                MagicItemTreasureTypeSelectionChances = 8,
+
+                MundaneItemChance = 100,
+                MundaneItemMinAmount = 1,
+                MundaneItemMaxAmount = 1,
+                MundaneItemTypeSelectionChances = 7,
+
+                UnknownChances = 21
+            };
+
+            return CreateRandomLootObjects_New(treasureDeath, category);
+        }
+
+        public static WorldObject CreateRandomLootObjects_New(TreasureDeath treasureDeath, TreasureItemCategory category)
+        {
+            var treasureRoll = RollWcid(treasureDeath, category);
 
             if (treasureRoll == null) return null;
 

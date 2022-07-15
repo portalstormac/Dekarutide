@@ -2369,13 +2369,7 @@ namespace ACE.Server.Command.Handlers
                 }
             }
 
-            var profile = new TreasureDeath()
-            {
-                Tier = tier,
-                LootQualityMod = 0
-            };
-
-            var wo = LootGenerationFactory.CreateRandomLootObjects_New(profile, TreasureItemCategory.MagicItem, treasureType, armorType, weaponType);
+            var wo = LootGenerationFactory.CreateRandomLootObjects_New(tier, 0.0f, TreasureItemCategory.MagicItem, treasureType, armorType, weaponType);
             if (wo != null)
                 session.Player.TryCreateInInventoryWithNetworking(wo);
             else
