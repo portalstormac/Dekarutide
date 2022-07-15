@@ -15,9 +15,49 @@ using ACE.Server.Entity.Actions;
 using ACE.Server.Factories;
 using ACE.Server.Network.GameEvent.Events;
 using ACE.Server.Managers;
+using ACE.Server.Factories.Enum;
 
 namespace ACE.Server.WorldObjects
 {
+    public class VendorItemComparer : IComparer<WorldObject>
+    {
+        public VendorItemComparer()
+        {
+        }
+
+        public int Compare(WorldObject a, WorldObject b)
+        {
+            var result = a.WeenieType.CompareTo(b.WeenieType);
+
+            if (result == 0)
+            {
+                result = a.ItemType.CompareTo(b.ItemType);
+                if (result == 0)
+                {
+                    if (a.WeaponSkill != Skill.None)
+                        result = a.WeaponSkill.CompareTo(b.WeaponSkill);
+                    else if (a.ArmorType != 0)
+                    {
+                        int armorTypeA = a.ArmorType ?? 0;
+                        int armorTypeB = b.ArmorType ?? 0;
+                        result = armorTypeA.CompareTo(armorTypeB);
+                    }
+
+                    if (result == 0)
+                    {
+                        result = a.WeenieClassId.CompareTo(b.WeenieClassId);
+                        if (result == 0)
+                        {
+                            result = a.Name.CompareTo(b.Name);
+                        }
+                    }
+                }
+            }
+
+            return result;
+        }
+    }
+
     /// <summary>
     /// ** Buy Data Flow **
     ///
@@ -28,10 +68,12 @@ namespace ACE.Server.WorldObjects
     {
         private static readonly ILog log = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
+        private static readonly VendorItemComparer VendorItemComparer = new VendorItemComparer();
+
         public readonly Dictionary<ObjectGuid, WorldObject> DefaultItemsForSale = new Dictionary<ObjectGuid, WorldObject>();
 
         // unique items purchased from other players
-        public readonly Dictionary<ObjectGuid, WorldObject> UniqueItemsForSale = new Dictionary<ObjectGuid, WorldObject>();
+        public Dictionary<ObjectGuid, WorldObject> UniqueItemsForSale = new Dictionary<ObjectGuid, WorldObject>();
 
         private bool inventoryloaded { get; set; }
 
@@ -39,6 +81,8 @@ namespace ACE.Server.WorldObjects
         ///  The last player who used this vendor
         /// </summary>
         private WorldObjectInfo lastPlayerInfo { get; set; }
+
+        private DateTime LastRestockTime;
 
         public uint? AlternateCurrency
         {
@@ -71,6 +115,7 @@ namespace ACE.Server.WorldObjects
                 GeneratorProfiles.RemoveAll(p => p.Biota.WhereCreate.HasFlag(RegenLocationType.Shop));
             }
 
+            LastRestockTime = DateTime.MinValue;
             OpenForBusiness = ValidateVendorRequirements();
         }
 
@@ -663,6 +708,261 @@ namespace ACE.Server.WorldObjects
             NumServicesSold++;
         }
 
+        private int ShopTier = 0;
+        private int ShopRandomItemStockAmount = 0;
+        private float ShopQualityMod = 0.0f;
+        private bool RandomItemGenerationInitialized = false;
+
+        private bool sellsRandomArmor;
+        private bool sellsRandomMeleeWeapons;
+        private bool sellsRandomMissileWeapons;
+        private bool sellsRandomCasters;
+        private bool sellsRandomClothing;
+        private bool sellsRandomJewelry;
+        private bool sellsRandomGems;
+        private bool sellsRandomScrolls;
+
+        private TreasureHeritageGroup ShopHeritage;
+
+        private void SetupRandomItemShop()
+        {
+            RandomItemGenerationInitialized = true;
+
+            sellsRandomArmor = ((ItemType)MerchandiseItemTypes & ItemType.Armor) == ItemType.Armor;
+            sellsRandomMeleeWeapons = ((ItemType)MerchandiseItemTypes & ItemType.MeleeWeapon) == ItemType.MeleeWeapon;
+            sellsRandomMissileWeapons = ((ItemType)MerchandiseItemTypes & ItemType.MissileWeapon) == ItemType.MissileWeapon;
+            sellsRandomCasters = ((ItemType)MerchandiseItemTypes & ItemType.Caster) == ItemType.Caster;
+            sellsRandomClothing = ((ItemType)MerchandiseItemTypes & ItemType.Clothing) == ItemType.Clothing;
+            sellsRandomJewelry = ((ItemType)MerchandiseItemTypes & ItemType.Jewelry) == ItemType.Jewelry;
+            sellsRandomGems = ((ItemType)MerchandiseItemTypes & ItemType.Gem) == ItemType.Gem;
+            sellsRandomScrolls = ((ItemType)MerchandiseItemTypes & ItemType.Writable) == ItemType.Writable && sellsRandomCasters; // Check if we also sell casters to prevent scribes from carrying scrolls
+
+            if (!sellsRandomArmor && !sellsRandomMeleeWeapons && !sellsRandomMissileWeapons && !sellsRandomCasters && !sellsRandomClothing && !sellsRandomJewelry && !sellsRandomGems && !sellsRandomScrolls)
+                return;
+
+            int categoriesSold = 0;
+            if (sellsRandomArmor)
+                categoriesSold++;
+            if (sellsRandomMeleeWeapons)
+                categoriesSold++;
+            if (sellsRandomMissileWeapons)
+                categoriesSold++;
+            if (sellsRandomCasters)
+                categoriesSold++;
+            if (sellsRandomClothing)
+                categoriesSold++;
+            if (sellsRandomJewelry)
+                categoriesSold++;
+            if (sellsRandomGems)
+                categoriesSold++;
+            if (sellsRandomScrolls)
+                categoriesSold++;
+
+            ShopRandomItemStockAmount = categoriesSold * ThreadSafeRandom.Next(5, 10);
+
+            ShopHeritage = (TreasureHeritageGroup)(Heritage ?? 0);
+
+            if (ShopHeritage > TreasureHeritageGroup.Sho)
+                ShopHeritage = TreasureHeritageGroup.Invalid;
+
+            string townName = GetProperty(PropertyString.TownName);
+            switch(townName)
+            {
+                case "South Holtburg Outpost":
+                case "West Holtburg Outpost":
+                case "East Lytelthorpe Outpost":
+                case "West Lytelthorpe Outpost":
+                case "East Rithwic Outpost":
+                case "South Rithwic Outpost":
+                case "East Nanto Outpost":
+                case "North Nanto Outpost":
+                case "Southeast Shoushi Outpost":
+                case "West Shoushi Outpost":
+                case "North Yanshi Outpost":
+                case "South Yanshi Outpost":
+                case "North Al-Arqas Outpost":
+                case "West Al-Arqas Outpost":
+                case "East Samsur Outpost":
+                case "Northwest Samsur Outpost":
+                case "East Yaraq Outpost":
+                case "North Yaraq Outpost":
+                    ShopTier = 1;
+                    ShopQualityMod = -0.5f;
+                    break;
+                case "Al-Arqas":
+                case "Bluespire":
+                case "Greenspire":
+                case "Holtburg":
+                case "Lytelthorpe":
+                case "Martine's Retreat":
+                case "Nanto":
+                case "Redspire":
+                case "Rithwic":
+                case "Samsur":
+                case "Shoushi":
+                case "Tufa":
+                case "Underground City":
+                case "Xarabydun":
+                case "Yanshi":
+                case "Yaraq":
+                // The following 3 outposts are not starter outposts
+                case "East Glenden Wood Outpost":
+                case "West Glenden Wood Outpost":
+                case "Southwest Yanshi Outpost":
+                    ShopTier = 1;
+                    ShopQualityMod = 0.0f;
+                    break;
+                case "Al-Jalima":
+                case "Ahurenga":
+                case "Arwic":
+                case "Baishi":
+                case "Cragstone":
+                case "Eastham":
+                case "Glenden Wood":
+                case "Hebian-To":
+                case "Khayyaban":
+                case "Kryst":
+                case "Lin":
+                case "Mayoi":
+                case "Oolutanga's Refuge":
+                case "Sawato":
+                case "Tou-Tou":
+                case "Uziz":
+                case "Zaikhal":
+                    ShopTier = 2;
+                    ShopQualityMod = 0.0f;
+                    break;
+                case "Bandit Castle":
+                case "Crater Lake":
+                case "Dryreach":
+                case "Danby's Outpost":
+                case "Kara":
+                case "Linvak Tukal":
+                case "MacNiall's Freehold":
+                case "Neydisa Castle":
+                case "Plateau Village":
+                case "Qalaba'r":
+                case "Timaru":
+                    ShopTier = 3;
+                    ShopQualityMod = 0.0f;
+                    break;
+                case "Candeth Keep":
+                case "Fort Tethana":
+                case "Stonehold":
+                    ShopTier = 4;
+                    ShopQualityMod = 0.0f;
+                    break;
+                case "Ayan Baqur":
+                case "Wai Jhou":
+                    ShopTier = 5;
+                    ShopQualityMod = 0.0f;
+                    break;
+            }
+
+            if (ShopTier == 0) // We're not in a town! See what's around us.
+            {
+                ShopTier = 1; // Fallback to tier 1 if there's nothing around us.
+
+                foreach (var obj in CurrentLandblock.GetAllWorldObjectsForDiagnostics())
+                {
+                    if(obj.ItemType == ItemType.Creature)
+                    {
+                        PlayerKillerStatus pkStatus = (PlayerKillerStatus)(obj.GetProperty(PropertyInt.PlayerKillerStatus) ?? 0);
+
+                        Creature creature = obj as Creature;
+
+                        if (!(obj.Guid.IsPlayer()) && creature != null && pkStatus != PlayerKillerStatus.RubberGlue)
+                        {
+                            if(creature.DeathTreasure != null && creature.DeathTreasure.Tier > ShopTier)
+                                ShopTier = creature.DeathTreasure.Tier; // Trade in the highest tier we can find around us.
+                        }
+                    }
+                }
+            }
+        }
+
+        private void RestockRandomItems()
+        {
+            if (!RandomItemGenerationInitialized)
+                SetupRandomItemShop();
+
+            if (ShopTier == 0)
+                return;
+
+            if ((DateTime.UtcNow - LastRestockTime).TotalSeconds < 60)
+                return;
+
+            LastRestockTime = DateTime.UtcNow;
+
+            if (UniqueItemsForSale.Count >= ShopRandomItemStockAmount)
+                return;
+
+            int itemsToGenerate = ShopRandomItemStockAmount - UniqueItemsForSale.Count;
+
+            if (itemsToGenerate <= 0)
+                return;
+
+            int added = 0;
+            while(added < itemsToGenerate)
+            {
+                if (sellsRandomArmor && added < itemsToGenerate)
+                {
+                    AddRandomItem(TreasureItemType_Orig.Armor, TreasureArmorType.Undef, TreasureWeaponType.Undef);
+                    added++;
+                }
+                if (sellsRandomMeleeWeapons && added < itemsToGenerate)
+                {
+                    AddRandomItem(TreasureItemType_Orig.Weapon, TreasureArmorType.Undef, TreasureWeaponType.MeleeWeapon);
+                    added++;
+                }
+                if (sellsRandomMissileWeapons && added < itemsToGenerate)
+                {
+                    AddRandomItem(TreasureItemType_Orig.Weapon, TreasureArmorType.Undef, TreasureWeaponType.MissileWeapon);
+                    added++;
+                }
+                if (sellsRandomCasters && added < itemsToGenerate)
+                {
+                    AddRandomItem(TreasureItemType_Orig.Caster, TreasureArmorType.Undef, TreasureWeaponType.Undef);
+                    added++;
+                }
+                if (sellsRandomClothing && added < itemsToGenerate)
+                {
+                    AddRandomItem(TreasureItemType_Orig.Clothing, TreasureArmorType.Undef, TreasureWeaponType.Undef);
+                    added++;
+                }
+                if (sellsRandomJewelry && added < itemsToGenerate)
+                {
+                    AddRandomItem(TreasureItemType_Orig.Jewelry, TreasureArmorType.Undef, TreasureWeaponType.Undef);
+                    added++;
+                }
+                if (sellsRandomGems && added < itemsToGenerate)
+                {
+                    AddRandomItem(TreasureItemType_Orig.Gem, TreasureArmorType.Undef, TreasureWeaponType.Undef);
+                    added++;
+                }
+                if (sellsRandomScrolls && added < itemsToGenerate)
+                {
+                    AddRandomItem(TreasureItemType_Orig.Scroll, TreasureArmorType.Undef, TreasureWeaponType.Undef);
+                    added++;
+                }
+            }
+            
+            UniqueItemsForSale = new Dictionary<ObjectGuid, WorldObject>(UniqueItemsForSale.OrderBy(key => key.Value, VendorItemComparer));
+
+        }
+
+        private void AddRandomItem(TreasureItemType_Orig treasureItemType, TreasureArmorType armorType = TreasureArmorType.Undef, TreasureWeaponType weaponType = TreasureWeaponType.Undef)
+        {
+            var item = LootGenerationFactory.CreateRandomLootObjects_New(ShopTier, ShopQualityMod, TreasureItemCategory.MagicItem, treasureItemType, armorType, weaponType, ShopHeritage);
+
+            item.ContainerId = Guid.Full;
+
+            UniqueItemsForSale.Add(item.Guid, item);
+
+            item.SoldTimestamp = Time.GetUnixTime();
+            item.RemoveBiotaFromDatabase();
+        }
+
         /// <summary>
         /// Unique items in the vendor's inventory sold to the vendor by players
         /// expire after vendor_unique_rot_time seconds
@@ -703,6 +1003,8 @@ namespace ACE.Server.WorldObjects
                     itemToRemove.Destroy();     // even though it has already been removed from the db at this point, we want to mark as freed in guid manager now
                 }
             }
+
+            RestockRandomItems();
         }
 
         private static void CleanupCreatedItems(List<WorldObject> createdItems)

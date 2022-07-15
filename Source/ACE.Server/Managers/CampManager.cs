@@ -260,7 +260,10 @@ namespace ACE.Server.Managers
         {
             if (campId == 0) // Rest camp
                 return 3000;
-            return 500;
+            else if (campId > 0x0000FFFF) // Area Camp
+                return 500;
+            else
+                return 2000; // Type Camp
         }
 
         public CharacterPropertiesCampRegistry CheckDecay(uint campId)

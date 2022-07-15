@@ -58,10 +58,20 @@ namespace ACE.Server.Factories.Entity
             var total = 0.0f;
 
             double rng;
-            if(invertedQualityMod)
-                rng = ThreadSafeRandom.Next(0.0f, 1.0f - qualityMod);
+            if (invertedQualityMod)
+            {
+                if (qualityMod >= 0)
+                    rng = ThreadSafeRandom.Next(0.0f, 1.0f - qualityMod);
+                else
+                    rng = ThreadSafeRandom.Next(-qualityMod, 1.0f);
+            }
             else
-                rng = ThreadSafeRandom.Next(qualityMod, 1.0f);
+            {
+                if (qualityMod >= 0)
+                    rng = ThreadSafeRandom.Next(qualityMod, 1.0f);
+                else
+                    rng = ThreadSafeRandom.Next(0.0f, Math.Max(1.0f + qualityMod, 0.0f));
+            }
 
             foreach (var entry in this)
             {

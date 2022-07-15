@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-
+using ACE.Entity.Enum;
 using ACE.Server.Factories.Entity;
 using ACE.Server.Factories.Enum;
 
@@ -67,6 +67,26 @@ namespace ACE.Server.Factories.Tables
                                                                 // and not deeper in WeaponWcids.cs
         };
 
+        private static ChanceTable<TreasureWeaponType> MeleeChances = new ChanceTable<TreasureWeaponType>()
+        {
+            ( TreasureWeaponType.Sword,           1.25f ),
+            ( TreasureWeaponType.Mace,            1.25f ),
+            ( TreasureWeaponType.Axe,             1.25f ),
+            ( TreasureWeaponType.Spear,           1.25f ),
+            ( TreasureWeaponType.Unarmed,         1.25f ),
+            ( TreasureWeaponType.Staff,           1.25f ),
+            ( TreasureWeaponType.Dagger,          1.25f ),
+            ( TreasureWeaponType.TwoHandedWeapon, 1.25f ),      // see TreasureWeaponType for an explanation of why this is here,
+                                                                // and not deeper in WeaponWcids.cs
+        };
+
+        private static ChanceTable<TreasureWeaponType> MissileChances = new ChanceTable<TreasureWeaponType>()
+        {
+            ( TreasureWeaponType.Bow,             0.34f ),
+            ( TreasureWeaponType.Crossbow,        0.33f ),
+            ( TreasureWeaponType.Atlatl,          0.33f ),
+        };
+
         private static readonly List<ChanceTable<TreasureWeaponType>> weaponTiers = new List<ChanceTable<TreasureWeaponType>>()
         {
             T1_T4_Chances,
@@ -98,17 +118,36 @@ namespace ACE.Server.Factories.Tables
                     ( TreasureWeaponType.Atlatl,   0.09f ),
                     ( TreasureWeaponType.Caster,   0.10f ),
                 };
+
+                MeleeChances = new ChanceTable<TreasureWeaponType>(ChanceTableType.Weight)
+                {
+                    ( TreasureWeaponType.Sword,           1.0f ),
+                    ( TreasureWeaponType.Mace,            1.0f ),
+                    ( TreasureWeaponType.Axe,             1.0f ),
+                    ( TreasureWeaponType.Spear,           1.0f ),
+                    ( TreasureWeaponType.Unarmed,         1.0f ),
+                    ( TreasureWeaponType.Staff,           1.0f ),
+                    ( TreasureWeaponType.Dagger,          1.0f ),
+                };
             }
         }
 
-        public static TreasureWeaponType Roll(int tier)
+        public static TreasureWeaponType Roll(int tier, TreasureWeaponType filterToType = TreasureWeaponType.Undef)
         {
             // todo: add unique profiles for t7 / t8?
             //tier = Math.Clamp(tier, 1, 6);
 
             //return weaponTiers[tier - 1].Roll();
 
-            return RetailChances.Roll();
+            switch(filterToType)
+            {
+                case TreasureWeaponType.MeleeWeapon:
+                    return MeleeChances.Roll();
+                case TreasureWeaponType.MissileWeapon:
+                    return MissileChances.Roll();
+                default:
+                    return RetailChances.Roll();
+            }            
         }
     }
 }

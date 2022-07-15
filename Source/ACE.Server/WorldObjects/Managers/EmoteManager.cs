@@ -256,9 +256,10 @@ namespace ACE.Server.WorldObjects.Managers
                         var treasureClass = (TreasureItemType_Orig?)emote.TreasureClass ?? TreasureItemType_Orig.Undef;
 
                         // Create a dummy treasure profile for passing emote values
-                        var profile = new Database.Models.World.TreasureDeath
+                        var profile = new ACE.Server.Factories.Entity.TreasureDeathExtended
                         {
                             Tier = treasureTier,
+                            ForceTreasureItemType = treasureClass,
                             //TreasureType = (uint)treasureType,
                             LootQualityMod = 0,
                             ItemChance = 100,
@@ -276,7 +277,7 @@ namespace ACE.Server.WorldObjects.Managers
                             UnknownChances = 21
                         };
 
-                        var treasure = LootGenerationFactory.CreateRandomLootObjects_New(profile, treasureType, treasureClass);
+                        var treasure = LootGenerationFactory.CreateRandomLootObjects_New(profile, treasureType);
                         if (treasure != null)
                         {
                             player.TryCreateForGive(WorldObject, treasure);

@@ -1,6 +1,7 @@
 using ACE.Common;
 using ACE.Database.Models.World;
 using ACE.Entity.Enum;
+using ACE.Server.Factories.Entity;
 using ACE.Server.Factories.Enum;
 
 using WeenieClassName = ACE.Server.Factories.Enum.WeenieClassName;
@@ -124,7 +125,11 @@ namespace ACE.Server.Factories.Tables.Wcids
 
         public static TreasureHeritageGroup RollHeritage(TreasureDeath treasureDeath)
         {
-            return HeritageChance.Roll(treasureDeath.UnknownChances);
+            TreasureDeathExtended treasureDeathExtended = treasureDeath as TreasureDeathExtended;
+            if (treasureDeathExtended != null && treasureDeathExtended.ForceHeritage != TreasureHeritageGroup.Invalid)
+                return treasureDeathExtended.ForceHeritage;
+            else
+                return HeritageChance.Roll(treasureDeath.UnknownChances);
         }
 
         public static WeenieClassName RollSwordWcid(TreasureDeath treasureDeath, ref TreasureWeaponType weaponType)
