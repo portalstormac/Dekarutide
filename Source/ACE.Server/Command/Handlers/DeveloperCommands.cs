@@ -3840,6 +3840,8 @@ namespace ACE.Server.Command.Handlers
                         }
                         msg += $"BuyPrice: {(vendor.BuyPrice.HasValue ? $"{vendor.BuyPrice:F}" : "NULL")}\n";
                         msg += $"SellPrice: {(vendor.SellPrice.HasValue ? $"{vendor.SellPrice:F}" : "NULL")}\n";
+                        msg += $"BuyPriceBase: {(vendor.BuyPriceBase.HasValue ? $"{vendor.BuyPriceBase:F}" : "NULL")}\n";
+                        msg += $"SellPriceBase: {(vendor.SellPriceBase.HasValue ? $"{vendor.SellPriceBase:F}" : "NULL")}\n";
 
                         msg += $"DealMagicalItems: {(vendor.DealMagicalItems.HasValue ? $"{vendor.DealMagicalItems}" : "NULL")}\n";
                         msg += $"VendorService: {(vendor.VendorService.HasValue ? $"{vendor.VendorService}" : "NULL")}\n";
@@ -3853,10 +3855,12 @@ namespace ACE.Server.Command.Handlers
                         msg += $"VendorHappyMaxItems: {(vendor.VendorHappyMaxItems.HasValue ? $"{vendor.VendorHappyMaxItems}" : "NULL")}\n";
 
                         msg += $"MoneyOutflow: {vendor.MoneyOutflow:N0} {(vendor.MoneyOutflow == 1 ? currencyWeenie.GetName() : currencyWeenie.GetPluralName())}\n";
+                        msg += $"RecentMoneyOutflow: {vendor.RecentMoneyOutflow:N0} {(vendor.RecentMoneyOutflow == 1 ? currencyWeenie.GetName() : currencyWeenie.GetPluralName())}\n";
                         msg += $"NumItemsBought: {vendor.NumItemsBought:N0}\n";
                         msg += $"NumItemsSold: {vendor.NumItemsSold:N0}\n";
                         msg += $"NumServicesSold: {vendor.NumServicesSold:N0}\n";
                         msg += $"MoneyIncome: {vendor.MoneyIncome:N0} {(vendor.MoneyIncome == 1 ? currencyWeenie.GetName() : currencyWeenie.GetPluralName())}\n";
+                        msg += $"RecentMoneyIncome: {vendor.RecentMoneyIncome:N0} {(vendor.RecentMoneyIncome == 1 ? currencyWeenie.GetName() : currencyWeenie.GetPluralName())}\n";
                     }
 
                     if (all || createList)

@@ -60,7 +60,7 @@ namespace ACE.Server.WorldObjects
 
             SpendCurrency(currencyWcid, cost, true);
 
-            vendor.MoneyIncome += (int)cost;
+            vendor.AddMoneyIncome((int)cost);
 
             foreach (var item in genericItems)
             {
@@ -187,7 +187,7 @@ namespace ACE.Server.WorldObjects
 
             var payoutCoinStacks = CreatePayoutCoinStacks(payoutCoinAmount);
 
-            vendor.MoneyOutflow += payoutCoinAmount;
+            vendor.AddMoneyOutflow(payoutCoinAmount);
 
             // remove sell items from player inventory
             foreach (var item in sellList.Values)
