@@ -316,6 +316,41 @@ namespace ACE.Server.WorldObjects
             lastPlayerInfo = new WorldObjectInfo(player);
         }
 
+        private int CurrentVendorHappyThreshold;
+        private double VendorHappyMultiplier = 100; // To do: once we have a notion on the exact value for this multiplier modify the values in the database so we can remove the need for this.
+        private double BuyPriceMod;
+        private double SellPriceMod;
+        public int RecentMoneyIncome;
+        public int RecentMoneyOutflow;
+
+        public void AddMoneyIncome(int value)
+        {
+            MoneyIncome += value;
+            RecentMoneyIncome += value;
+        }
+
+        public void AddMoneyOutflow(int value)
+        {
+            MoneyOutflow += value;
+            RecentMoneyOutflow += value;
+        }
+
+        public void UpdateHappyVendor()
+        {
+            int vendorHappyMean = (int)((VendorHappyMean ?? 0) * VendorHappyMultiplier);
+            int vendorHappyVariance = (int)((VendorHappyVariance ?? 0) * VendorHappyMultiplier);
+            if (vendorHappyMean == 0)
+            {
+                BuyPriceMod = 0.0f;
+                SellPriceMod = 0.0f;
+                return;
+            }
+
+            CurrentVendorHappyThreshold = ThreadSafeRandom.Next(vendorHappyMean - vendorHappyVariance, vendorHappyMean + vendorHappyVariance);
+            SellPriceMod = -Math.Min(((RecentMoneyIncome + RecentMoneyOutflow) / (float)CurrentVendorHappyThreshold * 0.1f), 0.1f);
+            BuyPriceMod = 0.1f + SellPriceMod;
+        }
+
         /// <summary>
         /// Sends the latest vendor inventory list to player, rotates vendor towards player, and performs the appropriate emote.
         /// </summary>
@@ -889,10 +924,17 @@ namespace ACE.Server.WorldObjects
             if (ShopTier == 0)
                 return;
 
-            if ((DateTime.UtcNow - LastRestockTime).TotalSeconds < 60)
+            if ((DateTime.UtcNow - LastRestockTime).TotalSeconds < PropertyManager.GetDouble("vendor_unique_rot_time", 300).Item)
                 return;
 
             LastRestockTime = DateTime.UtcNow;
+
+            UpdateHappyVendor();
+
+            // Decay our recent income and outflow so prices can change accordingly.
+            int minutesSinceLastRestock = (int)(DateTime.UtcNow - LastRestockTime).TotalMinutes;
+            RecentMoneyOutflow -= Math.Max(minutesSinceLastRestock * 100, 0);
+            RecentMoneyIncome -= Math.Max(minutesSinceLastRestock * 100, 0);
 
             if (UniqueItemsForSale.Count >= ShopRandomItemStockAmount)
                 return;
@@ -953,7 +995,7 @@ namespace ACE.Server.WorldObjects
 
         private void AddRandomItem(TreasureItemType_Orig treasureItemType, TreasureArmorType armorType = TreasureArmorType.Undef, TreasureWeaponType weaponType = TreasureWeaponType.Undef)
         {
-            var item = LootGenerationFactory.CreateRandomLootObjects_New(ShopTier, ShopQualityMod, TreasureItemCategory.MagicItem, treasureItemType, armorType, weaponType, ShopHeritage);
+            var item = LootGenerationFactory.CreateRandomLootObjects_New(ShopTier, ShopQualityMod, (DealMagicalItems ?? false) ? TreasureItemCategory.MagicItem : TreasureItemCategory.Item, treasureItemType, armorType, weaponType, ShopHeritage);
 
             item.ContainerId = Guid.Full;
 
@@ -1004,7 +1046,8 @@ namespace ACE.Server.WorldObjects
                 }
             }
 
-            RestockRandomItems();
+            if (Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.CustomDM)
+                RestockRandomItems();
         }
 
         private static void CleanupCreatedItems(List<WorldObject> createdItems)
@@ -1039,11 +1082,21 @@ namespace ACE.Server.WorldObjects
 
         public double? BuyPrice
         {
+            get { return BuyPriceBase != null ? BuyPriceBase + BuyPriceMod : null; }
+        }
+
+        public double? SellPrice
+        {
+            get { return SellPriceBase != null ? SellPriceBase + SellPriceMod : null; }
+        }
+
+        public double? BuyPriceBase
+        {
             get => GetProperty(PropertyFloat.BuyPrice);
             set { if (!value.HasValue) RemoveProperty(PropertyFloat.BuyPrice); else SetProperty(PropertyFloat.BuyPrice, value.Value); }
         }
 
-        public double? SellPrice
+        public double? SellPriceBase
         {
             get => GetProperty(PropertyFloat.SellPrice);
             set { if (!value.HasValue) RemoveProperty(PropertyFloat.SellPrice); else SetProperty(PropertyFloat.SellPrice, value.Value); }
