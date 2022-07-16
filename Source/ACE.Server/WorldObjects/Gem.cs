@@ -191,7 +191,7 @@ namespace ACE.Server.WorldObjects
             if (UseSound > 0)
                 player.Session.Network.EnqueueSend(new GameMessageSound(player.Guid, UseSound));
 
-            if (Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.CustomDM)
+            if (Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.CustomDM && (ItemManaCost ?? 0) != 0)
             {
                 if (GetProperty(PropertyBool.UnlimitedUse) ?? false)
                     return;
