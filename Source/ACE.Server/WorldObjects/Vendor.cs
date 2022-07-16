@@ -347,7 +347,7 @@ namespace ACE.Server.WorldObjects
             }
 
             CurrentVendorHappyThreshold = ThreadSafeRandom.Next(vendorHappyMean - vendorHappyVariance, vendorHappyMean + vendorHappyVariance);
-            SellPriceMod = -Math.Min(((RecentMoneyIncome + RecentMoneyOutflow) / (float)CurrentVendorHappyThreshold * 0.1f), 0.1f);
+            SellPriceMod = -((RecentMoneyIncome + RecentMoneyOutflow) / (float)CurrentVendorHappyThreshold * 0.1f);
             BuyPriceMod = 0.1f + SellPriceMod;
         }
 
