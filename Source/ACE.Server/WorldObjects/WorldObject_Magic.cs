@@ -101,13 +101,13 @@ namespace ACE.Server.WorldObjects
         /// based upon the caster's magic skill vs target's magic defense skill
         /// </summary>
         /// <returns>TRUE if spell is resisted</returns>
-        public static bool MagicDefenseCheck(uint casterMagicSkill, uint targetMagicDefenseSkill, out float resistChance)
+        public static bool MagicDefenseCheck(uint casterMagicSkill, uint targetMagicDefenseSkill, out float resistChance, float chanceMod = 1.0f)
         {
             // uses regular 0.03 factor, and not magic casting 0.07 factor
             var chance = SkillCheck.GetSkillChance((int)casterMagicSkill, (int)targetMagicDefenseSkill);
             var rng = ThreadSafeRandom.Next(0.0f, 1.0f);
 
-            resistChance = (float)(1.0f - chance);
+            resistChance = (float)(1.0f - (chance * chanceMod));
 
             return chance <= rng;
         }
@@ -164,8 +164,26 @@ namespace ACE.Server.WorldObjects
             // Retrieve target's Magic Defense Skill
             var difficulty = targetCreature.GetEffectiveMagicDefense();
 
+            float resistChanceMod = 1.0f;
+            if (Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.CustomDM && casterCreature != null)
+            {
+                var amulet = casterCreature.GetEquippedLeyLineAmulet();
+                if (amulet != null && (amulet.LeyLineTriggerChance ?? 0) > 0 && (amulet.LeyLineEffectId == (uint)LeyLineEffect.LowerResistChance))
+                {
+                    SpellId triggerSpellLevel1Id = (SpellId)(amulet.LeyLineTriggerSpellId ?? 0);
+                    if (triggerSpellLevel1Id != SpellId.Undef)
+                    {
+                        var triggerSpellLvl1 = new Spell(triggerSpellLevel1Id);
+                        if (triggerSpellLvl1 != null && triggerSpellLvl1.Category == spell.Category)
+                        {
+                            resistChanceMod = 1.3f;
+                        }
+                    }
+                }
+            }
+
             //Console.WriteLine($"{target.Name}.ResistSpell({Name}, {spell.Name}): magicSkill: {magicSkill}, difficulty: {difficulty}");
-            bool resisted = MagicDefenseCheck(magicSkill, difficulty, out float resistChance);
+            bool resisted = MagicDefenseCheck(magicSkill, difficulty, out float resistChance, resistChanceMod);
 
             var player = this as Player;
             var targetPlayer = target as Player;

@@ -82,6 +82,8 @@ namespace ACE.Server.Entity
 
             if (loadDB && (_spell == null || _spellBase == null))
                 log.Debug($"Spell.Init(spellID = {spellID}, loadDB = {loadDB}) failed! {(_spell == null ? "_spell was null" : "")} {(_spellBase == null ? "_spellBase was null" : "")}");
+
+            IntensityMod = 1.0f;
         }
 
         /// <summary>
@@ -148,6 +150,16 @@ namespace ACE.Server.Entity
 
             //DebugComponents();
 
+            var componentBurnChanceMod = 1.0f;
+            if (Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.CustomDM)
+            {
+                var amulet = player.GetEquippedLeyLineAmulet();
+                if (amulet != null && (amulet.LeyLineTriggerChance ?? 0) > 0 && (amulet.LeyLineEffectId == (uint)LeyLineEffect.LowerCompBurnChanceAllSpells))
+                {
+                    componentBurnChanceMod = 0.7f;
+                }
+            }
+
             foreach (var component in Formula.CurrentFormula)
             {
                 if (!SpellFormula.SpellComponentsTable.SpellComponents.TryGetValue(component, out var spellComponent))
@@ -157,7 +169,7 @@ namespace ACE.Server.Entity
                 }
 
                 // component burn rate = spell base rate * component destruction modifier * skillMod?
-                var burnRate = baseRate * spellComponent.CDM * skillMod;
+                var burnRate = baseRate * spellComponent.CDM * skillMod * componentBurnChanceMod;
 
                 // TODO: curve?
                 var rng = ThreadSafeRandom.Next(0.0f, 1.0f);

@@ -201,6 +201,11 @@ namespace ACE.Server.WorldObjects
             return EquippedObjects.Values.FirstOrDefault(e => e.CurrentWieldedLocation == EquipMask.TrinketOne);
         }
 
+        public LeyLineAmulet GetEquippedLeyLineAmulet()
+        {
+            return EquippedObjects.Values.FirstOrDefault(e => e.CurrentWieldedLocation == EquipMask.Cloak) as LeyLineAmulet;
+        }
+
         /// <summary>
         /// Returns the ammo slot item for bows / atlatls,
         /// or the missile weapon for thrown weapons
@@ -444,6 +449,13 @@ namespace ACE.Server.WorldObjects
                 EnqueueBroadcast(false, new GameMessageSound(Guid, Sound.UnwieldObject));
 
             EnqueueBroadcast(new GameMessageObjDescEvent(this));
+
+            if (Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.CustomDM)
+            {
+                var leyLineAmulet = worldObject as LeyLineAmulet;
+                if (leyLineAmulet != null)
+                    leyLineAmulet.OnDequip(this as Player);
+            }
 
             // If item has any spells, remove them from the registry on unequip
             if (worldObject.Biota.PropertiesSpellBook != null)

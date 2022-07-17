@@ -633,6 +633,14 @@ namespace ACE.Entity.Enum.Properties
         // CustomDM
         [ServerOnly]
         TacticAndTechniqueId                     = 10000,
+        [ServerOnly]
+        LeyLineSchool                            = 10001,
+        [ServerOnly]
+        LeyLineEffectId                          = 10002,
+        [ServerOnly]
+        LeyLineEffectSeed                        = 10003,
+        [ServerOnly]
+        LeyLineLastDecayTime                     = 10004
     }
 
     public static class PropertyIntExtensions

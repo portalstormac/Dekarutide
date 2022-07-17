@@ -8,6 +8,7 @@ using ACE.Entity;
 using ACE.Entity.Enum;
 using ACE.Server.Entity;
 using ACE.Server.Entity.Actions;
+using ACE.Server.Factories.Tables;
 using ACE.Server.Managers;
 using ACE.Server.Network.GameEvent.Events;
 using ACE.Server.Network.GameMessages.Messages;
@@ -526,6 +527,24 @@ namespace ACE.Server.WorldObjects
             if (magicSkill > 0 && magicSkill >= (int)difficulty - 50)
             {
                 var chance = SkillCheck.GetMagicSkillChance((int)magicSkill, (int)difficulty);
+
+                if (Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.CustomDM)
+                {
+                    var amulet = GetEquippedLeyLineAmulet();
+                    if (amulet != null && (amulet.LeyLineTriggerChance ?? 0) > 0 && (amulet.LeyLineEffectId == (uint)LeyLineEffect.LowerFizzleChance))
+                    {
+                        SpellId triggerSpellLevel1Id = (SpellId)(amulet.LeyLineTriggerSpellId ?? 0);
+                        if (triggerSpellLevel1Id != SpellId.Undef)
+                        {
+                            var triggerSpellLvl1 = new Spell(triggerSpellLevel1Id);
+                            if (triggerSpellLvl1 != null && triggerSpellLvl1.Category == spell.Category)
+                            {
+                                chance *= 1.3f;
+                            }
+                        }
+                    }
+                }
+
                 var rng = ThreadSafeRandom.Next(0.0f, 1.0f);
                 if (chance > rng)
                     castingPreCheckStatus = CastingPreCheckStatus.Success;
@@ -841,6 +860,24 @@ namespace ACE.Server.WorldObjects
 
             var itemCaster = isWeaponSpell ? caster : null;
 
+            LeyLineAmulet amulet = null;
+            if (Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.CustomDM)
+            {
+                amulet = GetEquippedLeyLineAmulet();
+                if (amulet != null && (amulet.LeyLineTriggerChance ?? 0) > 0 && (amulet.LeyLineEffectId == (uint)LeyLineEffect.LessManaUsage))
+                {
+                    SpellId triggerSpellLevel1Id = (SpellId)(amulet.LeyLineTriggerSpellId ?? 0);
+                    if (triggerSpellLevel1Id != SpellId.Undef)
+                    {
+                        var triggerSpellLvl1 = new Spell(triggerSpellLevel1Id);
+                        if (triggerSpellLvl1 != null && triggerSpellLvl1.Category == spell.Category)
+                        {
+                            manaUsed = (uint)(manaUsed * 0.7f);
+                        }
+                    }
+                }
+            }
+
             if (!isWeaponSpell)
                 UpdateVitalDelta(Mana, -(int)manaUsed);
             else
@@ -881,7 +918,55 @@ namespace ACE.Server.WorldObjects
                 case CastingPreCheckStatus.Success:
 
                     if ((spell.Flags & SpellFlags.FellowshipSpell) == 0)
+                    {
+                        if (Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.CustomDM)
+                        {
+                            if (amulet != null && (amulet.LeyLineTriggerChance ?? 0) > 0 && (amulet.LeyLineEffectId == (uint)LeyLineEffect.MirrorSpell || amulet.LeyLineEffectId == (uint)LeyLineEffect.CastExtraSpellOther || amulet.LeyLineEffectId == (uint)LeyLineEffect.CastExtraSpellSelf || amulet.LeyLineEffectId == (uint)LeyLineEffect.ExtraSpellIntensity))
+                            {
+                                var rng = ThreadSafeRandom.Next(0.0f, 1.0f);
+                                if (amulet.LeyLineTriggerChance > rng)
+                                {
+                                    SpellId triggerSpellLevel1Id = (SpellId)(amulet.LeyLineTriggerSpellId ?? 0);
+                                    if (triggerSpellLevel1Id != SpellId.Undef)
+                                    {
+                                        var triggerSpellLvl1 = new Spell(triggerSpellLevel1Id);
+                                        if (triggerSpellLvl1 != null && triggerSpellLvl1.Category == spell.Category)
+                                        {
+                                            if (amulet.LeyLineEffectId == (uint)LeyLineEffect.ExtraSpellIntensity)
+                                            {
+                                                spell.IntensityMod = 1.3f;
+                                            }
+                                            else
+                                            {
+                                                SpellId castSpellLevel1Id = (SpellId)(amulet.LeyLineCastSpellId ?? 0);
+                                                if (castSpellLevel1Id != SpellId.Undef)
+                                                {
+                                                    SpellId castSpellId = SpellLevelProgression.GetSpellAtLevel(castSpellLevel1Id, (int)spell.Level - 1, true);
+                                                    if (castSpellId != SpellId.Undef)
+                                                    {
+                                                        var castSpell = new Spell(castSpellId);
+                                                        var mirrorSpellChain = new ActionChain();
+                                                        mirrorSpellChain.AddDelaySeconds(0.3);
+                                                        mirrorSpellChain.AddAction(this, () =>
+                                                        {
+                                                            if (amulet.LeyLineEffectId == (uint)LeyLineEffect.CastExtraSpellSelf)
+                                                                CreatePlayerSpell(this, castSpell, isWeaponSpell);
+                                                            else
+                                                                CreatePlayerSpell(target, castSpell, isWeaponSpell);
+                                                        });
+
+                                                        mirrorSpellChain.EnqueueChain();
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+
                         CreatePlayerSpell(target, spell, isWeaponSpell);
+                    }
                     else
                     {
                         var fellows = GetFellowshipTargets();
@@ -1421,6 +1506,14 @@ namespace ACE.Server.WorldObjects
         {
             if (!SquelchManager.Squelches.Contains(source, msgType))
                 Session.Network.EnqueueSend(new GameMessageSystemChat(msg, msgType));
+        }
+
+        public void AlignLeyLineAmulet(Hotspot manaField)
+        {
+            var amulet = GetEquippedLeyLineAmulet();
+
+            if (amulet != null)
+                amulet.AlignLeyLineAmulet(manaField);
         }
     }
 }
