@@ -33,6 +33,9 @@ namespace ACE.Server.WorldObjects
         private double houseRentWarnTimestamp;
         private const double houseRentWarnInterval = 3600;
 
+        private double LeyLineAmuletsTickTimestamp;
+        private const double leyLineAmuletsTickInterval = 3600;
+
         public void Player_Tick(double currentUnixTime)
         {
             if (CharacterSaveFailed)
@@ -101,6 +104,13 @@ namespace ACE.Server.WorldObjects
                 }
                 else if (houseRentWarnTimestamp == 0)
                     houseRentWarnTimestamp = Time.GetFutureUnixTime(houseRentWarnInterval);
+            }
+
+            if (LeyLineAmuletsTickTimestamp == 0 || currentUnixTime > LeyLineAmuletsTickTimestamp)
+            {
+                LeyLineAmuletsTick(currentUnixTime);
+
+                LeyLineAmuletsTickTimestamp = Time.GetFutureUnixTime(leyLineAmuletsTickInterval);
             }
         }
 
@@ -690,6 +700,22 @@ namespace ACE.Server.WorldObjects
         public override void EnqueueAction(IAction action)
         {
             actionQueue.EnqueueAction(action);
+        }
+
+        public void LeyLineAmuletsTick(double currentUnixTime)
+        {
+            if (EquippedObjectsLoaded && InventoryLoaded)
+            {
+                var list = EquippedObjects.Values.Where(i => i.WeenieType == WeenieType.LeyLineAmulet).ToList();
+                list = list.Concat(Inventory.Values).Where(i => i.WeenieType == WeenieType.LeyLineAmulet).ToList();
+
+                foreach (var item in list)
+                {
+                    LeyLineAmulet amulet = item as LeyLineAmulet;
+                    if(amulet != null)
+                        amulet.CheckAlignmentDecay(this, currentUnixTime);
+                }
+            }
         }
 
         /// <summary>

@@ -1919,7 +1919,7 @@ namespace ACE.Server.WorldObjects
             set { if (!value.HasValue) RemoveProperty(PropertyDataId.ClothingBase); else SetProperty(PropertyDataId.ClothingBase, value.Value); }
         }
 
-        public int? ItemCurMana
+        public virtual int? ItemCurMana
         {
             get => GetProperty(PropertyInt.ItemCurMana);
             set { if (!value.HasValue) RemoveProperty(PropertyInt.ItemCurMana); else SetProperty(PropertyInt.ItemCurMana, value.Value); }

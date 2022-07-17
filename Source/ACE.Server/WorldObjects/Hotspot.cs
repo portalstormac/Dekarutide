@@ -169,6 +169,12 @@ namespace ACE.Server.WorldObjects
 
             var player = creature as Player;
 
+            if (Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.CustomDM && WeenieClassId == 8127) // Menhir Mana Field
+            {
+                if (player != null)
+                    player.AlignLeyLineAmulet(this);
+            }
+
             switch (DamageType)
             {
                 default:

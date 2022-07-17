@@ -300,7 +300,7 @@ namespace ACE.Server.WorldObjects
             TryShuffleStance(wieldedLocation);
 
             // handle item spells
-            if (item.ItemCurMana > 0)
+            if (item.ItemCurMana > 0 || item is LeyLineAmulet)
                 TryActivateSpells(item);
 
             // handle equipment sets
@@ -310,8 +310,15 @@ namespace ACE.Server.WorldObjects
             return true;
         }
 
-        private bool TryActivateSpells(WorldObject item)
+        public bool TryActivateSpells(WorldObject item)
         {
+            if (Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.CustomDM)
+            {
+                var leyLineAmulet = item as LeyLineAmulet;
+                if (leyLineAmulet != null)
+                    leyLineAmulet.OnEquip(this);
+            }
+
             // check activation requirements
             var result = item.CheckUseRequirements(this);
 
