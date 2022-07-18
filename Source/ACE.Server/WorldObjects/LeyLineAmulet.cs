@@ -428,6 +428,8 @@ namespace ACE.Server.WorldObjects
         {
         }
 
+        private static ushort MaxLeyLineAmuletStructure = 200;
+
         public virtual void AlignLeyLineAmulet(Hotspot manaField)
         {
             if(manaField == null)
@@ -460,7 +462,7 @@ namespace ACE.Server.WorldObjects
                 SetupNewAlignment(pseudoRandom, (LeyLineEffect)newLeyLineAlignEffectId);
 
                 Structure = 10;
-                MaxStructure = 101; // 101 so we keep the green bar when full
+                MaxStructure = (ushort)(MaxLeyLineAmuletStructure + 1); // + 1 so we keep the green bar when full
                 playerWielder.Session.Network.EnqueueSend(new GameMessagePublicUpdatePropertyInt(this, PropertyInt.Structure, (int)Structure));
                 playerWielder.Session.Network.EnqueueSend(new GameMessagePublicUpdatePropertyInt(this, PropertyInt.MaxStructure, (int)MaxStructure));
 
@@ -469,7 +471,7 @@ namespace ACE.Server.WorldObjects
 
                 OnEquip(playerWielder, true);
             }
-            else if(LeyLineSeed == seed && Structure < 100)
+            else if(LeyLineSeed == seed && Structure < MaxLeyLineAmuletStructure)
             {
                 IncreasedAlignment(10, playerWielder);
             }
@@ -481,13 +483,13 @@ namespace ACE.Server.WorldObjects
 
         private void IncreasedAlignment(int amount, Player player)
         {
-            Structure = (ushort)Math.Min((Structure ?? 0) + amount, 100);
+            Structure = (ushort)Math.Min((Structure ?? 0) + amount, MaxLeyLineAmuletStructure);
             if (player != null)
                 player.Session.Network.EnqueueSend(new GameMessagePublicUpdatePropertyInt(this, PropertyInt.Structure, (int)Structure));
 
             bool isWielded = player != null && player == Wielder;
 
-            if (Structure < 100)
+            if (Structure < MaxLeyLineAmuletStructure)
             {
                 LeyLineLastDecayTime = (int)Time.GetUnixTime();
 
@@ -656,7 +658,7 @@ namespace ACE.Server.WorldObjects
                     LeyLineTriggerSpellId = (uint)triggerSpellId;
                     LeyLineCastSpellId = (uint)triggerSpellId;
                     LeyLineTriggerChance = 0.3;
-                    effect = $"When casting a {triggerSpellName} there is a chance a second {triggerSpellName} of a lower level will also be cast.";
+                    effect = $"When casting {triggerSpellName} there is a chance a second {triggerSpellName} of a lower level will also be cast.";
                     LongDesc = $"{basicDescription}\n\nCurrent Effect: {effect}\n\nTrigger Spell: {triggerSpellName}\n\nCasted Spell: {triggerSpellName}";
                     break;
 
@@ -666,7 +668,7 @@ namespace ACE.Server.WorldObjects
                     LeyLineTriggerSpellId = (uint)triggerSpellId;
                     LeyLineCastSpellId = (uint)castSpellId;
                     LeyLineTriggerChance = 0.3;
-                    effect = $"When casting a {triggerSpellName} there is a chance a {castSpellName} of a lower level will also be cast on your target.";
+                    effect = $"When casting {triggerSpellName} there is a chance {castSpellName} of a lower level will also be cast on your target.";
                     LongDesc = $"{basicDescription}\n\nCurrent Effect: {effect}\n\nTrigger Spell: {triggerSpellName}\n\nCasted Spell: {castSpellName}";
                     break;
 
@@ -676,7 +678,7 @@ namespace ACE.Server.WorldObjects
                     LeyLineTriggerSpellId = (uint)triggerSpellId;
                     LeyLineCastSpellId = (uint)castSpellId;
                     LeyLineTriggerChance = 0.3;
-                    effect = $"When casting a {triggerSpellName} there is a chance a {castSpellName} of a lower level will also be cast on yourself.";
+                    effect = $"When casting {triggerSpellName} there is a chance {castSpellName} of a lower level will also be cast on yourself.";
                     LongDesc = $"{basicDescription}\n\nCurrent Effect: {effect}\n\nTrigger Spell: {triggerSpellName}\n\nCasted Spell: {castSpellName}";
                     break;
 
@@ -729,7 +731,7 @@ namespace ACE.Server.WorldObjects
             }
         }
 
-        private static double DecayInterval = 7200; // 2 hours
+        private static double DecayInterval = 3600; // 1 hour
         public void CheckAlignmentDecay(Player player, double currentUnixTime)
         {
             if (LeyLineLastDecayTime != null)
