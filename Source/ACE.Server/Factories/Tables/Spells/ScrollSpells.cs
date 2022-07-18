@@ -172,7 +172,7 @@ namespace ACE.Server.Factories.Tables
             SpellId.EnfeebleOther1,
 
             //SpellId.ManaBoostSelf1,       // these 2 mana boost spells exist,
-            //SpellId.ManaBoostOther1       // but they weren't learnable by the player in retail
+            //SpellId.ManaBoostOther1,      // but they weren't learnable by the player in retail
             SpellId.ManaDrainOther1,
 
             SpellId.RegenerationSelf1,

@@ -374,14 +374,14 @@ namespace ACE.Server.Factories.Tables
 
                 T7_CantripLevel = new ChanceTable<int>()
                 {
-                    ( 1, 0.40f ),
-                    ( 2, 0.60f ),
+                    ( 1, 0.80f ),
+                    ( 2, 0.20f ),
                 };
 
                 T8_CantripLevel = new ChanceTable<int>()
                 {
-                    ( 1, 0.20f ),
-                    ( 2, 0.80f ),
+                    ( 1, 0.80f ),
+                    ( 2, 0.20f ),
                 };
 
                 _cantripLevels = new List<ChanceTable<int>>()
