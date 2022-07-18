@@ -638,7 +638,7 @@ namespace ACE.Entity.Enum.Properties
         [ServerOnly]
         LeyLineEffectId                          = 10002,
         [ServerOnly]
-        LeyLineEffectSeed                        = 10003,
+        LeyLineSeed                        = 10003,
         [ServerOnly]
         LeyLineLastDecayTime                     = 10004
     }
