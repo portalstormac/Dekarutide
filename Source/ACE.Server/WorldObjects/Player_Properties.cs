@@ -1352,5 +1352,11 @@ namespace ACE.Server.WorldObjects
             get => GetProperty(PropertyInt.ImbueSuccesses) ?? 0;
             set { if (value == 0) RemoveProperty(PropertyInt.ImbueSuccesses); else SetProperty(PropertyInt.ImbueSuccesses, value); }
         }
+
+        public int? LeyLineSeed
+        {
+            get => GetProperty(PropertyInt.LeyLineSeed);
+            set { if (!value.HasValue) RemoveProperty(PropertyInt.LeyLineSeed); else SetProperty(PropertyInt.LeyLineSeed, value.Value); }
+        }
     }
 }

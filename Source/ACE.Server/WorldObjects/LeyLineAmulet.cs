@@ -373,10 +373,10 @@ namespace ACE.Server.WorldObjects
             set { if (!value.HasValue) RemoveProperty(PropertyInt.LeyLineEffectId); else SetProperty(PropertyInt.LeyLineEffectId, value.Value); }
         }
 
-        public int? LeyLineEffectSeed
+        public int? LeyLineSeed
         {
-            get => GetProperty(PropertyInt.LeyLineEffectSeed);
-            set { if (!value.HasValue) RemoveProperty(PropertyInt.LeyLineEffectSeed); else SetProperty(PropertyInt.LeyLineEffectSeed, value.Value); }
+            get => GetProperty(PropertyInt.LeyLineSeed);
+            set { if (!value.HasValue) RemoveProperty(PropertyInt.LeyLineSeed); else SetProperty(PropertyInt.LeyLineSeed, value.Value); }
         }
 
         public int? LeyLineLastDecayTime
@@ -442,7 +442,10 @@ namespace ACE.Server.WorldObjects
                 return;
 
             ;
-            int seed = (int)(WeenieClassId + playerWielder.Guid.Low + (playerWielder.CurrentLandblock.Id.LandblockX << 8 | playerWielder.CurrentLandblock.Id.LandblockY) + DerethDateTime.UtcNowToLoreTime.Month);
+            //int seed = (int)(WeenieClassId + playerWielder.Guid.Low + (playerWielder.CurrentLandblock.Id.LandblockX << 8 | playerWielder.CurrentLandblock.Id.LandblockY) + DerethDateTime.UtcNowToLoreTime.Month);
+            if ((playerWielder.LeyLineSeed ?? 0) == 0)
+                playerWielder.LeyLineSeed = ThreadSafeRandom.Next(0, int.MaxValue / 2);
+            int seed = (int)(WeenieClassId + playerWielder.LeyLineSeed + (playerWielder.CurrentLandblock.Id.LandblockX << 8 | playerWielder.CurrentLandblock.Id.LandblockY));
 
             Random pseudoRandom = new Random(seed); // Note that this class uses EXCLUSIVE max values instead of inclusive for our regular ThreadSafeRandom.
 
@@ -451,13 +454,13 @@ namespace ACE.Server.WorldObjects
             if ((LeyLineEffectId ?? 0) == 0)
             {
                 // Align
-                LeyLineEffectSeed = seed;
+                LeyLineSeed = seed;
                 LeyLineLastDecayTime = (int)Time.GetUnixTime();
 
                 SetupNewAlignment(pseudoRandom, (LeyLineEffect)newLeyLineAlignEffectId);
 
                 Structure = 10;
-                MaxStructure = 100;
+                MaxStructure = 101; // 101 so we keep the green bar when full
                 playerWielder.Session.Network.EnqueueSend(new GameMessagePublicUpdatePropertyInt(this, PropertyInt.Structure, (int)Structure));
                 playerWielder.Session.Network.EnqueueSend(new GameMessagePublicUpdatePropertyInt(this, PropertyInt.MaxStructure, (int)MaxStructure));
 
@@ -466,11 +469,11 @@ namespace ACE.Server.WorldObjects
 
                 OnEquip(playerWielder, true);
             }
-            else if(LeyLineEffectSeed == seed && Structure < 100)
+            else if(LeyLineSeed == seed && Structure < 100)
             {
                 IncreasedAlignment(10, playerWielder);
             }
-            else if(LeyLineEffectSeed != seed && Structure > 0)
+            else if(LeyLineSeed != seed && Structure > 0)
             {
                 DecreaseAlignment(10, playerWielder);
             }
@@ -552,7 +555,7 @@ namespace ACE.Server.WorldObjects
 
         private void ResetAmulet()
         {
-            LeyLineEffectSeed = null;
+            LeyLineSeed = null;
             LeyLineEffectId = null;
             LeyLineLastDecayTime = null;
             LeyLineTriggerSpellId = null;
