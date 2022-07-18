@@ -34,7 +34,7 @@ namespace ACE.Server.WorldObjects
         private const double houseRentWarnInterval = 3600;
 
         private double LeyLineAmuletsTickTimestamp;
-        private const double leyLineAmuletsTickInterval = 3600;
+        private const double leyLineAmuletsTickInterval = 1800;
 
         public void Player_Tick(double currentUnixTime)
         {
