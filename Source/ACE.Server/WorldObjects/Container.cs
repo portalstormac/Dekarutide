@@ -15,6 +15,8 @@ using ACE.Server.Managers;
 using ACE.Server.Network.GameMessages.Messages;
 using ACE.Server.Network.GameEvent.Events;
 using ACE.Server.Network.GameMessages;
+using ACE.Server.Entity;
+using ACE.Server.Factories.Tables;
 
 namespace ACE.Server.WorldObjects
 {
@@ -500,52 +502,52 @@ namespace ACE.Server.WorldObjects
             return newStackSize <= maxStackSize;
         }
 
-        List<SpellId> spellsToRemove = new List<SpellId>()
+        Dictionary<SpellId, int> SpellsToReplace = new Dictionary<SpellId, int>()
         {
-            SpellId.BloodDrinkerSelf1,
-            SpellId.BloodDrinkerSelf2,
-            SpellId.BloodDrinkerSelf3,
-            SpellId.BloodDrinkerSelf4,
-            SpellId.BloodDrinkerSelf5,
-            SpellId.BloodDrinkerSelf6,
-            SpellId.BloodDrinkerSelf7,
-            SpellId.BloodDrinkerSelf8,
+            { SpellId.BloodDrinkerSelf1, -1 }, // -1 means replace with a level 1 proc and so on.
+            { SpellId.BloodDrinkerSelf2, -2 },
+            { SpellId.BloodDrinkerSelf3, -3 },
+            { SpellId.BloodDrinkerSelf4, -4 },
+            { SpellId.BloodDrinkerSelf5, -5 },
+            { SpellId.BloodDrinkerSelf6, -6 },
+            { SpellId.BloodDrinkerSelf7, -7 },
+            { SpellId.BloodDrinkerSelf8, -8 },
 
-            SpellId.BloodDrinkerOther1,
-            SpellId.BloodDrinkerOther2,
-            SpellId.BloodDrinkerOther3,
-            SpellId.BloodDrinkerOther4,
-            SpellId.BloodDrinkerOther5,
-            SpellId.BloodDrinkerOther6,
-            SpellId.BloodDrinkerOther7,
-            SpellId.BloodDrinkerOther8,
+            { SpellId.BloodDrinkerOther1, -1 },
+            { SpellId.BloodDrinkerOther2, -2 },
+            { SpellId.BloodDrinkerOther3, -3 },
+            { SpellId.BloodDrinkerOther4, -4 },
+            { SpellId.BloodDrinkerOther5, -5 },
+            { SpellId.BloodDrinkerOther6, -6 },
+            { SpellId.BloodDrinkerOther7, -7 },
+            { SpellId.BloodDrinkerOther8, -8 },
 
-            SpellId.SpiritDrinkerSelf1,
-            SpellId.SpiritDrinkerSelf2,
-            SpellId.SpiritDrinkerSelf3,
-            SpellId.SpiritDrinkerSelf4,
-            SpellId.SpiritDrinkerSelf5,
-            SpellId.SpiritDrinkerSelf6,
-            SpellId.SpiritDrinkerSelf7,
-            SpellId.SpiritDrinkerSelf8,
+            { SpellId.SpiritDrinkerSelf1, 0 }, // 0 means remove, positive values mean the spellId of the replacement spell.
+            { SpellId.SpiritDrinkerSelf2, 0 },
+            { SpellId.SpiritDrinkerSelf3, 0 },
+            { SpellId.SpiritDrinkerSelf4, 0 },
+            { SpellId.SpiritDrinkerSelf5, 0 },
+            { SpellId.SpiritDrinkerSelf6, 0 },
+            { SpellId.SpiritDrinkerSelf7, 0 },
+            { SpellId.SpiritDrinkerSelf8, 0 },
 
-            SpellId.SpiritDrinkerOther1,
-            SpellId.SpiritDrinkerOther2,
-            SpellId.SpiritDrinkerOther3,
-            SpellId.SpiritDrinkerOther4,
-            SpellId.SpiritDrinkerOther5,
-            SpellId.SpiritDrinkerOther6,
-            SpellId.SpiritDrinkerOther7,
-            SpellId.SpiritDrinkerOther8,
+            { SpellId.SpiritDrinkerOther1, 0 },
+            { SpellId.SpiritDrinkerOther2, 0 },
+            { SpellId.SpiritDrinkerOther3, 0 },
+            { SpellId.SpiritDrinkerOther4, 0 },
+            { SpellId.SpiritDrinkerOther5, 0 },
+            { SpellId.SpiritDrinkerOther6, 0 },
+            { SpellId.SpiritDrinkerOther7, 0 },
+            { SpellId.SpiritDrinkerOther8, 0 },
 
-            SpellId.Impenetrability1,
-            SpellId.Impenetrability2,
-            SpellId.Impenetrability3,
-            SpellId.Impenetrability4,
-            SpellId.Impenetrability5,
-            SpellId.Impenetrability6,
-            SpellId.Impenetrability7,
-            SpellId.Impenetrability8,
+            { SpellId.Impenetrability1, 0 },
+            { SpellId.Impenetrability2, 0 },
+            { SpellId.Impenetrability3, 0 },
+            { SpellId.Impenetrability4, 0 },
+            { SpellId.Impenetrability5, 0 },
+            { SpellId.Impenetrability6, 0 },
+            { SpellId.Impenetrability7, 0 },
+            { SpellId.Impenetrability8, 0 },
         };
 
         /// <summary>
@@ -657,10 +659,38 @@ namespace ACE.Server.WorldObjects
                     var list = worldObject.Biota.GetKnownSpellsIds(BiotaDatabaseLock);
                     foreach (var entry in list)
                     {
-                        if (spellsToRemove.Contains((SpellId)entry))
+                        int replacementId;
+                        if (SpellsToReplace.TryGetValue((SpellId)entry, out replacementId))
                         {
-                            worldObject.Biota.TryRemoveKnownSpell(entry, BiotaDatabaseLock);
-                            log.Warn($"Removed invalid spell {(SpellId)entry} from {worldObject.GetProperty(PropertyString.Name)}.");
+                            if (worldObject.Biota.TryRemoveKnownSpell(entry, BiotaDatabaseLock))
+                            {
+                                if (replacementId < 0 && (worldObject is MeleeWeapon || worldObject is MissileLauncher || worldObject is Missile))
+                                {
+                                    int level = Math.Clamp(Math.Abs(replacementId), 1, 8);
+
+                                    SpellId procSpellLevel1Id;
+                                    if (worldObject is MeleeWeapon)
+                                        procSpellLevel1Id = MeleeSpells.PseudoRandomRollProc((int)worldObject.WeenieClassId);
+                                    else
+                                        procSpellLevel1Id = MissileSpells.PseudoRandomRollProc((int)worldObject.WeenieClassId);
+
+                                    var procSpellId = SpellLevelProgression.GetSpellAtLevel(procSpellLevel1Id, level);
+
+                                    Spell spell = new Spell(procSpellId);
+                                    worldObject.ProcSpellRate = 0.05f;
+                                    worldObject.ProcSpell = (uint)procSpellId;
+                                    worldObject.ProcSpellSelfTargeted = spell.IsSelfTargeted;
+
+                                    log.Warn($"Replaced invalid spell {(SpellId)entry} with {(SpellId)procSpellId} as a proc on {worldObject.GetProperty(PropertyString.Name)}.");
+                                }
+                                else if (replacementId > 0)
+                                {
+                                    worldObject.Biota.GetOrAddKnownSpell(entry, BiotaDatabaseLock, out _);
+                                    log.Warn($"Replaced invalid spell {(SpellId)entry} with {replacementId} on {worldObject.GetProperty(PropertyString.Name)}.");
+                                }
+                                else
+                                    log.Warn($"Removed invalid spell {(SpellId)entry} from {worldObject.GetProperty(PropertyString.Name)}.");
+                            }
                         }
                     }
                 }

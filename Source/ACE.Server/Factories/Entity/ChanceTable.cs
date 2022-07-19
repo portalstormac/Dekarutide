@@ -50,6 +50,29 @@ namespace ACE.Server.Factories.Entity
             verified = true;
         }
 
+        public T PseudoRandomRoll(int seed)
+        {
+            if (!verified)
+                VerifyTable();
+
+            var total = 0.0f;
+
+            Random random = new Random(seed);
+            var rng = random.NextDouble();
+
+            foreach (var entry in this)
+            {
+                total += entry.chance / TotalWeight;
+
+                if (rng < total)
+                    return entry.result;
+            }
+
+            //Console.WriteLine($"Rolled {rng}, everything >= {total}");
+
+            return this.Last(i => i.chance > 0).result;
+        }
+
         public T Roll(float qualityMod = 0.0f, bool invertedQualityMod = false)
         {
             if (!verified)

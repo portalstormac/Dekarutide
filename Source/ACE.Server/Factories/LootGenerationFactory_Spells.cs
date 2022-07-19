@@ -24,6 +24,22 @@ namespace ACE.Server.Factories
                 wo.Biota.GetOrAddKnownSpell((int)spell, wo.BiotaDatabaseLock, out _);
             }
             numSpells = spells.Count;
+
+            if ((roll.IsMeleeWeapon || roll.IsMissileWeapon) && Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.CustomDM)
+            {
+                var itemProc = RollItemProc(wo, profile, roll);
+
+                if(itemProc != SpellId.Undef)
+                {
+                    Server.Entity.Spell spell = new Server.Entity.Spell(itemProc);
+                    wo.ProcSpellRate = 0.05f;
+                    wo.ProcSpell = (uint)itemProc;
+                    wo.ProcSpellSelfTargeted = spell.IsSelfTargeted;
+
+                    numSpells++;
+                }
+            }
+
             return true;
         }
 
@@ -64,6 +80,44 @@ namespace ACE.Server.Factories
             }
 
             return spells;
+        }
+
+        private static SpellId RollItemProc(WorldObject wo, TreasureDeath profile, TreasureRoll roll)
+        {
+            SpellId procSpellId = SpellId.Undef;
+
+            if (roll.IsMeleeWeapon)
+            {
+                procSpellId = MeleeSpells.RollProc(profile);
+            }
+            else if (roll.IsMissileWeapon)
+            {
+               procSpellId = MissileSpells.RollProc(profile);
+            }
+            else
+            {
+                log.Error($"RollItemProc({wo.Name}) - item is not melee or missile weapon");
+                return SpellId.Undef;
+            }
+
+            if(procSpellId != SpellId.Undef)
+                return RollProcLevel(wo, profile, procSpellId);
+            return SpellId.Undef;
+        }
+
+        private static SpellId RollProcLevel(WorldObject wo, TreasureDeath profile, SpellId procSpellId)
+        {
+            var spellLevel = SpellLevelChance.Roll(profile.Tier);
+
+            var spellLevels = SpellLevelProgression.GetSpellLevels(procSpellId);
+
+            if (spellLevels.Count != 8)
+            {
+                log.Error($"RollSpellLevels({wo.Name}, {procSpellId}) - spell level progression returned {spellLevels.Count}, expected 8");
+                return SpellId.Undef;
+            }
+
+            return(spellLevels[spellLevel - 1]);
         }
 
         private static List<SpellId> RollItemSpells(WorldObject wo, TreasureDeath profile, TreasureRoll roll)

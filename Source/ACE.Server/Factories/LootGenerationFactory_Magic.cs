@@ -34,7 +34,7 @@ namespace ACE.Server.Factories
                     return;
             }
 
-            if (numSpells == 0 && wo.SpellDID == null)
+            if (numSpells == 0 && wo.SpellDID == null && wo.ProcSpell == null)
             {
                 // we ended up without any spells, revert to non-magic item.
                 wo.ItemManaCost = null;
@@ -500,6 +500,14 @@ namespace ACE.Server.Factories
         {
             var maxBaseMana = 0;
 
+            if (wo.SpellDID != null)
+            {
+                var spell = new Server.Entity.Spell(wo.SpellDID.Value);
+
+                if (spell.BaseMana > maxBaseMana)
+                    maxBaseMana = (int)spell.BaseMana;
+            }
+
             if (wo.Biota.PropertiesSpellBook != null)
             {
                 foreach (var spellId in wo.Biota.PropertiesSpellBook.Keys)
@@ -510,6 +518,15 @@ namespace ACE.Server.Factories
                         maxBaseMana = (int)spell.BaseMana;
                 }
             }
+
+            if (wo.ProcSpell != null)
+            {
+                var spell = new Server.Entity.Spell(wo.ProcSpell.Value);
+
+                if (spell.BaseMana > maxBaseMana)
+                    maxBaseMana = (int)spell.BaseMana;
+            }
+
             return maxBaseMana;
         }
 
@@ -694,6 +711,15 @@ namespace ACE.Server.Factories
                 }
             }
 
+            if (wo.ProcSpell != null)
+            {
+                var spell = new Server.Entity.Spell(wo.ProcSpell.Value);
+
+                int spellPower = GetSpellPower(spell);
+                if (spellPower > maxSpellPower)
+                    maxSpellPower = spellPower;
+            }
+
             return maxSpellPower;
         }
 
@@ -814,6 +840,9 @@ namespace ACE.Server.Factories
         {
             // - # of spells on item
             var num_spells = wo.Biota.PropertiesSpellBook.Count();
+
+            if (wo.ProcSpell != null)
+                num_spells++;
 
             var spellAddonChance = num_spells * (20.0f / (num_spells + 2.0f));
             var spellAddon = (float)ThreadSafeRandom.Next(1.0f, spellAddonChance) * num_spells;
