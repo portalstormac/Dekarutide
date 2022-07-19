@@ -963,6 +963,9 @@ namespace ACE.Server.WorldObjects
 
         public void TryProcItem(WorldObject attacker, Creature target)
         {
+            if (Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.CustomDM && ItemMaxMana > 0 && !IsAffecting)
+                return; // The item spells must be active for the item to proc.
+
             // roll for a chance of casting spell
             var chance = ProcSpellRate ?? 0.0f;
 
