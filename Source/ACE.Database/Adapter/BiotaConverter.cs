@@ -482,7 +482,7 @@ namespace ACE.Database.Adapter
             result.Id = biota.Id;
             result.WeenieClassId = biota.WeenieClassId;
             result.WeenieType = (int)biota.WeenieType;
-
+            result.IsPartialCollection = biota.IsPartiallyPersistant;
 
             if (biota.PropertiesBool != null)
             {

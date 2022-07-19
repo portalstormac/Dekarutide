@@ -95,6 +95,17 @@ namespace ACE.Server.WorldObjects
         /// </summary>
         public Vendor(Weenie weenie, ObjectGuid guid) : base(weenie, guid)
         {
+            Biota.PartialPersitanceFilter = new List<PartialPersistanceEntry>()
+            {
+                { new PartialPersistanceEntry(PropertyInt.MoneyIncome)  },
+                { new PartialPersistanceEntry(PropertyInt.MoneyOutflow) },
+                { new PartialPersistanceEntry(PropertyInt.RecentMoneyIncome) },
+                { new PartialPersistanceEntry(PropertyInt.RecentMoneyOutflow) },
+                { new PartialPersistanceEntry(PropertyInt.NumItemsSold) },
+                { new PartialPersistanceEntry(PropertyInt.NumItemsBought) },
+                { new PartialPersistanceEntry(PropertyInt.NumServicesSold) }
+            };
+
             SetEphemeralValues();
         }
 
@@ -115,7 +126,7 @@ namespace ACE.Server.WorldObjects
                 GeneratorProfiles.RemoveAll(p => p.Biota.WhereCreate.HasFlag(RegenLocationType.Shop));
             }
 
-            LastRestockTime = DateTime.MinValue;
+            LastRestockTime = DateTime.UtcNow.Subtract(TimeSpan.FromSeconds(PropertyManager.GetDouble("vendor_unique_rot_time", 300).Item));
             OpenForBusiness = ValidateVendorRequirements();
         }
 
@@ -316,12 +327,8 @@ namespace ACE.Server.WorldObjects
             lastPlayerInfo = new WorldObjectInfo(player);
         }
 
-        private int CurrentVendorHappyThreshold;
-        private double VendorHappyMultiplier = 100; // To do: once we have a notion on the exact value for this multiplier modify the values in the database so we can remove the need for this.
         private double BuyPriceMod;
         private double SellPriceMod;
-        public int RecentMoneyIncome;
-        public int RecentMoneyOutflow;
 
         public void AddMoneyIncome(int value)
         {
@@ -337,8 +344,8 @@ namespace ACE.Server.WorldObjects
 
         public void UpdateHappyVendor()
         {
-            int vendorHappyMean = (int)((VendorHappyMean ?? 0) * VendorHappyMultiplier);
-            int vendorHappyVariance = (int)((VendorHappyVariance ?? 0) * VendorHappyMultiplier);
+            int vendorHappyMean = (VendorHappyMean ?? 0) * (MerchandiseMaxValue ?? 100000) / 1000;
+            int vendorHappyVariance = (VendorHappyVariance ?? 0) * (MerchandiseMaxValue ?? 100000) / 1000;
             if (vendorHappyMean == 0)
             {
                 BuyPriceMod = 0.0f;
@@ -346,9 +353,11 @@ namespace ACE.Server.WorldObjects
                 return;
             }
 
-            CurrentVendorHappyThreshold = ThreadSafeRandom.Next(vendorHappyMean - vendorHappyVariance, vendorHappyMean + vendorHappyVariance);
-            SellPriceMod = -Math.Min(((RecentMoneyIncome + RecentMoneyOutflow) / (float)CurrentVendorHappyThreshold * 0.1f), 0.1f);
-            BuyPriceMod = 0.1f + SellPriceMod;
+            int currentVendorHappyThreshold = ThreadSafeRandom.Next(vendorHappyMean, vendorHappyMean + vendorHappyVariance);
+            double priceMod = Math.Clamp((RecentMoneyIncome + RecentMoneyOutflow) / (float)currentVendorHappyThreshold * 0.1f, 0.0f, 0.1f);
+
+            SellPriceMod = -priceMod;
+            BuyPriceMod = 0.1f - priceMod;
         }
 
         /// <summary>
@@ -927,14 +936,15 @@ namespace ACE.Server.WorldObjects
             if ((DateTime.UtcNow - LastRestockTime).TotalSeconds < PropertyManager.GetDouble("vendor_unique_rot_time", 300).Item)
                 return;
 
+            // Decay our recent income and outflow so prices can change accordingly.
+            int minutesSinceLastRestock = (int)(DateTime.UtcNow - LastRestockTime).TotalMinutes;
+            int decayAmount = ThreadSafeRandom.Next(VendorHappyMean ?? 125, VendorHappyMean ?? 125 + VendorHappyVariance ?? 125) * minutesSinceLastRestock;
+            RecentMoneyOutflow = Math.Max(RecentMoneyOutflow - decayAmount, 0);
+            RecentMoneyIncome = Math.Max(RecentMoneyIncome - decayAmount, 0);
+
             LastRestockTime = DateTime.UtcNow;
 
             UpdateHappyVendor();
-
-            // Decay our recent income and outflow so prices can change accordingly.
-            int minutesSinceLastRestock = (int)(DateTime.UtcNow - LastRestockTime).TotalMinutes;
-            RecentMoneyOutflow -= Math.Max(minutesSinceLastRestock * 100, 0);
-            RecentMoneyIncome -= Math.Max(minutesSinceLastRestock * 100, 0);
 
             if (UniqueItemsForSale.Count >= ShopRandomItemStockAmount)
                 return;
@@ -1160,6 +1170,18 @@ namespace ACE.Server.WorldObjects
         {
             get => GetProperty(PropertyInt.MoneyOutflow) ?? 0;
             set { if (value == 0) RemoveProperty(PropertyInt.MoneyOutflow); else SetProperty(PropertyInt.MoneyOutflow, value); }
+        }
+
+        public int RecentMoneyIncome
+        {
+            get => GetProperty(PropertyInt.RecentMoneyIncome) ?? 0;
+            set { if (value == 0) RemoveProperty(PropertyInt.RecentMoneyIncome); else SetProperty(PropertyInt.RecentMoneyIncome, value); }
+        }
+
+        public int RecentMoneyOutflow
+        {
+            get => GetProperty(PropertyInt.RecentMoneyOutflow) ?? 0;
+            set { if (value == 0) RemoveProperty(PropertyInt.RecentMoneyOutflow); else SetProperty(PropertyInt.RecentMoneyOutflow, value); }
         }
     }
 }

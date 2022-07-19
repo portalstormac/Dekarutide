@@ -37,6 +37,7 @@ CREATE TABLE `biota` (
   `weenie_Class_Id` int unsigned NOT NULL COMMENT 'Weenie Class Id of the Weenie this Biota was created from',
   `weenie_Type` int NOT NULL DEFAULT '0' COMMENT 'WeenieType for this Object',
   `populated_Collection_Flags` int unsigned NOT NULL DEFAULT '4294967295',
+  `is_Partial_Collection` tinyint(1) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`),
   KEY `biota_wcid_idx` (`weenie_Class_Id`),
   KEY `biota_type_idx` (`weenie_Type`)

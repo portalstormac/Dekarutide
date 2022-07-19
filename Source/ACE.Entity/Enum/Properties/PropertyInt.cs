@@ -638,9 +638,11 @@ namespace ACE.Entity.Enum.Properties
         [ServerOnly]
         LeyLineEffectId                          = 10002,
         [ServerOnly]
-        LeyLineSeed                        = 10003,
+        LeyLineSeed                              = 10003,
         [ServerOnly]
-        LeyLineLastDecayTime                     = 10004
+        LeyLineLastDecayTime                     = 10004,
+        RecentMoneyIncome                        = 10005,
+        RecentMoneyOutflow                       = 10006,
     }
 
     public static class PropertyIntExtensions

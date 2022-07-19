@@ -104,6 +104,10 @@ namespace ACE.Database.Models.Shard
                 entity.Property(e => e.WeenieType)
                     .HasColumnName("weenie_Type")
                     .HasComment("WeenieType for this Object");
+
+                entity.Property(e => e.IsPartialCollection)
+                    .HasColumnName("is_Partial_Collection")
+                    .HasDefaultValueSql("'0'");
             });
 
             modelBuilder.Entity<BiotaPropertiesAllegiance>(entity =>
