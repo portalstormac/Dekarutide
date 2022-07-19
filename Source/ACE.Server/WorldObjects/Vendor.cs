@@ -344,8 +344,8 @@ namespace ACE.Server.WorldObjects
 
         public void UpdateHappyVendor()
         {
-            int vendorHappyMean = (VendorHappyMean ?? 0) * (MerchandiseMaxValue ?? 100000) / 1000;
-            int vendorHappyVariance = (VendorHappyVariance ?? 0) * (MerchandiseMaxValue ?? 100000) / 1000;
+            int vendorHappyMean = (VendorHappyMean ?? 0) * (MerchandiseMaxValue ?? 3000) / 3;
+            int vendorHappyVariance = (VendorHappyVariance ?? 0) * (MerchandiseMaxValue ?? 3000) / 3;
             if (vendorHappyMean == 0)
             {
                 BuyPriceMod = 0.0f;
@@ -809,6 +809,7 @@ namespace ACE.Server.WorldObjects
             if (ShopHeritage > TreasureHeritageGroup.Sho)
                 ShopHeritage = TreasureHeritageGroup.Invalid;
 
+            bool starterOutpostVendor = false;
             string townName = GetProperty(PropertyString.TownName);
             switch(townName)
             {
@@ -832,6 +833,7 @@ namespace ACE.Server.WorldObjects
                 case "North Yaraq Outpost":
                     ShopTier = 1;
                     ShopQualityMod = -0.5f;
+                    starterOutpostVendor = true;
                     break;
                 case "Al-Arqas":
                 case "Bluespire":
@@ -922,6 +924,33 @@ namespace ACE.Server.WorldObjects
                         }
                     }
                 }
+            }
+
+            // Let's overwrite the database values for MerchandiseMaxValue depending on our tier.
+            switch (ShopTier)
+            {
+                default:
+                case 1:
+                    if (starterOutpostVendor)
+                        MerchandiseMaxValue = 1500;
+                    else
+                        MerchandiseMaxValue = 3000;
+                    break;
+                case 2:
+                    MerchandiseMaxValue = 12000;
+                    break;
+                case 3:
+                    MerchandiseMaxValue = 18000;
+                    break;
+                case 4:
+                    MerchandiseMaxValue = 24000;
+                    break;
+                case 5:
+                    MerchandiseMaxValue = 30000;
+                    break;
+                case 6:
+                    MerchandiseMaxValue = 50000;
+                    break;
             }
         }
 
