@@ -111,6 +111,9 @@ namespace ACE.Server.WorldObjects
             if (BiotaOriginatedFromOrHasBeenSavedToDatabase())
                 return true;
 
+            if (Biota.IsPartiallyPersistant)
+                return true;
+
             if (WeenieType == WeenieType.SlumLord && this is SlumLord slumlord)
             {
                 if (slumlord.House != null && slumlord.House.HouseOwner.HasValue && slumlord.House.HouseOwner != 0)

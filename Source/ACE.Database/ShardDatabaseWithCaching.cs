@@ -6,6 +6,7 @@ using System.Threading;
 
 using ACE.Database.Models.Shard;
 using ACE.Entity;
+using ACE.Entity.Enum.Properties;
 
 namespace ACE.Database
 {
@@ -136,6 +137,103 @@ namespace ACE.Database
 
         public override bool SaveBiota(ACE.Entity.Models.Biota biota, ReaderWriterLockSlim rwLock)
         {
+            if (biota.IsPartiallyPersistant)
+            {
+                ACE.Entity.Models.Biota partialBiota = new ACE.Entity.Models.Biota();
+                partialBiota.Id = biota.Id;
+                partialBiota.WeenieClassId = biota.WeenieClassId;
+                partialBiota.WeenieType = biota.WeenieType;
+                partialBiota.PartialPersitanceFilter = biota.PartialPersitanceFilter;
+
+                foreach (var entry in biota.PartialPersitanceFilter)
+                {
+                    if (entry.PropertyType == PropertyType.PropertyBool)
+                    {
+                        if (biota.PropertiesBool.TryGetValue((PropertyBool)entry.Property, out var entryValue))
+                        {
+                            if (partialBiota.PropertiesBool == null)
+                                partialBiota.PropertiesBool = new Dictionary<PropertyBool, bool>();
+                            partialBiota.PropertiesBool.Add((PropertyBool)entry.Property, entryValue);
+                        }
+                    }                    
+                    else if (entry.PropertyType == PropertyType.PropertyDataId)
+                    {
+                        if (biota.PropertiesDID.TryGetValue((PropertyDataId)entry.Property, out var entryValue))
+                        {
+                            if (partialBiota.PropertiesDID == null)
+                                partialBiota.PropertiesDID = new Dictionary<PropertyDataId, uint>();
+                            partialBiota.PropertiesDID.Add((PropertyDataId)entry.Property, entryValue);
+                        }
+                    }
+                    else if (entry.PropertyType == PropertyType.PropertyFloat)
+                    {
+                        if (biota.PropertiesFloat.TryGetValue((PropertyFloat)entry.Property, out var entryValue))
+                        {
+                            if (partialBiota.PropertiesFloat == null)
+                                partialBiota.PropertiesFloat = new Dictionary<PropertyFloat, double>();
+                            partialBiota.PropertiesFloat.Add((PropertyFloat)entry.Property, entryValue);
+                        }
+                    }
+                    else if (entry.PropertyType == PropertyType.PropertyInstanceId)
+                    {
+                        if (biota.PropertiesIID.TryGetValue((PropertyInstanceId)entry.Property, out var entryValue))
+                        {
+                            if (partialBiota.PropertiesIID == null)
+                                partialBiota.PropertiesIID = new Dictionary<PropertyInstanceId, uint>();
+                            partialBiota.PropertiesIID.Add((PropertyInstanceId)entry.Property, entryValue);
+                        }
+                    }
+                    else if (entry.PropertyType == PropertyType.PropertyInt)
+                    {
+                        if (biota.PropertiesInt.TryGetValue((PropertyInt)entry.Property, out var entryValue))
+                        {
+                            if (partialBiota.PropertiesInt == null)
+                                partialBiota.PropertiesInt = new Dictionary<PropertyInt, int>();
+                            partialBiota.PropertiesInt.Add((PropertyInt)entry.Property, entryValue);
+                        }
+                    }
+                    else if (entry.PropertyType == PropertyType.PropertyInt64)
+                    {
+                        if (biota.PropertiesInt64.TryGetValue((PropertyInt64)entry.Property, out var entryValue))
+                        {
+                            if (partialBiota.PropertiesInt64 == null)
+                                partialBiota.PropertiesInt64 = new Dictionary<PropertyInt64, long>();
+                            partialBiota.PropertiesInt64.Add((PropertyInt64)entry.Property, entryValue);
+                        }
+                    }
+                    else if (entry.PropertyType == PropertyType.PropertyString)
+                    {
+                        if (biota.PropertiesString.TryGetValue((PropertyString)entry.Property, out var entryValue))
+                        {
+                            if (partialBiota.PropertiesString == null)
+                                partialBiota.PropertiesString = new Dictionary<PropertyString, string>();
+                            partialBiota.PropertiesString.Add((PropertyString)entry.Property, entryValue);
+                        }
+                    }
+                    // Todo: Add partial collection support for the following properties if we ever need them:
+                    // PropertiesPosition
+                    // PropertiesSpellBook
+                    // PropertiesAnimPart
+                    // PropertiesPalette
+                    // PropertiesTextureMap
+                    // PropertiesCreateList
+                    // PropertiesEmote
+                    // PropertiesEventFilter
+                    // PropertiesGenerator
+                    // PropertiesAttribute
+                    // PropertiesAttribute2nd
+                    // PropertiesBodyPart
+                    // PropertiesSkill
+                    // PropertiesBook
+                    // PropertiesBookPageData
+                    // PropertiesAllegiance
+                    // PropertiesEnchantmentRegistry
+                    // HousePermissions
+                }
+
+                biota = partialBiota;
+            }
+
             CacheObject<Biota> cachedBiota;
 
             lock (biotaCacheMutex)
