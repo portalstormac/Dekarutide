@@ -443,7 +443,9 @@ namespace ACE.Server.WorldObjects
             if (forwardCommand != MotionCommand.MeditateState)
                 return;
 
-            ;
+            if (playerWielder.GetCreatureSkill((MagicSchool)LeyLineSchool).AdvancementClass < SkillAdvancementClass.Trained)
+                return;
+
             //int seed = (int)(WeenieClassId + playerWielder.Guid.Low + (playerWielder.CurrentLandblock.Id.LandblockX << 8 | playerWielder.CurrentLandblock.Id.LandblockY) + DerethDateTime.UtcNowToLoreTime.Month);
             if ((playerWielder.LeyLineSeed ?? 0) == 0)
                 playerWielder.LeyLineSeed = ThreadSafeRandom.Next(0, int.MaxValue / 2);
@@ -713,7 +715,8 @@ namespace ACE.Server.WorldObjects
 
                 case LeyLineEffect.LowerCompBurnChanceAllSpells:
                     effect = $"Component burn chances are lower than usual.";
-                    LongDesc = $"{basicDescription}\n\nCurrent Effect: {effect}\n\nAffected Spell: All";
+                    triggerSpellName = isWarAmulet ? "All War Magic Spells" : "All Life Magic Spells";
+                    LongDesc = $"{basicDescription}\n\nCurrent Effect: {effect}\n\nAffected Spell: {triggerSpellName}";
                     break;
 
                 case LeyLineEffect.GrantCantrip:
