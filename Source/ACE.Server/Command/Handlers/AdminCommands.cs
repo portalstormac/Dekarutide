@@ -3554,17 +3554,17 @@ namespace ACE.Server.Command.Handlers
         [CommandHandler("qst", AccessLevel.Developer, CommandHandlerFlag.RequiresWorld, 1,
             "Query, stamp, and erase quests on the targeted player",
             "(fellow) [list | bestow | erase]\n"
-            + "qst list - List the quest flags for the targeted player\n"
+            + "qst list [filter] - List the quest flags for the targeted player\n"
             + "qst bestow - Stamps the specific quest flag on the targeted player. If this fails, it's probably because you spelled the quest flag wrong.\n"
             + "qst stamp - Stamps the specific quest flag on the targeted player the specified number of times. If this fails, it's probably because you spelled the quest flag wrong.\n"
             + "qst erase - Erase the specific quest flag from the targeted player. If no quest flag is given, it erases the entire quest table for the targeted player.\n")]
         public static void Handleqst(Session session, params string[] parameters)
         {
             // fellow bestow  stamp erase
-            // @qst list[filter]-List the quest flags for the targeted player, if a filter is provided, you will only get quest flags back that have the filter as a substring of the quest name. (Filter IS case sensitive!)
-            // @qst erase < quest flag > -Erase the specific quest flag from the targeted player.If no quest flag is given, it erases the entire quest table for the targeted player.
-            // @qst erase fellow < quest flag > -Erase a fellowship quest flag.
-            // @qst bestow < quest flag > -Stamps the specific quest flag on the targeted player.If this fails, it's probably because you spelled the quest flag wrong.
+            // @qst list [filter]-List the quest flags for the targeted player, if a filter is provided, you will only get quest flags back that have the filter as a substring of the quest name.
+            // @qst erase <quest flag> -Erase the specific quest flag from the targeted player.If no quest flag is given, it erases the entire quest table for the targeted player.
+            // @qst erase fellow <quest flag> -Erase a fellowship quest flag.
+            // @qst bestow <quest flag> -Stamps the specific quest flag on the targeted player.If this fails, it's probably because you spelled the quest flag wrong.
             // @qst - Query, stamp, and erase quests on the targeted player.
             if (parameters.Length == 0)
             {
@@ -3587,6 +3587,10 @@ namespace ACE.Server.Command.Handlers
             {
                 if (parameters[0].Equals("list"))
                 {
+                    string filter = "";
+                    if (parameters.Length > 1)
+                        filter = parameters[1].ToLower();
+
                     var questsHdr = $"Quest Registry for {creature.Name} (0x{creature.Guid}):\n";
                     questsHdr += "================================================\n";
                     session.Player.SendMessage(questsHdr);
@@ -3601,6 +3605,9 @@ namespace ACE.Server.Command.Handlers
 
                     foreach (var quest in quests)
                     {
+                        if (filter != "" && !quest.QuestName.ToLower().Contains(filter))
+                            continue;
+
                         var questEntry = "";
                         questEntry += $"Quest Name: {quest.QuestName}\nCompletions: {quest.NumTimesCompleted} | Last Completion: {quest.LastTimeCompleted} ({Common.Time.GetDateTimeFromTimestamp(quest.LastTimeCompleted).ToLocalTime()})\n";
                         var nextSolve = creature.QuestManager.GetNextSolveTime(quest.QuestName);

@@ -3984,37 +3984,99 @@ namespace ACE.Server.Command.Handlers
             session.Player.HandleActionUseWithTarget(guid, target.Guid.Full);
         }
 
-        [CommandHandler("portalstorm", AccessLevel.Developer, CommandHandlerFlag.RequiresWorld, 1, "Tests starting a portal storm on yourself", "storm_level [0=Brewing, 1=Imminent, 2=Stormed, 3=Subsided]")]
-        public static void HandlePortalStorm(Session session, params string[] parameters)
+        [CommandHandler("testrng", AccessLevel.Developer, CommandHandlerFlag.None, 0, "Performs some tests with the random number generator")]
+        public static void HandleTestRNG(Session session, params string[] parameters)
         {
-            if (!uint.TryParse(parameters[0], out var storm_level))
+            int testRolls = 100000;
+
+            SortedDictionary<int, int> valueDistribution = new SortedDictionary<int, int>();
+            for (int i = 0; i < testRolls; i++)
             {
-                CommandHandlerHelper.WriteOutputInfo(session, $"Invalid storm level {parameters[0]}");
-                return;
-            }
-            if (storm_level > 3) storm_level = 3;
+                //var roll = ThreadSafeRandom.Next(0, 99);
+                var roll = (int)(Math.Round(ThreadSafeRandom.Next(0.0f, 1.0f), 2) * 100);
 
-            switch (storm_level) {
-                case 0:
-                    session.Network.EnqueueSend(new GameEventPortalStormBrewing(session));
-                    break;
-                case 1:
-                    session.Network.EnqueueSend(new GameEventPortalStormImminent(session));
-                    break;
-                case 2:
-                    // Portal Storm Event comes immediatley before the teleport
-                    session.Network.EnqueueSend(new GameEventPortalStorm(session));
-
-                    // We're going to move the player to 0,0
-                    Position newPos = new Position(0x7F7F001C, 84, 84, 80, 0, 0, 0, 1);
-                    session.Player.Teleport(newPos);
-                    break;
-                case 3:
-                    session.Network.EnqueueSend(new GameEventPortalStormSubsided(session));
-                    break;
+                if (valueDistribution.ContainsKey(roll))
+                    valueDistribution[roll]++;
+                else
+                    valueDistribution.Add(roll, 1);
             }
+
+            CommandHandlerHelper.WriteOutputInfo(session, "--------- Random Number Generator Test ----------");
+            CommandHandlerHelper.WriteOutputInfo(session, $"------------- Rolling {testRolls} times --------------");
+            CommandHandlerHelper.WriteOutputInfo(session, "---- ThreadSafeRandom.Next(0.0f, 1.0f) * 100 ----");
+            foreach (KeyValuePair<int, int> entry in valueDistribution)
+            {
+                CommandHandlerHelper.WriteOutputInfo(session, $"value: {entry.Key} amount: {entry.Value} percent: {entry.Value * 100f / testRolls}%");
+            }
+
+            int previousRoll = -1;
+            int maxStreak = 0;
+            int currentStreak = 0;
+            SortedDictionary<int, int> streakCounter = new SortedDictionary<int, int>();
+            for (int i = 0; i < testRolls; i++)
+            {
+                //var roll = ThreadSafeRandom.Next(0, 99);
+                var roll = (int)(Math.Round(ThreadSafeRandom.Next(0.0f, 1.0f), 2) * 100);
+
+                bool isStreak = roll == previousRoll;
+
+                if (isStreak)
+                    currentStreak++;
+
+                if (streakCounter.ContainsKey(currentStreak))
+                    streakCounter[currentStreak]++;
+                else
+                    streakCounter.Add(currentStreak, 1);
+
+                if (isStreak)
+                    currentStreak = 0;
+
+                if (currentStreak > maxStreak)
+                    maxStreak = currentStreak;
+
+                previousRoll = roll;
+            }
+
+            CommandHandlerHelper.WriteOutputInfo(session, "--- Streaks: consecutive rolls the same value ---");
+            foreach (KeyValuePair<int, int> entry in streakCounter)
+            {
+                CommandHandlerHelper.WriteOutputInfo(session, $"value: {entry.Key} amount: {entry.Value} percent: {entry.Value * 100f / testRolls}%");
+            }
+
+            previousRoll = -1;
+            maxStreak = 0;
+            currentStreak = 0;
+            streakCounter.Clear();
+            for (int i = 0; i < testRolls; i++)
+            {
+                //var roll = ThreadSafeRandom.Next(0, 99);
+                var roll = (int)(Math.Round(ThreadSafeRandom.Next(0.0f, 1.0f), 2) * 100);
+
+                bool isClustered = Math.Abs(roll - previousRoll) < 10;
+                if (isClustered)
+                    currentStreak++;
+
+                if (streakCounter.ContainsKey(currentStreak))
+                    streakCounter[currentStreak]++;
+                else
+                    streakCounter.Add(currentStreak, 1);
+
+                if (isClustered)
+                    currentStreak = 0;
+
+                if (currentStreak > maxStreak)
+                    maxStreak = currentStreak;
+
+                if(!isClustered)
+                    previousRoll = roll;
+            }
+
+            CommandHandlerHelper.WriteOutputInfo(session, "--- Clustering: consecutive rolls less than 10 apart ---");
+            foreach (KeyValuePair<int, int> entry in streakCounter)
+            {
+                CommandHandlerHelper.WriteOutputInfo(session, $"value: {entry.Key} amount: {entry.Value} percent: {entry.Value * 100f / testRolls}%");
+            }
+            CommandHandlerHelper.WriteOutputInfo(session, "-------- Random Number Generator Test Finished --------");
         }
-
-
     }
 }
