@@ -103,11 +103,11 @@ namespace ACE.Server.Factories.Tables.Wcids
             ( WeenieClassName.glovescloth,         0.10f ),
         };
 
-        public static WeenieClassName Roll(TreasureDeath treasureDeath)
+        public static WeenieClassName Roll(TreasureDeath treasureDeath, TreasureRoll treasureRoll)
         {
             if (Common.ConfigManager.Config.Server.WorldRuleset <= Common.Ruleset.Infiltration)
             {
-                var heritage = HeritageChance.Roll(treasureDeath.UnknownChances);
+                var heritage = HeritageChance.Roll(treasureDeath.UnknownChances, treasureRoll);
 
                 switch (heritage)
                 {
@@ -123,7 +123,7 @@ namespace ACE.Server.Factories.Tables.Wcids
             }
             else
             {
-                var heritage = HeritageChance.Roll(treasureDeath.UnknownChances, true);
+                var heritage = HeritageChance.Roll(treasureDeath.UnknownChances, treasureRoll, true);
 
                 switch (heritage)
                 {

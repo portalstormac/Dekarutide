@@ -1295,6 +1295,7 @@ namespace ACE.Server.Factories
             {
                 treasureRoll.ArmorType = treasureDeathExtended.ForceArmorType;
                 treasureRoll.WeaponType = treasureDeathExtended.ForceWeaponType;
+                treasureRoll.Heritage = treasureDeathExtended.ForceHeritage;
             }
 
             switch (treasureItemType)
@@ -1328,19 +1329,19 @@ namespace ACE.Server.Factories
                         treasureRoll.WeaponType = WeaponTypeChance.Roll(treasureDeath.Tier);
                     else if(treasureRoll.WeaponType == TreasureWeaponType.MeleeWeapon || treasureRoll.WeaponType == TreasureWeaponType.MissileWeapon)
                         treasureRoll.WeaponType = WeaponTypeChance.Roll(treasureDeath.Tier, treasureRoll.WeaponType);
-                    treasureRoll.Wcid = WeaponWcids.Roll(treasureDeath, ref treasureRoll.WeaponType);
+                    treasureRoll.Wcid = WeaponWcids.Roll(treasureDeath, treasureRoll);
                     break;
 
                 case TreasureItemType_Orig.Armor:
 
                     if (treasureRoll.ArmorType == TreasureArmorType.Undef)
                         treasureRoll.ArmorType = ArmorTypeChance.Roll(treasureDeath.Tier);
-                    treasureRoll.Wcid = ArmorWcids.Roll(treasureDeath, ref treasureRoll.ArmorType);
+                    treasureRoll.Wcid = ArmorWcids.Roll(treasureDeath, treasureRoll);
                     break;
 
                 case TreasureItemType_Orig.Clothing:
 
-                    treasureRoll.Wcid = ClothingWcids.Roll(treasureDeath);
+                    treasureRoll.Wcid = ClothingWcids.Roll(treasureDeath, treasureRoll);
                     break;
 
                 case TreasureItemType_Orig.Scroll:
@@ -1394,7 +1395,7 @@ namespace ACE.Server.Factories
                     treasureRoll.ItemType = TreasureItemType_Orig.SocietyArmor;     // collapse for mutation
                     treasureRoll.ArmorType = TreasureArmorType.Society;
 
-                    treasureRoll.Wcid = SocietyArmorWcids.Roll(treasureDeath, treasureItemType);
+                    treasureRoll.Wcid = SocietyArmorWcids.Roll(treasureDeath, treasureItemType, treasureRoll);
                     break;
 
                 case TreasureItemType_Orig.Cloak:
