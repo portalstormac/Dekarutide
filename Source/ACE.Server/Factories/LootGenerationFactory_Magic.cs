@@ -7,6 +7,7 @@ using ACE.Database.Models.World;
 using ACE.Entity.Enum;
 using ACE.Entity.Models;
 using ACE.Server.Factories.Entity;
+using ACE.Server.Factories.Enum;
 using ACE.Server.Factories.Tables;
 using ACE.Server.Managers;
 using ACE.Server.WorldObjects;
@@ -665,7 +666,7 @@ namespace ACE.Server.Factories
 
         public static int GetSpellPower(Server.Entity.Spell spell)
         {
-            if (Common.ConfigManager.Config.Server.WorldRuleset <= Common.Ruleset.Infiltration)
+            if (Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.Infiltration)
             {
                 switch (spell.Formula.Level)
                 {
@@ -679,12 +680,26 @@ namespace ACE.Server.Factories
                     case 7: return 200; // EoR is 300
                 }
             }
+            else if (Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.CustomDM)
+            {
+                switch (spell.Formula.Level)
+                {
+                    case 1: return 20; // EoR is 1
+                    case 2: return 50; // EoR is 50
+                    case 3: return 100; // EoR is 100
+                    case 4: return 150; // EoR is 150
+                    case 5: return 200; // EoR is 200
+                    case 6: return 250; // EoR is 250
+                    default:
+                    case 7: return 300; // EoR is 300
+                }
+            }
             else
                 return (int)spell.Power;
         }
 
         /// <summary>
-        /// Returns the maximum power from the spells in item's SpellDID / spellbook
+        /// Returns the maximum power from the spells in item's SpellDID / spellbook / ProcSpell
         /// </summary>
         public static int GetMaxSpellPower(WorldObject wo)
         {
@@ -730,7 +745,7 @@ namespace ACE.Server.Factories
 
             if (Common.ConfigManager.Config.Server.WorldRuleset <= Common.Ruleset.Infiltration)
             {
-                TryMutate_HeritageRequirement(wo);
+                TryMutate_HeritageRequirement(wo, profile, roll);
                 TryMutate_AllegianceRequirement(wo, profile, roll);
             }
 
@@ -738,27 +753,28 @@ namespace ACE.Server.Factories
             wo.ItemDifficulty = CalculateArcaneLore(wo, roll);
         }
 
-        private static bool TryMutate_HeritageRequirement(WorldObject wo)
+        private static bool TryMutate_HeritageRequirement(WorldObject wo, TreasureDeath profile, TreasureRoll roll)
         {
-            if (wo.Biota.PropertiesSpellBook == null)
+            if (wo.Biota.PropertiesSpellBook == null && (wo.SpellDID ?? 0) == 0 && (wo.ProcSpell ?? 0) == 0)
                 return false;
 
             var rng = ThreadSafeRandom.Next(0.0f, 1.0f);
             if (rng < 0.05)
             {
-                HeritageGroup heritage = (HeritageGroup)ThreadSafeRandom.Next(1, 3);
+                if(roll.Heritage == TreasureHeritageGroup.Invalid)
+                    roll.Heritage = (TreasureHeritageGroup)ThreadSafeRandom.Next(1, 3);
 
-                switch (heritage)
+                switch (roll.Heritage)
                 {
-                    case HeritageGroup.Aluvian:
+                    case TreasureHeritageGroup.Aluvian:
                         wo.HeritageGroup = HeritageGroup.Aluvian;
                         break;
 
-                    case HeritageGroup.Gharundim:
+                    case TreasureHeritageGroup.Gharundim:
                         wo.HeritageGroup = HeritageGroup.Gharundim;
                         break;
 
-                    case HeritageGroup.Sho:
+                    case TreasureHeritageGroup.Sho:
                         wo.HeritageGroup = HeritageGroup.Sho;
                         break;
                 }
@@ -769,7 +785,7 @@ namespace ACE.Server.Factories
 
         private static bool TryMutate_AllegianceRequirement(WorldObject wo, TreasureDeath profile, TreasureRoll roll)
         {
-            if (wo.Biota.PropertiesSpellBook == null)
+            if (wo.Biota.PropertiesSpellBook == null && (wo.SpellDID ?? 0) == 0 && (wo.ProcSpell ?? 0) == 0)
                 return false;
 
             var rng = ThreadSafeRandom.Next(0.0f, 1.0f);
@@ -793,6 +809,8 @@ namespace ACE.Server.Factories
             if (roll.IsMeleeWeapon || roll.IsMissileWeapon)
             {
                 skill = wo.WeaponSkill;
+                if (Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.CustomDM && wo.WieldRequirements == WieldRequirement.RawSkill && wo.WieldDifficulty > wo.ItemSkillLevelLimit)
+                    wo.ItemSkillLevelLimit = wo.WieldDifficulty + ThreadSafeRandom.Next(5, 20);
             }
             else if (roll.IsArmor)
             {

@@ -10,9 +10,9 @@ namespace ACE.Server.Factories.Tables.Wcids
 {
     public static class WeaponWcids
     {
-        public static WeenieClassName Roll(TreasureDeath treasureDeath, ref TreasureWeaponType weaponType)
+        public static WeenieClassName Roll(TreasureDeath treasureDeath, TreasureRoll treasureRoll)
         {
-            switch (weaponType)
+            switch (treasureRoll.WeaponType)
             {
                 /*case TreasureWeaponType.Sword:
                     return RollSwordWcid(treasureDeath);
@@ -44,46 +44,46 @@ namespace ACE.Server.Factories.Tables.Wcids
                 case TreasureWeaponType.Unarmed:
                     if (ConfigManager.Config.Server.WorldRuleset <= Common.Ruleset.Infiltration)
                     {
-                        switch (weaponType)
+                        switch (treasureRoll.WeaponType)
                         {
                             case TreasureWeaponType.Sword:
-                                return RollSwordWcid(treasureDeath, ref weaponType);
+                                return RollSwordWcid(treasureDeath, treasureRoll);
 
                             case TreasureWeaponType.Mace:
-                                return RollMaceWcid(treasureDeath, ref weaponType);
+                                return RollMaceWcid(treasureDeath, treasureRoll);
 
                             case TreasureWeaponType.Axe:
-                                return RollAxeWcid(treasureDeath, ref weaponType);
+                                return RollAxeWcid(treasureDeath, treasureRoll);
 
                             case TreasureWeaponType.Spear:
-                                return RollSpearWcid(treasureDeath, ref weaponType);
+                                return RollSpearWcid(treasureDeath, treasureRoll);
 
                             case TreasureWeaponType.Unarmed:
-                                return RollUnarmedWcid(treasureDeath);
+                                return RollUnarmedWcid(treasureDeath, treasureRoll);
 
                             case TreasureWeaponType.Staff:
-                                return RollStaffWcid(treasureDeath);
+                                return RollStaffWcid(treasureDeath, treasureRoll);
 
                             case TreasureWeaponType.Dagger:
-                                return RollDaggerWcid(treasureDeath, ref weaponType);
+                                return RollDaggerWcid(treasureDeath, treasureRoll);
                         }
                     }
-                    return RollMeleeWeapon(ref weaponType);
+                    return RollMeleeWeapon(ref treasureRoll.WeaponType);
 
                 case TreasureWeaponType.Bow:
-                    return RollBowWcid(treasureDeath, ref weaponType);
+                    return RollBowWcid(treasureDeath, treasureRoll);
 
                 case TreasureWeaponType.Crossbow:
-                    return RollCrossbowWcid(treasureDeath, ref weaponType);
+                    return RollCrossbowWcid(treasureDeath, treasureRoll);
 
                 case TreasureWeaponType.Atlatl:
-                    return RollAtlatlWcid(treasureDeath, ref weaponType);
+                    return RollAtlatlWcid(treasureDeath, treasureRoll);
 
                 case TreasureWeaponType.Caster:
                     return RollCaster(treasureDeath);
 
                 case TreasureWeaponType.TwoHandedWeapon:
-                    return RollTwoHandedWeaponWcid(ref weaponType);
+                    return RollTwoHandedWeaponWcid(ref treasureRoll.WeaponType);
             }
             return WeenieClassName.undef;
         }
@@ -123,110 +123,107 @@ namespace ACE.Server.Factories.Tables.Wcids
             return WeenieClassName.undef;
         }
 
-        public static TreasureHeritageGroup RollHeritage(TreasureDeath treasureDeath)
+        public static TreasureHeritageGroup RollHeritage(TreasureDeath treasureDeath, TreasureRoll treasureRoll)
         {
-            TreasureDeathExtended treasureDeathExtended = treasureDeath as TreasureDeathExtended;
-            if (treasureDeathExtended != null && treasureDeathExtended.ForceHeritage != TreasureHeritageGroup.Invalid)
-                return treasureDeathExtended.ForceHeritage;
-            else
-                return HeritageChance.Roll(treasureDeath.UnknownChances);
+            treasureRoll.Heritage = HeritageChance.Roll(treasureDeath.UnknownChances, treasureRoll);
+            return treasureRoll.Heritage;
         }
 
-        public static WeenieClassName RollSwordWcid(TreasureDeath treasureDeath, ref TreasureWeaponType weaponType)
+        public static WeenieClassName RollSwordWcid(TreasureDeath treasureDeath, TreasureRoll treasureRoll)
         {
-            var heritage = RollHeritage(treasureDeath);
+            var heritage = RollHeritage(treasureDeath, treasureRoll);
 
             switch (heritage)
             {
                 case TreasureHeritageGroup.Aluvian:
-                    return SwordWcids_Aluvian.Roll(treasureDeath.Tier, out weaponType);
+                    return SwordWcids_Aluvian.Roll(treasureDeath.Tier, out treasureRoll.WeaponType);
 
                 case TreasureHeritageGroup.Gharundim:
-                    return SwordWcids_Gharundim.Roll(treasureDeath.Tier, out weaponType);
+                    return SwordWcids_Gharundim.Roll(treasureDeath.Tier, out treasureRoll.WeaponType);
 
                 case TreasureHeritageGroup.Sho:
-                    return SwordWcids_Sho.Roll(treasureDeath.Tier, out weaponType);
+                    return SwordWcids_Sho.Roll(treasureDeath.Tier, out treasureRoll.WeaponType);
             }
             return WeenieClassName.undef;
         }
 
-        public static WeenieClassName RollMaceWcid(TreasureDeath treasureDeath, ref TreasureWeaponType weaponType)
+        public static WeenieClassName RollMaceWcid(TreasureDeath treasureDeath, TreasureRoll treasureRoll)
         {
-            var heritage = RollHeritage(treasureDeath);
+            var heritage = RollHeritage(treasureDeath, treasureRoll);
 
-            return MaceWcids.Roll(heritage, treasureDeath.Tier, out weaponType);
+            return MaceWcids.Roll(heritage, treasureDeath.Tier, out treasureRoll.WeaponType);
         }
 
-        public static WeenieClassName RollAxeWcid(TreasureDeath treasureDeath, ref TreasureWeaponType weaponType)
+        public static WeenieClassName RollAxeWcid(TreasureDeath treasureDeath, TreasureRoll treasureRoll)
         {
-            var heritage = RollHeritage(treasureDeath);
+            var heritage = RollHeritage(treasureDeath, treasureRoll);
 
-            return AxeWcids.Roll(heritage, treasureDeath.Tier, out weaponType);
+            return AxeWcids.Roll(heritage, treasureDeath.Tier, out treasureRoll.WeaponType);
         }
 
-        public static WeenieClassName RollSpearWcid(TreasureDeath treasureDeath, ref TreasureWeaponType weaponType)
+        public static WeenieClassName RollSpearWcid(TreasureDeath treasureDeath, TreasureRoll treasureRoll)
         {
-            var heritage = RollHeritage(treasureDeath);
+            var heritage = RollHeritage(treasureDeath, treasureRoll);
 
-            return SpearWcids.Roll(heritage, treasureDeath.Tier, out weaponType);
+            return SpearWcids.Roll(heritage, treasureDeath.Tier, out treasureRoll.WeaponType);
         }
 
-        public static WeenieClassName RollUnarmedWcid(TreasureDeath treasureDeath)
+        public static WeenieClassName RollUnarmedWcid(TreasureDeath treasureDeath, TreasureRoll treasureRoll)
         {
-            var heritage = RollHeritage(treasureDeath);
+            var heritage = RollHeritage(treasureDeath, treasureRoll);
 
             return UnarmedWcids.Roll(heritage, treasureDeath.Tier);
         }
 
-        public static WeenieClassName RollStaffWcid(TreasureDeath treasureDeath)
+        public static WeenieClassName RollStaffWcid(TreasureDeath treasureDeath, TreasureRoll treasureRoll)
         {
-            var heritage = RollHeritage(treasureDeath);
+            var heritage = RollHeritage(treasureDeath, treasureRoll);
 
             return StaffWcids.Roll(heritage, treasureDeath.Tier);
         }
 
-        public static WeenieClassName RollDaggerWcid(TreasureDeath treasureDeath, ref TreasureWeaponType weaponType)
+        public static WeenieClassName RollDaggerWcid(TreasureDeath treasureDeath, TreasureRoll treasureRoll)
         {
-            var heritage = RollHeritage(treasureDeath);
+            var heritage = RollHeritage(treasureDeath, treasureRoll);
 
             switch (heritage)
             {
                 case TreasureHeritageGroup.Aluvian:
                 case TreasureHeritageGroup.Sho:
-                    return DaggerWcids_Aluvian_Sho.Roll(treasureDeath.Tier, out weaponType);
+                    return DaggerWcids_Aluvian_Sho.Roll(treasureDeath.Tier, out treasureRoll.WeaponType);
 
                 case TreasureHeritageGroup.Gharundim:
-                    return DaggerWcids_Gharundim.Roll(treasureDeath.Tier, out weaponType);
+                    return DaggerWcids_Gharundim.Roll(treasureDeath.Tier, out treasureRoll.WeaponType);
             }
             return WeenieClassName.undef;
         }
 
-        public static WeenieClassName RollBowWcid(TreasureDeath treasureDeath, ref TreasureWeaponType weaponType)
+        public static WeenieClassName RollBowWcid(TreasureDeath treasureDeath, TreasureRoll treasureRoll)
         {
-            var heritage = RollHeritage(treasureDeath);
+            var heritage = RollHeritage(treasureDeath, treasureRoll);
 
             switch (heritage)
             {
                 case TreasureHeritageGroup.Aluvian:
-                    return BowWcids_Aluvian.Roll(treasureDeath.Tier, out weaponType);
+                    return BowWcids_Aluvian.Roll(treasureDeath.Tier, out treasureRoll.WeaponType);
 
                 case TreasureHeritageGroup.Gharundim:
-                    return BowWcids_Gharundim.Roll(treasureDeath.Tier, out weaponType);
+                    return BowWcids_Gharundim.Roll(treasureDeath.Tier, out treasureRoll.WeaponType);
 
                 case TreasureHeritageGroup.Sho:
-                    return BowWcids_Sho.Roll(treasureDeath.Tier, out weaponType);
+                    return BowWcids_Sho.Roll(treasureDeath.Tier, out treasureRoll.WeaponType);
             }
             return WeenieClassName.undef;
         }
 
-        public static WeenieClassName RollCrossbowWcid(TreasureDeath treasureDeath, ref TreasureWeaponType weaponType)
+        public static WeenieClassName RollCrossbowWcid(TreasureDeath treasureDeath, TreasureRoll treasureRoll)
         {
-            return CrossbowWcids.Roll(treasureDeath.Tier, out weaponType);
+            return CrossbowWcids.Roll(treasureDeath.Tier, out treasureRoll.WeaponType);
         }
 
-        public static WeenieClassName RollAtlatlWcid(TreasureDeath treasureDeath, ref TreasureWeaponType weaponType)
+        public static WeenieClassName RollAtlatlWcid(TreasureDeath treasureDeath, TreasureRoll treasureRoll)
         {
-            return AtlatlWcids.Roll(treasureDeath.Tier, out weaponType);
+            return AtlatlWcids.Roll(treasureDeath.Tier, out treasureRoll.WeaponType);
         }
 
         public static WeenieClassName RollCaster(TreasureDeath treasureDeath)
