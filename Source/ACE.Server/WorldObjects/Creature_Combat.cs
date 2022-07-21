@@ -574,8 +574,9 @@ namespace ACE.Server.WorldObjects
         /// </summary>
         public virtual void OnAttackReceived(WorldObject attacker, CombatType attackType, bool critical, bool avoided)
         {
-            if(avoided)
-                TryCastAssessCreatureAndPersonDebuffs(this, attackType);
+            var attackerAsCreature = attacker as Creature;
+            if (!avoided && attackerAsCreature != null)
+                attackerAsCreature.TryCastAssessCreatureAndPersonDebuffs(this, attackType);
 
             numRecentAttacksReceived++;
         }
@@ -686,7 +687,7 @@ namespace ACE.Server.WorldObjects
         public float GetShieldMod(WorldObject attacker, DamageType damageType, WorldObject weapon)
         {
             // ensure combat stance
-            if (CombatMode == CombatMode.NonCombat)
+            if (Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.EoR && CombatMode == CombatMode.NonCombat)
                 return 1.0f;
 
             // does the player have a shield equipped?
