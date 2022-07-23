@@ -445,6 +445,12 @@ namespace ACE.Database
             }
         }
 
+        public void ClearEncountersCache()
+        {
+            lock (cachedEncounters)
+                cachedEncounters.Clear();
+        }
+
         public bool ClearCachedEncountersByLandblock(ushort landblock)
         {
             return cachedEncounters.TryRemove(landblock, out _);

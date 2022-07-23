@@ -1473,6 +1473,98 @@ namespace ACE.Server.Command.Handlers.Processors
                 RemoveChild(session, subLink, instances);
         }
 
+        [CommandHandler("showenc", AccessLevel.Developer, CommandHandlerFlag.RequiresWorld, "Lists encounters contained in the current landblock")]
+        public static void HandleShowEnc(Session session, params string[] parameters)
+        {
+            var pos = session.Player.Location;
+
+            if ((pos.Cell & 0xFFFF) >= 0x100)
+            {
+                session.Network.EnqueueSend(new GameMessageSystemChat("Only the outdoors have encounters!", ChatMessageType.Broadcast));
+                return;
+            }
+
+            var landblock = (ushort)pos.Landblock;
+            bool spawnDensityIncreased = PropertyManager.GetBool("increase_minimum_encounter_spawn_density").Item;
+
+            // get existing encounters for this landblock
+            var encounters = DatabaseManager.World.GetCachedEncountersByLandblock(landblock);
+
+            session.Network.EnqueueSend(new GameMessageSystemChat($"--- Landblock {pos.Landblock:X4}: {encounters.Count} Encounters Found {(spawnDensityIncreased ? " - increase_minimum_encounter_spawn_density property is set to true" : "")} ---", ChatMessageType.Broadcast));
+            int counter = 1;
+            foreach (var entry in encounters)
+            {
+                Weenie weenie = DatabaseManager.World.GetWeenie(entry.WeenieClassId);
+                session.Network.EnqueueSend(new GameMessageSystemChat($"{counter}: {weenie.ClassId}({weenie.WeeniePropertiesString.FirstOrDefault(i => i.Type == (int)PropertyString.Name)?.Value}) - cellX: {entry.CellX} - cellY: {entry.CellY}", ChatMessageType.Broadcast));
+                counter++;
+            }
+            session.Network.EnqueueSend(new GameMessageSystemChat($"---", ChatMessageType.Broadcast));
+        }
+
+        [CommandHandler("replaceenc", AccessLevel.Developer, CommandHandlerFlag.RequiresWorld, 2, "Replaces a wcid or classname in the current outdoor landblock encounters for another", "<wcid or classname> <wcid or classname>")]
+        public static void HandleReplaceEncounter(Session session, params string[] parameters)
+        {
+            var paramSource = parameters[0];
+            var paramTarget = parameters[1];
+
+            Weenie weenieSource = null;
+            Weenie weenieTarget = null;
+
+            uint wcid;
+            if (uint.TryParse(paramSource, out wcid))
+                weenieSource = DatabaseManager.World.GetWeenie(wcid);   // wcid
+            else
+                weenieSource = DatabaseManager.World.GetWeenie(paramSource);  // classname
+
+            if (uint.TryParse(paramTarget, out wcid))
+                weenieTarget = DatabaseManager.World.GetWeenie(wcid);   // wcid
+            else
+                weenieTarget = DatabaseManager.World.GetWeenie(paramTarget);  // classname
+
+            if (weenieSource == null)
+            {
+                session.Network.EnqueueSend(new GameMessageSystemChat($"Couldn't find weenie {paramSource}", ChatMessageType.Broadcast));
+                return;
+            }
+
+            if (weenieTarget == null)
+            {
+                session.Network.EnqueueSend(new GameMessageSystemChat($"Couldn't find weenie {paramTarget}", ChatMessageType.Broadcast));
+                return;
+            }
+
+            var pos = session.Player.Location;
+
+            if ((pos.Cell & 0xFFFF) >= 0x100)
+            {
+                session.Network.EnqueueSend(new GameMessageSystemChat("You must be outdoors to replace an encounter!", ChatMessageType.Broadcast));
+                return;
+            }
+
+            var landblock = (ushort)pos.Landblock;
+
+            // clear any cached encounters for this landblock
+            DatabaseManager.World.ClearCachedEncountersByLandblock(landblock);
+
+            // get existing encounters for this landblock
+            var encounters = DatabaseManager.World.GetCachedEncountersByLandblock(landblock);
+
+            foreach(var entry in encounters)
+            {
+                if (entry.WeenieClassId == weenieSource.ClassId)
+                {
+                    entry.WeenieClassId = weenieTarget.ClassId;
+                    entry.LastModified = DateTime.Now;
+                }
+            }
+
+            session.Network.EnqueueSend(new GameMessageSystemChat($"Replacing entries of encounter {weenieSource.ClassId}({weenieSource.WeeniePropertiesString.FirstOrDefault(i => i.Type == (int)PropertyString.Name)?.Value}) for {weenieTarget.ClassId}({weenieTarget.WeeniePropertiesString.FirstOrDefault(i => i.Type == (int)PropertyString.Name)?.Value}) @ landblock {pos.Landblock:X4}", ChatMessageType.Broadcast));
+
+            SyncEncounters(session, landblock, encounters);
+            DeveloperCommands.HandleReloadLandblocks(session);
+
+        }
+
         public static EncounterSQLWriter LandblockEncounterWriter;
 
         [CommandHandler("addenc", AccessLevel.Developer, CommandHandlerFlag.RequiresWorld, 1, "Spawns a new wcid or classname in the current outdoor cell as an encounter", "<wcid or classname>")]
@@ -2291,6 +2383,8 @@ namespace ACE.Server.Command.Handlers.Processors
                     mode = CacheType.Weenie;
                 if (parameters[0].Contains("wield", StringComparison.OrdinalIgnoreCase))
                     mode = CacheType.WieldedTreasure;
+                if (parameters[0].Contains("encounter", StringComparison.OrdinalIgnoreCase))
+                    mode = CacheType.Encounter;
             }
 
             if (mode.HasFlag(CacheType.Landblock))
@@ -2323,6 +2417,12 @@ namespace ACE.Server.Command.Handlers.Processors
                 CommandHandlerHelper.WriteOutputInfo(session, "Clearing wielded treasure cache");
                 DatabaseManager.World.ClearWieldedTreasureCache();
             }
+
+            if (mode.HasFlag(CacheType.Encounter))
+            {
+                CommandHandlerHelper.WriteOutputInfo(session, "Clearing encounter cache");
+                DatabaseManager.World.ClearEncountersCache();
+            }
         }
 
         [Flags]
@@ -2334,6 +2434,7 @@ namespace ACE.Server.Command.Handlers.Processors
             Spell           = 0x4,
             Weenie          = 0x8,
             WieldedTreasure = 0x10,
+            Encounter       = 0x01,
             All             = 0xFFFF
         };
 
