@@ -220,7 +220,7 @@ namespace ACE.Database.SQLFormatters
                     }
                     break;
                 case PropertyDataId.WieldedTreasureType:
-                    string treasureW = "";
+                    /*string treasureW = "";
                     if (TreasureWielded != null && TreasureWielded.ContainsKey(value))
                     {
                         foreach (var item in TreasureWielded[value])
@@ -229,7 +229,7 @@ namespace ACE.Database.SQLFormatters
                         }
                         return treasureW;
                     }
-                    else if (TreasureDeath != null && TreasureDeath.ContainsKey(value))
+                    else*/ if (TreasureDeath != null && TreasureDeath.ContainsKey(value))
                     {
                         return $"Loot Tier: {TreasureDeath[value].Tier}";
                     }
