@@ -950,5 +950,79 @@ namespace ACE.Database
                 rwLock.ExitReadLock();
             }
         }
+
+        public void LogAccountSessionStart(uint accountId, string accountName, string sessionIP)
+        {
+            var logEntry = new AccountSessionLog();
+
+            try
+            {
+                logEntry.AccountId = accountId;
+                logEntry.AccountName = accountName;
+                logEntry.SessionIP = sessionIP;
+                logEntry.LoginDateTime = DateTime.Now;
+
+                using (var context = new ShardDbContext())
+                {
+                    context.AccountSessions.Add(logEntry);
+                    context.SaveChanges();
+                }
+            }
+            catch (Exception ex)
+            {
+                log.Error($"Exception in LogAccountSessionStart saving session log data to DB. Ex: {ex}");
+            }
+
+            return;
+        }
+
+        public void LogCharacterLogin(uint accountId, string accountName, string sessionIP, uint characterId, string characterName)
+        {
+            var logEntry = new CharacterLoginLog();
+
+            try
+            {
+                logEntry.AccountId = accountId;
+                logEntry.AccountName = accountName;
+                logEntry.SessionIP = sessionIP;
+                logEntry.CharacterId = characterId;
+                logEntry.CharacterName = characterName;
+                logEntry.LoginDateTime = DateTime.Now;
+
+                using (var context = new ShardDbContext())
+                {
+                    context.CharacterLogins.Add(logEntry);
+                    context.SaveChanges();
+                }
+            }
+            catch (Exception ex)
+            {
+                log.Error($"Exception in LogCharacterLogin saving character login info to DB. Ex: {ex}");
+            }
+        }
+
+        public void CreatePKKill(uint victimId, uint killerId, uint? victimMonarchId, uint? killerMonarchId)
+        {
+            var kill = new PKKill();
+
+            try
+            {
+                kill.VictimId = victimId;
+                kill.KillerId = killerId;
+                kill.VictimMonarchId = victimMonarchId;
+                kill.KillerMonarchId = killerMonarchId;
+                kill.KillDateTime = DateTime.Now;
+
+                using (var context = new ShardDbContext())
+                {
+                    context.PKKills.Add(kill);
+                    context.SaveChanges();
+                }
+            }
+            catch (Exception ex)
+            {
+                log.Error($"Exception in CreateKill saving kill data to PKKills DB. Ex: {ex}");
+            }
+        }
     }
 }
