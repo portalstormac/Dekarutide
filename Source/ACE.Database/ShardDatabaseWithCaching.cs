@@ -6,7 +6,6 @@ using System.Threading;
 
 using ACE.Database.Models.Shard;
 using ACE.Entity;
-using ACE.Entity.Enum.Properties;
 
 namespace ACE.Database
 {
