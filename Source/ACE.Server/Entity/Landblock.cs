@@ -263,6 +263,41 @@ namespace ACE.Server.Entity
             }));
         }
 
+        private class AvailableCell
+        {
+            public int CellX;
+            public int CellY;
+            public ushort TerrainType;
+
+            public AvailableCell(int cellX, int cellY, ushort terrainType)
+            {
+                CellX = cellX;
+                CellY = cellY;
+                TerrainType = terrainType;
+            }
+        }
+
+        private class EncounterInfo
+        {
+            public int Coords;
+            public Encounter Encounter;
+            public ushort TerrainType;
+
+            public EncounterInfo(int coords, Encounter encounter, ushort terrainType)
+            {
+                Coords = coords;
+                Encounter = encounter;
+                TerrainType = terrainType;
+            }
+        }
+
+        private ushort getTerrainType(int cellX, int cellY)
+        {
+            var terrain = PhysicsLandblock.get_terrain(cellX, cellY);
+            var terrainType = (ushort)(terrain >> 2 & 0x1F);
+            return terrainType;
+        }
+
         /// <summary>
         /// Spawns the semi-randomized monsters scattered around the outdoors<para />
         /// This will be called from a separate task from our constructor. Use thread safety when interacting with this landblock.
@@ -270,54 +305,78 @@ namespace ACE.Server.Entity
         private void SpawnEncounters()
         {
             // get the encounter spawns for this landblock
-            var encounters = DatabaseManager.World.GetCachedEncountersByLandblock(Id.Landblock);
+            var encounters = DatabaseManager.World.GetCachedEncountersByLandblock(Id.Landblock, out var wasCached);
 
-            if (PropertyManager.GetBool("increase_minimum_encounter_spawn_density").Item)
+            if (PropertyManager.GetBool("increase_minimum_encounter_spawn_density").Item && !wasCached)
             {
-                // Landscape spawn density multiplier
-                List<int> encounterCoords = new List<int>();
-
-                foreach (var encounter in encounters)
-                {
-                    encounterCoords.Add(encounter.CellX << 16 | encounter.CellY);
-                }
-
                 if (encounters.Count > 0)
                 {
+                    // Landscape spawn density multiplier
+                    // The maximum amount of encounters that will fit in a landblock is 64.
                     int newCount;
-                    //if (encounters.Count == 1)
-                    //    newCount = encounters.Count * 8;
-                    //else if (encounters.Count == 2)
-                    //    newCount = encounters.Count * 6;
-                    //else if (encounters.Count <= 5)
-                    //    newCount = (int)(encounters.Count * 2.5f);
-                    //else if (encounters.Count <= 8)
-                    //    newCount = (int)(encounters.Count * 1.5f);
                     if (encounters.Count < 8)
                         newCount = 8;
                     else
                         newCount = encounters.Count;
 
-                    int failedAttempts = 0;
-                    while (encounters.Count < newCount && failedAttempts < 10)
+                    if (newCount != encounters.Count)
                     {
-                        var encounter = encounters[ThreadSafeRandom.Next(0, encounters.Count - 1)];
+                        Dictionary<int, EncounterInfo> encountersToDuplicate = new Dictionary<int, EncounterInfo>();
+                        Dictionary<ushort, List<AvailableCell>> terrainTypeMap = new Dictionary<ushort, List<AvailableCell>>();
 
-                        Encounter newEncounter = new Encounter();
-                        newEncounter.WeenieClassId = encounter.WeenieClassId;
-                        newEncounter.Landblock = encounter.Landblock;
-                        newEncounter.CellX = Math.Clamp(encounter.CellX + ThreadSafeRandom.Next(-1, 1) * (ThreadSafeRandom.Next(1, 2) * 2), 0, 7);
-                        newEncounter.CellY = Math.Clamp(encounter.CellY + ThreadSafeRandom.Next(-1, 1) * (ThreadSafeRandom.Next(1, 2) * 2), 0, 7);
-
-                        int newEncounterCoords = newEncounter.CellX << 16 | newEncounter.CellY;
-                        if (!encounterCoords.Contains(newEncounterCoords))
+                        foreach (var encounter in encounters)
                         {
-                            encounters.Add(newEncounter);
-                            encounterCoords.Add(newEncounterCoords);
-                            failedAttempts = 0;
+                            int coords = encounter.CellX << 16 | encounter.CellY;
+                            encountersToDuplicate.Add(coords, new EncounterInfo(coords, encounter, getTerrainType(encounter.CellX, encounter.CellY)));
                         }
-                        else
-                            failedAttempts++;
+
+                        for (int cellX = 0; cellX < LandDefs.BlockSide; cellX++)
+                        {
+                            for (int cellY = 0; cellY < LandDefs.BlockSide; cellY++)
+                            {
+                                int coords = cellX << 16 | cellY;
+
+                                if (!encountersToDuplicate.ContainsKey(coords)) // Only add cells that do not yet contain encounters.
+                                {
+                                    ushort terrainType = getTerrainType(cellX,cellY);
+
+                                    if (terrainTypeMap.TryGetValue(terrainType, out var entry))
+                                        entry.Add(new AvailableCell(cellX, cellY, terrainType));
+                                    else
+                                        terrainTypeMap.Add(terrainType, new List<AvailableCell>() { new AvailableCell(cellX, cellY, terrainType) });
+                                }
+                            }
+                        }
+
+                        while (encounters.Count < newCount && encountersToDuplicate.Count > 0)
+                        {
+                            var sourceEncounter = encountersToDuplicate.ElementAt(ThreadSafeRandom.Next(0, encountersToDuplicate.Count - 1)).Value;
+                            if (terrainTypeMap.TryGetValue(sourceEncounter.TerrainType, out var availableCells))
+                            {
+                                var newEncounterCell = availableCells[ThreadSafeRandom.Next(0, availableCells.Count - 1)];
+
+                                Encounter newEncounter = new Encounter();
+                                newEncounter.WeenieClassId = sourceEncounter.Encounter.WeenieClassId;
+                                newEncounter.Landblock = sourceEncounter.Encounter.Landblock;
+                                newEncounter.LastModified = sourceEncounter.Encounter.LastModified;
+                                newEncounter.CellX = newEncounterCell.CellX;
+                                newEncounter.CellY = newEncounterCell.CellY;
+
+                                encounters.Add(newEncounter);
+                                availableCells.Remove(newEncounterCell);
+                                if (availableCells.Count == 0)
+                                {
+                                    terrainTypeMap.Remove(sourceEncounter.TerrainType);
+                                    encountersToDuplicate = encountersToDuplicate.Where(i => i.Value.TerrainType != sourceEncounter.TerrainType).ToDictionary(i => i.Key, i => i.Value);
+                                }
+                            }
+                            else
+                            {
+                                // This should never happen.
+                                terrainTypeMap.Remove(sourceEncounter.TerrainType);
+                                encountersToDuplicate = encountersToDuplicate.Where(i => i.Value.TerrainType != sourceEncounter.TerrainType).ToDictionary(i => i.Key, i => i.Value);
+                            }
+                        }
                     }
                 }
             }
@@ -332,8 +391,8 @@ namespace ACE.Server.Entity
 
                 actionQueue.EnqueueAction(new ActionEventDelegate(() =>
                 {
-                    var xPos = Math.Clamp(encounter.CellX * 24.0f, 0.5f, 191.5f);
-                    var yPos = Math.Clamp(encounter.CellY * 24.0f, 0.5f, 191.5f);
+                    var xPos = Math.Clamp((encounter.CellX * 24.0f) + 12.0f, 0.5f, 191.5f);
+                    var yPos = Math.Clamp((encounter.CellY * 24.0f) + 12.0f, 0.5f, 191.5f);
 
                     var pos = new Physics.Common.Position();
                     pos.ObjCellID = (uint)(Id.Landblock << 16) | 1;
