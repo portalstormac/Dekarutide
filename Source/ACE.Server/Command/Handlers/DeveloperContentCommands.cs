@@ -1485,12 +1485,13 @@ namespace ACE.Server.Command.Handlers.Processors
             }
 
             var landblock = (ushort)pos.Landblock;
-            bool spawnDensityIncreased = PropertyManager.GetBool("increase_minimum_encounter_spawn_density").Item;
+            // clear any cached encounters for this landblock so we get the unmodified entries
+            DatabaseManager.World.ClearCachedEncountersByLandblock(landblock);
 
             // get existing encounters for this landblock
-            var encounters = DatabaseManager.World.GetCachedEncountersByLandblock(landblock);
+            var encounters = DatabaseManager.World.GetCachedEncountersByLandblock(landblock, out _);
 
-            session.Network.EnqueueSend(new GameMessageSystemChat($"--- Landblock {pos.Landblock:X4}: {encounters.Count} Encounters Found {(spawnDensityIncreased ? " - increase_minimum_encounter_spawn_density property is set to true" : "")} ---", ChatMessageType.Broadcast));
+            session.Network.EnqueueSend(new GameMessageSystemChat($"--- Landblock 0x{pos.Landblock:X4}: {encounters.Count} Encounters Found ---", ChatMessageType.Broadcast));
             int counter = 1;
             foreach (var entry in encounters)
             {
@@ -1543,11 +1544,11 @@ namespace ACE.Server.Command.Handlers.Processors
 
             var landblock = (ushort)pos.Landblock;
 
-            // clear any cached encounters for this landblock
+            // clear any cached encounters for this landblock so we get the unmodified entries
             DatabaseManager.World.ClearCachedEncountersByLandblock(landblock);
 
             // get existing encounters for this landblock
-            var encounters = DatabaseManager.World.GetCachedEncountersByLandblock(landblock);
+            var encounters = DatabaseManager.World.GetCachedEncountersByLandblock(landblock, out _);
 
             foreach(var entry in encounters)
             {
@@ -1558,7 +1559,7 @@ namespace ACE.Server.Command.Handlers.Processors
                 }
             }
 
-            session.Network.EnqueueSend(new GameMessageSystemChat($"Replacing entries of encounter {weenieSource.ClassId}({weenieSource.WeeniePropertiesString.FirstOrDefault(i => i.Type == (int)PropertyString.Name)?.Value}) for {weenieTarget.ClassId}({weenieTarget.WeeniePropertiesString.FirstOrDefault(i => i.Type == (int)PropertyString.Name)?.Value}) @ landblock {pos.Landblock:X4}", ChatMessageType.Broadcast));
+            session.Network.EnqueueSend(new GameMessageSystemChat($"Replacing entries of encounter {weenieSource.ClassId}({weenieSource.WeeniePropertiesString.FirstOrDefault(i => i.Type == (int)PropertyString.Name)?.Value}) for {weenieTarget.ClassId}({weenieTarget.WeeniePropertiesString.FirstOrDefault(i => i.Type == (int)PropertyString.Name)?.Value}) @ landblock 0x{pos.Landblock:X4}", ChatMessageType.Broadcast));
 
             SyncEncounters(session, landblock, encounters);
             DeveloperCommands.HandleReloadLandblocks(session);
@@ -1593,16 +1594,16 @@ namespace ACE.Server.Command.Handlers.Processors
                 return;
             }
 
-            var cellX = (int)pos.PositionX / 24;
-            var cellY = (int)pos.PositionY / 24;
+            var cellX = (int)Math.Floor(pos.PositionX / Physics.Common.LandDefs.CellLength);
+            var cellY = (int)Math.Floor(pos.PositionY / Physics.Common.LandDefs.CellLength);
 
             var landblock = (ushort)pos.Landblock;
 
-            // clear any cached encounters for this landblock
+            // clear any cached encounters for this landblock so we get the unmodified entries
             DatabaseManager.World.ClearCachedEncountersByLandblock(landblock);
 
             // get existing encounters for this landblock
-            var encounters = DatabaseManager.World.GetCachedEncountersByLandblock(landblock);
+            var encounters = DatabaseManager.World.GetCachedEncountersByLandblock(landblock, out _);
 
             // check for existing encounter
             if (encounters.Any(i => i.CellX == cellX && i.CellY == cellY))
@@ -1616,7 +1617,7 @@ namespace ACE.Server.Command.Handlers.Processors
 
             if (wo == null) return;
 
-            session.Network.EnqueueSend(new GameMessageSystemChat($"Creating new encounter @ landblock {pos.Landblock:X4}, cellX={cellX}, cellY={cellY}\n{wo.WeenieClassId} - {wo.Name}", ChatMessageType.Broadcast));
+            session.Network.EnqueueSend(new GameMessageSystemChat($"Creating new encounter @ landblock 0x{pos.Landblock:X4}, cellX={cellX}, cellY={cellY}\n{wo.WeenieClassId} - {wo.Name}", ChatMessageType.Broadcast));
 
             // add a new encounter (verifications?)
             var encounter = new Encounter();
@@ -1648,8 +1649,8 @@ namespace ACE.Server.Command.Handlers.Processors
                 return null;
             }
 
-            var xPos = Math.Clamp(cellX * 24.0f, 0.5f, 191.5f);
-            var yPos = Math.Clamp(cellY * 24.0f, 0.5f, 191.5f);
+            var xPos = Math.Clamp((cellX * 24.0f) + 12.0f, 0.5f, 191.5f);
+            var yPos = Math.Clamp((cellY * 24.0f) + 12.0f, 0.5f, 191.5f);
 
             var newPos = new Physics.Common.Position();
             newPos.ObjCellID = pos.Cell;
@@ -1762,16 +1763,16 @@ namespace ACE.Server.Command.Handlers.Processors
             while (obj.Generator != null)
                 obj = obj.Generator;
 
-            var cellX = (int)obj.Location.PositionX / 24;
-            var cellY = (int)obj.Location.PositionY / 24;
+            var cellX = (int)Math.Floor(obj.Location.PositionX / Physics.Common.LandDefs.CellLength);
+            var cellY = (int)Math.Floor(obj.Location.PositionY / Physics.Common.LandDefs.CellLength);
 
             var landblock = (ushort)obj.Location.Landblock;
 
-            // clear any cached encounters for this landblock
+            // clear any cached encounters for this landblock so we get the unmodified entries
             DatabaseManager.World.ClearCachedEncountersByLandblock(landblock);
 
             // get existing encounters for this landblock
-            var encounters = DatabaseManager.World.GetCachedEncountersByLandblock(landblock);
+            var encounters = DatabaseManager.World.GetCachedEncountersByLandblock(landblock, out _);
 
             // check for existing encounter
             var encounter = encounters.FirstOrDefault(i => i.CellX == cellX && i.CellY == cellY && i.WeenieClassId == obj.WeenieClassId);

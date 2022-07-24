@@ -4078,5 +4078,17 @@ namespace ACE.Server.Command.Handlers
             }
             CommandHandlerHelper.WriteOutputInfo(session, "-------- Random Number Generator Test Finished --------");
         }
+
+        [CommandHandler("showTerrain", AccessLevel.Developer, CommandHandlerFlag.RequiresWorld, "Show information about the terrain the player is standing on")]
+        public static void HandleShowTerrain(Session session, params string[] parameters)
+        {
+            var terrain = session.Player.CurrentLandblock.PhysicsLandblock.get_terrain(session.Player.Location.PositionX, session.Player.Location.PositionY);
+            var terrainType = terrain >> 2 & 0x1F;      // TerrainTypes table size = 32 (grass, desert, volcano, etc.)
+            var sceneType = terrain >> 11;              // SceneTypes table size = 89 total, 32 which can be indexed for each terrain type
+
+            CommandHandlerHelper.WriteOutputInfo(session, $"Terrain: 0x{terrain:X4}");
+            CommandHandlerHelper.WriteOutputInfo(session, $"TerrainType: 0x{terrainType:X4}");
+            CommandHandlerHelper.WriteOutputInfo(session, $"SceneType: 0x{sceneType:X4}");
+        }
     }
 }
