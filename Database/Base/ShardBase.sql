@@ -844,6 +844,60 @@ CREATE TABLE `house_permission` (
   CONSTRAINT `biota_Id_house_Id` FOREIGN KEY (`house_Id`) REFERENCES `biota` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `account_session_log`
+--
+
+DROP TABLE IF EXISTS `account_session_log`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `account_session_log` (
+  `sessionLogId` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `accountId` INT UNSIGNED NOT NULL,
+  `accountName` VARCHAR(50) NOT NULL,  
+  `sessionIP` VARCHAR(45),
+  `loginDateTime` DATETIME,  
+  PRIMARY KEY (`sessionLogId`)  
+) ENGINE=INNODB DEFAULT CHARSET=utf8mb4;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `character_login_log`
+--
+
+DROP TABLE IF EXISTS `character_login_log`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `character_login_log` (
+  `characterLoginLogId` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `accountId` INT UNSIGNED NOT NULL,
+  `accountName` VARCHAR(50) NOT NULL, 
+  `characterId` INT UNSIGNED NOT NULL,
+  `characterName` VARCHAR(50) NOT NULL,   
+  `sessionIP` VARCHAR(45),
+  `loginDateTime` DATETIME,  
+  PRIMARY KEY (`characterLoginLogId`)  
+) ENGINE=INNODB DEFAULT CHARSET=utf8mb4;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `kills`
+--
+
+DROP TABLE IF EXISTS `pkkills`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `pkkills` (
+  `id` int unsigned NOT NULL AUTO_INCREMENT COMMENT 'Unique Id of this Kill',
+  `killer_id` int unsigned NOT NULL COMMENT 'Unique Id of Killer Character',
+  `victim_id` int unsigned NOT NULL COMMENT 'Unique Id of Victim Character',
+  `killer_monarch_id` int unsigned,
+  `victim_monarch_id` int unsigned,
+  `kill_datetime` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+/*!40101 SET character_set_client = @saved_cs_client */;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
