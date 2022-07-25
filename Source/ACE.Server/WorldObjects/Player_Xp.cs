@@ -27,27 +27,28 @@ namespace ACE.Server.WorldObjects
             int formulaVersion = 0;
             if (xpType == XpType.Quest && amount < 0 && amount > -6000) // this range is used to specify the reward by level system.
             {
-                if (amount <= -5000)
+                // The following comments are just recommendations and vary from quest to quest, but the larger the value the higher the xp sum awarded.
+                if (amount <= -5000) // once per character
                 {
                     xpSourceLevel = -((int)amount + 5000);
                     formulaVersion = 5;
                 }
-                else if (amount <= -4000)
+                else if (amount <= -4000) // once every 3 weeks or more
                 {
                     xpSourceLevel = -((int)amount + 4000);
                     formulaVersion = 4;
                 }
-                else if (amount <= -3000)
+                else if (amount <= -3000) // once a week or more
                 {
                     xpSourceLevel = -((int)amount + 3000);
                     formulaVersion = 3;
                 }
-                else if (amount <= -2000)
+                else if (amount <= -2000) // once a day or more
                 {
                     xpSourceLevel = -((int)amount + 2000);
                     formulaVersion = 2;
                 }
-                else if (amount <= -1000)
+                else if (amount <= -1000) // more than once per day
                 {
                     xpSourceLevel = -((int)amount + 1000);
                     formulaVersion = 1;
