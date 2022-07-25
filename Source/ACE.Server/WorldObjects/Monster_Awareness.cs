@@ -149,42 +149,39 @@ namespace ACE.Server.WorldObjects
 
                 Entity.CreatureSkill skill = target.GetCreatureSkill(Skill.Deception);
 
-                if (skill.AdvancementClass != SkillAdvancementClass.Untrained && skill.AdvancementClass != SkillAdvancementClass.Inactive) // We need to have Deception skill to taunt.
+                if (target.Mana.Current < manaCost)
                 {
-                    if (target.Mana.Current < manaCost)
+                    // Not enough mana, stop taunting, remove from targetDistances to incentivize the monster to switch targets.
+                    target.Session.Network.EnqueueSend(new GameMessageSystemChat($"You falter in your attempt at taunting {Name}.", ChatMessageType.CombatSelf));
+                    targetDistances.Remove(targetDistances.Single(r => r.Target == AttackTarget));
+                }
+                else if (target.attacksReceivedPerSecond >= skill.Current / 50.0f)
+                {
+                    // We're too busy to keep this taunt going, remove from targetDistances to incentivize the monster to switch targets.
+                    target.Session.Network.EnqueueSend(new GameMessageSystemChat($"You're too busy to keep taunting {Name}!", ChatMessageType.CombatSelf));
+                    targetDistances.Remove(targetDistances.Single(r => r.Target == AttackTarget));
+                }
+                else
+                {
+                    Entity.CreatureSkill defenseSkill;
+                    if (target.CreatureType == ACE.Entity.Enum.CreatureType.Human)
+                        defenseSkill = GetCreatureSkill(Skill.AssessPerson);
+                    else
+                        defenseSkill = GetCreatureSkill(Skill.AssessCreature);
+
+                    var avoidChance = 1.0f - SkillCheck.GetSkillChance(skill.Current, defenseSkill.Current);
+
+                    if (avoidChance > ThreadSafeRandom.Next(0.0f, 1.0f))
                     {
-                        // Not enough mana, stop taunting, remove from targetDistances to incentivize the monster to switch targets.
-                        target.Session.Network.EnqueueSend(new GameMessageSystemChat($"You falter in your attempt at taunting {Name}.", ChatMessageType.CombatSelf));
-                        targetDistances.Remove(targetDistances.Single(r => r.Target == AttackTarget));
-                    }
-                    else if (target.attacksReceivedPerSecond >= skill.Current / 50.0f)
-                    {
-                        // We're too busy to keep this taunt going, remove from targetDistances to incentivize the monster to switch targets.
-                        target.Session.Network.EnqueueSend(new GameMessageSystemChat($"You're too busy to keep taunting {Name}!", ChatMessageType.CombatSelf));
+                        // The current taunter has lost the taunt! Give other taunters a shot, remove from targetDistances to incentivize the monster to switch targets.
+                        target.Session.Network.EnqueueSend(new GameMessageSystemChat($"Your taunt loses its effect on {Name}!", ChatMessageType.CombatSelf));
                         targetDistances.Remove(targetDistances.Single(r => r.Target == AttackTarget));
                     }
                     else
                     {
-                        Entity.CreatureSkill defenseSkill;
-                        if (target.CreatureType == ACE.Entity.Enum.CreatureType.Human)
-                            defenseSkill = GetCreatureSkill(Skill.AssessPerson);
-                        else
-                            defenseSkill = GetCreatureSkill(Skill.AssessCreature);
-
-                        var avoidChance = 1.0f - SkillCheck.GetSkillChance(skill.Current, defenseSkill.Current);
-
-                        if (avoidChance > ThreadSafeRandom.Next(0.0f, 1.0f))
-                        {
-                            // The current taunter has lost the taunt! Give other taunters a shot, remove from targetDistances to incentivize the monster to switch targets.
-                            target.Session.Network.EnqueueSend(new GameMessageSystemChat($"Your taunt loses its effect on {Name}!", ChatMessageType.CombatSelf));
-                            targetDistances.Remove(targetDistances.Single(r => r.Target == AttackTarget));
-                        }
-                        else
-                        {
-                            // The current taunter keeps the taunt.
-                            target.UpdateVitalDelta(target.Mana, -manaCost);
-                            return target;
-                        }
+                        // The current taunter keeps the taunt.
+                        target.UpdateVitalDelta(target.Mana, -manaCost);
+                        return target;
                     }
                 }
             }
@@ -208,7 +205,7 @@ namespace ACE.Server.WorldObjects
                         continue;
                     else if (skill.AdvancementClass == SkillAdvancementClass.Trained && activationChance > 0.25)
                         continue;
-                    else if (skill.AdvancementClass == SkillAdvancementClass.Untrained || skill.AdvancementClass == SkillAdvancementClass.Inactive)
+                    else if (activationChance > 0.10)
                         continue;
 
                     if (target.attacksReceivedPerSecond >= skill.Current / 50.0f)
