@@ -13,13 +13,13 @@ namespace ACE.Server.WorldObjects
         // bows and crossbows
         public static readonly float BowMod = 0.008f;
 
-        public static readonly float UnarmedMod = 0.004f; // Unarmed combat gets str scaling but with the lower factor as a test to see if this is closer to retail values.
+        public static readonly float UnarmedMod = 0.004f; // Infiltration Ruleset: Unarmed combat gets str scaling but with the lower factor as a test to see if this is closer to retail values.
 
         public static readonly float ArmorMod = 200.0f / 3.0f;
 
-        public static float GetAttributeMod(int currentSkill, ACE.Entity.Enum.Skill skill = ACE.Entity.Enum.Skill.None)
+        public static float GetAttributeMod(int currentAttribute, ACE.Entity.Enum.Skill skill = ACE.Entity.Enum.Skill.None)
         {
-            float factor;
+            float factor = 0.0f;
 
             switch(skill)
             {
@@ -27,14 +27,15 @@ namespace ACE.Server.WorldObjects
                     factor = BowMod;
                     break;
                 case ACE.Entity.Enum.Skill.UnarmedCombat:
-                    factor = UnarmedMod;
+                    if (Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.Infiltration)
+                        factor = UnarmedMod;
                     break;
                 default:
                     factor = DefaultMod;
                     break;
             }
 
-            return Math.Max(1.0f + (currentSkill - 55) * factor, 1.0f);
+            return Math.Max(1.0f + (currentAttribute - 55) * factor, 1.0f);
         }
 
         /// <summary>
