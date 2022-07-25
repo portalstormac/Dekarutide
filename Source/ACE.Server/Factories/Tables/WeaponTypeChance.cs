@@ -99,7 +99,7 @@ namespace ACE.Server.Factories.Tables
 
         static WeaponTypeChance()
         {
-            if (Common.ConfigManager.Config.Server.WorldRuleset <= Common.Ruleset.Infiltration)
+            if (Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.Infiltration)
             {
                 RetailChances = new ChanceTable<TreasureWeaponType>()
                 {
@@ -128,6 +128,38 @@ namespace ACE.Server.Factories.Tables
                     ( TreasureWeaponType.Unarmed,         1.0f ),
                     ( TreasureWeaponType.Staff,           1.0f ),
                     ( TreasureWeaponType.Dagger,          1.0f ),
+                };
+            }
+            else if (Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.CustomDM)
+            {
+                RetailChances = new ChanceTable<TreasureWeaponType>(ChanceTableType.Weight)
+                {
+                    ( TreasureWeaponType.Sword,    2.0f ),
+                    ( TreasureWeaponType.Unarmed,  2.0f ),
+                    ( TreasureWeaponType.Dagger,   2.0f ),
+
+                    ( TreasureWeaponType.Mace,     1.0f ),
+                    ( TreasureWeaponType.Axe,      1.0f ),
+                    ( TreasureWeaponType.Spear,    1.0f ),
+                    ( TreasureWeaponType.Staff,    1.0f ),
+
+                    ( TreasureWeaponType.Atlatl,   1.0f ),
+                    ( TreasureWeaponType.Bow,      1.0f ),
+                    ( TreasureWeaponType.Crossbow, 1.0f ),
+
+                    ( TreasureWeaponType.Caster,   1.5f ),
+                };
+
+                MeleeChances = new ChanceTable<TreasureWeaponType>(ChanceTableType.Weight)
+                {
+                    ( TreasureWeaponType.Sword,           2.0f ),
+                    ( TreasureWeaponType.Unarmed,         2.0f ),
+                    ( TreasureWeaponType.Dagger,          2.0f ),
+
+                    ( TreasureWeaponType.Mace,            1.0f ),
+                    ( TreasureWeaponType.Axe,             1.0f ),
+                    ( TreasureWeaponType.Spear,           1.0f ),
+                    ( TreasureWeaponType.Staff,           1.0f ),
                 };
             }
         }
