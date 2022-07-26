@@ -422,7 +422,7 @@ namespace ACE.Server.WorldObjects
 
             Entity.CreatureAttribute attribute;
             if (ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.CustomDM)
-                attribute = isBow || weapon?.WeaponSkill == Skill.Dagger || weapon?.WeaponSkill == Skill.Sword || weapon?.WeaponSkill == Skill.Spear || weapon?.WeaponSkill == Skill.Staff ? Coordination : Strength;
+                attribute = isBow || weapon?.WeaponSkill == Skill.Dagger || weapon?.WeaponSkill == Skill.Spear || weapon?.WeaponSkill == Skill.Staff ? Coordination : Strength;
             else if (ConfigManager.Config.Server.WorldRuleset <= Common.Ruleset.Infiltration)
                 attribute = isBow || weapon?.WeaponSkill == Skill.Dagger ? Coordination : Strength;
             else

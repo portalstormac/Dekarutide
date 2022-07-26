@@ -57,15 +57,20 @@ namespace ACE.Server.Entity
             if (formula.X == 0) return 0;
 
             var attr1 = (PropertyAttribute)formula.Attr1;
+            var attr1Multiplier = formula.X;
             var attr2 = (PropertyAttribute)formula.Attr2;
+            var attr2Multiplier = formula.Y;
             var divisor = formula.Z;
+            var addition = formula.W;
 
-            var total = current ? creature.Attributes[attr1].Current : creature.Attributes[attr1].Base;
+            var total = (current ? creature.Attributes[attr1].Current : creature.Attributes[attr1].Base) * attr1Multiplier;
             if (attr2 != PropertyAttribute.Undef)
-                total += current ? creature.Attributes[attr2].Current : creature.Attributes[attr2].Base;
+                total += (current ? creature.Attributes[attr2].Current : creature.Attributes[attr2].Base) * attr2Multiplier;
 
             if (divisor != 1)
                 total = (uint)((float)total / divisor).Round();
+
+            total += addition;
 
             return total;
         }
