@@ -504,25 +504,27 @@ namespace ACE.Server.WorldObjects
 
         Dictionary<SpellId, int> SpellsToReplace = new Dictionary<SpellId, int>()
         {
-            { SpellId.BloodDrinkerSelf1, -1 }, // -1 means replace with a level 1 proc and so on.
-            { SpellId.BloodDrinkerSelf2, -2 },
-            { SpellId.BloodDrinkerSelf3, -3 },
-            { SpellId.BloodDrinkerSelf4, -4 },
-            { SpellId.BloodDrinkerSelf5, -5 },
-            { SpellId.BloodDrinkerSelf6, -6 },
-            { SpellId.BloodDrinkerSelf7, -7 },
-            { SpellId.BloodDrinkerSelf8, -8 },
+            // -1 means replace with a pseudorandom(based on wcid) level 1 proc and so on.
+            // 0 means remove, positive values mean the spellId of the replacement spell.
+            { SpellId.BloodDrinkerSelf1, (int)SpellId.DrainHealth1 }, 
+            { SpellId.BloodDrinkerSelf2, (int)SpellId.DrainHealth2 },
+            { SpellId.BloodDrinkerSelf3, (int)SpellId.DrainHealth3 },
+            { SpellId.BloodDrinkerSelf4, (int)SpellId.DrainHealth4 },
+            { SpellId.BloodDrinkerSelf5, (int)SpellId.DrainHealth5 },
+            { SpellId.BloodDrinkerSelf6, (int)SpellId.DrainHealth6 },
+            { SpellId.BloodDrinkerSelf7, (int)SpellId.DrainHealth7 },
+            { SpellId.BloodDrinkerSelf8, (int)SpellId.DrainHealth8 },
 
-            { SpellId.BloodDrinkerOther1, -1 },
-            { SpellId.BloodDrinkerOther2, -2 },
-            { SpellId.BloodDrinkerOther3, -3 },
-            { SpellId.BloodDrinkerOther4, -4 },
-            { SpellId.BloodDrinkerOther5, -5 },
-            { SpellId.BloodDrinkerOther6, -6 },
-            { SpellId.BloodDrinkerOther7, -7 },
-            { SpellId.BloodDrinkerOther8, -8 },
+            { SpellId.BloodDrinkerOther1, (int)SpellId.DrainHealth1 },
+            { SpellId.BloodDrinkerOther2, (int)SpellId.DrainHealth2 },
+            { SpellId.BloodDrinkerOther3, (int)SpellId.DrainHealth3 },
+            { SpellId.BloodDrinkerOther4, (int)SpellId.DrainHealth4 },
+            { SpellId.BloodDrinkerOther5, (int)SpellId.DrainHealth5 },
+            { SpellId.BloodDrinkerOther6, (int)SpellId.DrainHealth6 },
+            { SpellId.BloodDrinkerOther7, (int)SpellId.DrainHealth7 },
+            { SpellId.BloodDrinkerOther8, (int)SpellId.DrainHealth8 },
 
-            { SpellId.SpiritDrinkerSelf1, 0 }, // 0 means remove, positive values mean the spellId of the replacement spell.
+            { SpellId.SpiritDrinkerSelf1, 0 }, 
             { SpellId.SpiritDrinkerSelf2, 0 },
             { SpellId.SpiritDrinkerSelf3, 0 },
             { SpellId.SpiritDrinkerSelf4, 0 },
@@ -681,12 +683,12 @@ namespace ACE.Server.WorldObjects
                                     worldObject.ProcSpell = (uint)procSpellId;
                                     worldObject.ProcSpellSelfTargeted = spell.IsSelfTargeted;
 
-                                    log.Warn($"Replaced invalid spell {(SpellId)entry} with {(SpellId)procSpellId} as a proc on {worldObject.GetProperty(PropertyString.Name)}.");
+                                    log.Warn($"Replaced invalid spell {(SpellId)entry} with {procSpellId} as a proc on {worldObject.GetProperty(PropertyString.Name)}.");
                                 }
                                 else if (replacementId > 0)
                                 {
-                                    worldObject.Biota.GetOrAddKnownSpell(entry, BiotaDatabaseLock, out _);
-                                    log.Warn($"Replaced invalid spell {(SpellId)entry} with {replacementId} on {worldObject.GetProperty(PropertyString.Name)}.");
+                                    worldObject.Biota.GetOrAddKnownSpell(replacementId, BiotaDatabaseLock, out _);
+                                    log.Warn($"Replaced invalid spell {(SpellId)entry} with {(SpellId)replacementId} on {worldObject.GetProperty(PropertyString.Name)}.");
                                 }
                                 else
                                     log.Warn($"Removed invalid spell {(SpellId)entry} from {worldObject.GetProperty(PropertyString.Name)}.");
