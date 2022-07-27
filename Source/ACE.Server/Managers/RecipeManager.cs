@@ -464,19 +464,32 @@ namespace ACE.Server.Managers
                 case 0x38000043:    // Leather
                     target.Retained = true;
                     break;
-                case 0x3900004E:    // Sandstone: 43 -> 4E
+                case 0x3800004E:    // Sandstone: 43 -> 4E
                     target.Retained = false;
                     break;
                 case 0x3800002F:    // Moonstone
                     target.ItemMaxMana += 500;
                     break;
 
-                case 0x39000042:
-                    // legacy, these are handled in recipe mods
-                    //target.SetProperty(PropertyString.ItemHeritageGroupRestriction, "Aluvian");     // Teak
-                    //target.SetProperty(PropertyString.ItemHeritageGroupRestriction, "Gharu'ndim");  // Ebony
-                    //target.SetProperty(PropertyString.ItemHeritageGroupRestriction, "Sho");         // Porcelain
-                    //target.SetProperty(PropertyString.ItemHeritageGroupRestriction, "Viamontian");  // Satin
+                case 0x38000042:
+                    switch (target.ItemHeritageGroupRestriction)
+                    {
+                        case "Aluvian":
+                            target.HeritageGroup = HeritageGroup.Aluvian;
+                            break;
+
+                        case "Gharu'ndim":
+                            target.HeritageGroup = HeritageGroup.Gharundim;
+                            break;
+
+                        case "Sho":
+                            target.HeritageGroup = HeritageGroup.Sho;
+                            break;
+
+                        case "Viamontian":
+                            target.HeritageGroup = HeritageGroup.Viamontian;
+                            break;
+                    }
                     break;
 
                 case 0x38000035:    // Copper
@@ -510,12 +523,12 @@ namespace ACE.Server.Managers
 
                 // armatures / trinkets
                 // these are handled in recipe mod
-                case 0x39000048:    // Amber
-                case 0x39000049:    // Diamond
-                case 0x39000050:    // GromnieHide
-                case 0x39000051:    // Pyreal
-                case 0x39000052:    // Ruby
-                case 0x39000053:    // Sapphire
+                case 0x38000048:    // Amber
+                case 0x38000049:    // Diamond
+                case 0x38000050:    // GromnieHide
+                case 0x38000051:    // Pyreal
+                case 0x38000052:    // Ruby
+                case 0x38000053:    // Sapphire
                     return false;
 
                 // magic item tinkering
@@ -1450,6 +1463,29 @@ namespace ACE.Server.Managers
         {
             if (useMutateNative)
                 return TryMutateNative(player, source, target, recipe, dataId);
+
+            if (dataId == 0x38000042)
+            {
+                // Can this be done with mutation script?
+                switch (target.ItemHeritageGroupRestriction)
+                {
+                    case "Aluvian":
+                        target.HeritageGroup = HeritageGroup.Aluvian;
+                        break;
+
+                    case "Gharu'ndim":
+                        target.HeritageGroup = HeritageGroup.Gharundim;
+                        break;
+
+                    case "Sho":
+                        target.HeritageGroup = HeritageGroup.Sho;
+                        break;
+
+                    case "Viamontian":
+                        target.HeritageGroup = HeritageGroup.Viamontian;
+                        break;
+                }
+            }
 
             var numTimesTinkered = target.NumTimesTinkered;
 
