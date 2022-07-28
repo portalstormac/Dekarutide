@@ -756,6 +756,7 @@ namespace ACE.Server.WorldObjects
         private int ShopRandomItemStockAmount = 0;
         private float ShopQualityMod = 0.0f;
         private bool RandomItemGenerationInitialized = false;
+        private bool IsStarterOutpostVendor = false;
 
         private bool sellsRandomArmor;
         private bool sellsRandomMeleeWeapons;
@@ -772,46 +773,8 @@ namespace ACE.Server.WorldObjects
         {
             RandomItemGenerationInitialized = true;
 
-            sellsRandomArmor = ((ItemType)MerchandiseItemTypes & ItemType.Armor) == ItemType.Armor;
-            sellsRandomMeleeWeapons = ((ItemType)MerchandiseItemTypes & ItemType.MeleeWeapon) == ItemType.MeleeWeapon;
-            sellsRandomMissileWeapons = ((ItemType)MerchandiseItemTypes & ItemType.MissileWeapon) == ItemType.MissileWeapon;
-            sellsRandomCasters = ((ItemType)MerchandiseItemTypes & ItemType.Caster) == ItemType.Caster;
-            sellsRandomClothing = ((ItemType)MerchandiseItemTypes & ItemType.Clothing) == ItemType.Clothing;
-            sellsRandomJewelry = ((ItemType)MerchandiseItemTypes & ItemType.Jewelry) == ItemType.Jewelry;
-            sellsRandomGems = ((ItemType)MerchandiseItemTypes & ItemType.Gem) == ItemType.Gem;
-            sellsRandomScrolls = ((ItemType)MerchandiseItemTypes & ItemType.Writable) == ItemType.Writable && sellsRandomCasters; // Check if we also sell casters to prevent scribes from carrying scrolls
-
-            if (!sellsRandomArmor && !sellsRandomMeleeWeapons && !sellsRandomMissileWeapons && !sellsRandomCasters && !sellsRandomClothing && !sellsRandomJewelry && !sellsRandomGems && !sellsRandomScrolls)
-                return;
-
-            int categoriesSold = 0;
-            if (sellsRandomArmor)
-                categoriesSold++;
-            if (sellsRandomMeleeWeapons)
-                categoriesSold++;
-            if (sellsRandomMissileWeapons)
-                categoriesSold++;
-            if (sellsRandomCasters)
-                categoriesSold++;
-            if (sellsRandomClothing)
-                categoriesSold++;
-            if (sellsRandomJewelry)
-                categoriesSold++;
-            if (sellsRandomGems)
-                categoriesSold++;
-            if (sellsRandomScrolls)
-                categoriesSold++;
-
-            ShopRandomItemStockAmount = categoriesSold * ThreadSafeRandom.Next(5, 10);
-
-            ShopHeritage = (TreasureHeritageGroup)(Heritage ?? 0);
-
-            if (ShopHeritage > TreasureHeritageGroup.Sho)
-                ShopHeritage = TreasureHeritageGroup.Invalid;
-
-            bool starterOutpostVendor = false;
             string townName = GetProperty(PropertyString.TownName);
-            switch(townName)
+            switch (townName)
             {
                 case "South Holtburg Outpost":
                 case "West Holtburg Outpost":
@@ -833,7 +796,7 @@ namespace ACE.Server.WorldObjects
                 case "North Yaraq Outpost":
                     ShopTier = 1;
                     ShopQualityMod = -0.5f;
-                    starterOutpostVendor = true;
+                    IsStarterOutpostVendor = true;
                     break;
                 case "Al-Arqas":
                 case "Bluespire":
@@ -905,6 +868,46 @@ namespace ACE.Server.WorldObjects
                     break;
             }
 
+            sellsRandomArmor = ((ItemType)MerchandiseItemTypes & ItemType.Armor) == ItemType.Armor;
+            sellsRandomMeleeWeapons = ((ItemType)MerchandiseItemTypes & ItemType.MeleeWeapon) == ItemType.MeleeWeapon;
+            sellsRandomMissileWeapons = ((ItemType)MerchandiseItemTypes & ItemType.MissileWeapon) == ItemType.MissileWeapon;
+            sellsRandomCasters = ((ItemType)MerchandiseItemTypes & ItemType.Caster) == ItemType.Caster;
+            if (!IsStarterOutpostVendor)
+            {
+                sellsRandomClothing = ((ItemType)MerchandiseItemTypes & ItemType.Clothing) == ItemType.Clothing;
+                sellsRandomJewelry = ((ItemType)MerchandiseItemTypes & ItemType.Jewelry) == ItemType.Jewelry;
+                sellsRandomGems = ((ItemType)MerchandiseItemTypes & ItemType.Gem) == ItemType.Gem;
+                sellsRandomScrolls = ((ItemType)MerchandiseItemTypes & ItemType.Writable) == ItemType.Writable && sellsRandomCasters; // Check if we also sell casters to prevent scribes from carrying scrolls
+            }
+
+            if (!sellsRandomArmor && !sellsRandomMeleeWeapons && !sellsRandomMissileWeapons && !sellsRandomCasters && !sellsRandomClothing && !sellsRandomJewelry && !sellsRandomGems && !sellsRandomScrolls)
+                return;
+
+            int categoriesSold = 0;
+            if (sellsRandomArmor)
+                categoriesSold++;
+            if (sellsRandomMeleeWeapons)
+                categoriesSold++;
+            if (sellsRandomMissileWeapons)
+                categoriesSold++;
+            if (sellsRandomCasters)
+                categoriesSold++;
+            if (sellsRandomClothing)
+                categoriesSold++;
+            if (sellsRandomJewelry)
+                categoriesSold++;
+            if (sellsRandomGems)
+                categoriesSold++;
+            if (sellsRandomScrolls)
+                categoriesSold++;
+
+            ShopRandomItemStockAmount = categoriesSold * ThreadSafeRandom.Next(5, 10);
+
+            ShopHeritage = (TreasureHeritageGroup)(Heritage ?? 0);
+
+            if (ShopHeritage > TreasureHeritageGroup.Sho)
+                ShopHeritage = TreasureHeritageGroup.Invalid;
+
             if (ShopTier == 0) // We're not in a town! See what's around us.
             {
                 ShopTier = 1; // Fallback to tier 1 if there's nothing around us.
@@ -931,7 +934,7 @@ namespace ACE.Server.WorldObjects
             {
                 default:
                 case 1:
-                    if (starterOutpostVendor)
+                    if (IsStarterOutpostVendor)
                         MerchandiseMaxValue = 1500;
                     else
                         MerchandiseMaxValue = 3000;

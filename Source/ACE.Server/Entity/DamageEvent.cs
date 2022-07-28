@@ -276,7 +276,7 @@ namespace ACE.Server.Entity
                     }
                 }
 
-                if (playerAttacker.AttackHeight == AttackHeight.High) // High height attacks give players a 5% damage.
+                if (playerAttacker.AttackHeight == AttackHeight.High) // High height attacks give players an extra 5% damage bonus.
                     extraDamageMod += 0.05f;
             }
 
