@@ -119,7 +119,7 @@ namespace ACE.Server.Factories
             var _spell = new Server.Entity.Spell(finalSpellId);
 
             // retail spellcraft was capped at 370
-            wo.ItemSpellcraft = Math.Min((int)_spell.Power, 370);
+            wo.ItemSpellcraft = Math.Min(GetSpellPower(_spell), 370);
 
             var castableMana = (int)_spell.BaseMana * 5;
 

@@ -679,7 +679,7 @@ namespace ACE.Server.WorldObjects
                                     var procSpellId = SpellLevelProgression.GetSpellAtLevel(procSpellLevel1Id, level);
 
                                     Spell spell = new Spell(procSpellId);
-                                    worldObject.ProcSpellRate = 0.05f;
+                                    worldObject.ProcSpellRate = 0.10f;
                                     worldObject.ProcSpell = (uint)procSpellId;
                                     worldObject.ProcSpellSelfTargeted = spell.IsSelfTargeted;
 
@@ -687,8 +687,21 @@ namespace ACE.Server.WorldObjects
                                 }
                                 else if (replacementId > 0)
                                 {
-                                    worldObject.Biota.GetOrAddKnownSpell(replacementId, BiotaDatabaseLock, out _);
-                                    log.Warn($"Replaced invalid spell {(SpellId)entry} with {(SpellId)replacementId} on {worldObject.GetProperty(PropertyString.Name)}.");
+                                    Spell spell = new Spell(replacementId);
+
+                                    if (spell.IsBeneficial)
+                                    {
+                                        worldObject.Biota.GetOrAddKnownSpell(replacementId, BiotaDatabaseLock, out _);
+                                        log.Warn($"Replaced invalid spell {(SpellId)entry} with {(SpellId)replacementId} on {worldObject.GetProperty(PropertyString.Name)}.");
+                                    }
+                                    else
+                                    {
+                                        worldObject.ProcSpellRate = 0.10f;
+                                        worldObject.ProcSpell = (uint)replacementId;
+                                        worldObject.ProcSpellSelfTargeted = spell.IsSelfTargeted;
+
+                                        log.Warn($"Replaced invalid spell {(SpellId)entry} with {(SpellId)replacementId} as a proc on {worldObject.GetProperty(PropertyString.Name)}.");
+                                    }
                                 }
                                 else
                                     log.Warn($"Removed invalid spell {(SpellId)entry} from {worldObject.GetProperty(PropertyString.Name)}.");

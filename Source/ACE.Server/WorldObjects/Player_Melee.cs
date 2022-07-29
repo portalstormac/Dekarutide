@@ -256,6 +256,8 @@ namespace ACE.Server.WorldObjects
         {
             //log.Info($"{Name}.Attack({target.Name}, {attackSequence})");
 
+            HasPerformedActionsSinceLastMovementUpdate = true;
+
             if (AttackSequence != attackSequence)
                 return;
 
@@ -321,7 +323,7 @@ namespace ACE.Server.WorldObjects
             }
 
             // handle self-procs
-            TryProcEquippedItems(this, this, true, weapon);
+            TryProcEquippedItems(this, this, true, weapon, PowerLevel);
 
             var prevTime = 0.0f;
             bool targetProc = false;
@@ -348,7 +350,7 @@ namespace ACE.Server.WorldObjects
                     // handle target procs
                     if (damageEvent != null && damageEvent.HasDamage && !targetProc)
                     {
-                        TryProcEquippedItems(this, creature, false, weapon);
+                        TryProcEquippedItems(this, creature, false, weapon, PowerLevel);
                         targetProc = true;
                     }
 

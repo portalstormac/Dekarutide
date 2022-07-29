@@ -34,8 +34,6 @@ namespace ACE.Server.WorldObjects
                 baseCost += spell.ManaMod * (uint)numFellows;
             }
 
-            Console.WriteLine(baseCost);
-
             var manaConversion = caster.GetCreatureSkill(Skill.ManaConversion);
 
             if (manaConversion.AdvancementClass < SkillAdvancementClass.Trained || spell.Flags.HasFlag(SpellFlags.IgnoresManaConversion))

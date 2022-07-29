@@ -356,7 +356,7 @@ namespace ACE.Server.WorldObjects
             int currentVendorHappyThreshold = ThreadSafeRandom.Next(vendorHappyMean, vendorHappyMean + vendorHappyVariance);
             double priceMod = Math.Clamp((RecentMoneyIncome + RecentMoneyOutflow) / (float)currentVendorHappyThreshold * 0.1f, 0.0f, 0.1f);
 
-            SellPriceMod = -priceMod;
+            SellPriceMod = priceMod;
             BuyPriceMod = 0.1f - priceMod;
         }
 
@@ -367,6 +367,9 @@ namespace ACE.Server.WorldObjects
         public void ApproachVendor(Player player, VendorType action = VendorType.Undef, uint altCurrencySpent = 0)
         {
             RotUniques();
+
+            if (Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.CustomDM)
+                RestockRandomItems();
 
             player.Session.Network.EnqueueSend(new GameEventApproachVendor(player.Session, this, altCurrencySpent));
 
@@ -1087,9 +1090,6 @@ namespace ACE.Server.WorldObjects
                     itemToRemove.Destroy();     // even though it has already been removed from the db at this point, we want to mark as freed in guid manager now
                 }
             }
-
-            if (Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.CustomDM)
-                RestockRandomItems();
         }
 
         private static void CleanupCreatedItems(List<WorldObject> createdItems)

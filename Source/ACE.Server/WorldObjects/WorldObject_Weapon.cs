@@ -961,13 +961,16 @@ namespace ACE.Server.WorldObjects
             return HasProc && ProcSpell == spellID;
         }
 
-        public void TryProcItem(WorldObject attacker, Creature target)
+        public void TryProcItem(WorldObject attacker, Creature target, float powerOrAccuracyLevel)
         {
             if (Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.CustomDM && ItemMaxMana > 0 && !IsAffecting)
                 return; // The item spells must be active for the item to proc.
 
             // roll for a chance of casting spell
             var chance = ProcSpellRate ?? 0.0f;
+
+            if (Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.CustomDM)
+                chance += powerOrAccuracyLevel * (ProcSpellRate ?? 0.0f); // The proc chances scales with the power/accuracy bar.
 
             // special handling for aetheria
             if (Aetheria.IsAetheria(WeenieClassId) && attacker is Creature wielder)
