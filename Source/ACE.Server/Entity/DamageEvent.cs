@@ -235,20 +235,12 @@ namespace ACE.Server.Entity
             SneakAttackMod = attacker.GetSneakAttackMod(defender);
             HeritageMod = attacker.GetHeritageBonus(Weapon) ? 1.05f : 1.0f;
 
-            DamageRatingMod = Creature.AdditiveCombine(DamageRatingBaseMod, RecklessnessMod, SneakAttackMod, HeritageMod);
-
-            if (pkBattle)
-            {
-                PkDamageMod = Creature.GetPositiveRatingMod(attacker.GetPKDamageRating());
-                DamageRatingMod = Creature.AdditiveCombine(DamageRatingMod, PkDamageMod);
-            }
-
-            var extraDamageMod = 1.0f;
-
             TacticAndTechniqueType attackerTechniqueId = TacticAndTechniqueType.None;
             WorldObject attackerTechniqueTrinket;
             TacticAndTechniqueType defenderTechniqueId = TacticAndTechniqueType.None;
             WorldObject defenderTechniqueTrinket;
+
+            var extraDamageMod = 1.0f;
 
             if (playerAttacker != null && Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.CustomDM)
             {
@@ -265,23 +257,28 @@ namespace ACE.Server.Entity
                     if (CombatType == CombatType.Melee || attacker.GetDistance(defender) < 3) // Make sure we're close to each other.
                     {
                         CreatureSkill attackerMeleeDef = playerAttacker.GetCreatureSkill(Skill.MeleeDefense);
-                        if (attackerMeleeDef.AdvancementClass == SkillAdvancementClass.Trained || attackerMeleeDef.AdvancementClass == SkillAdvancementClass.Specialized)
-                        {
-                            CreatureSkill defenderMeleeDef = defender.GetCreatureSkill(Skill.MeleeDefense);
+                        CreatureSkill defenderMeleeDef = defender.GetCreatureSkill(Skill.MeleeDefense);
 
-                            var activationChance = SkillCheck.GetSkillChance(attackerMeleeDef.Current, defenderMeleeDef.Current);
-                            if (activationChance > ThreadSafeRandom.Next(0.0f, 1.0f))
-                                extraDamageMod += 0.15f; // Extra damage while attacking with the Reckless technique.
-                        }
+                        var activationChance = SkillCheck.GetSkillChance(attackerMeleeDef.Current, defenderMeleeDef.Current);
+                        if (activationChance > ThreadSafeRandom.Next(0.0f, 1.0f))
+                            RecklessnessMod = 1.20f; // Extra damage dealt while attacking with the Reckless technique.
                     }
                 }
 
-                if (playerAttacker.AttackHeight == AttackHeight.High) // High height attacks give players an extra 5% damage bonus.
-                    extraDamageMod += 0.05f;
+                if (playerAttacker.AttackHeight == AttackHeight.High) // High height attacks give players an extra 10% damage bonus.
+                    extraDamageMod += 0.10f;
+            }
+
+            DamageRatingMod = Creature.AdditiveCombine(DamageRatingBaseMod, RecklessnessMod, SneakAttackMod, HeritageMod, extraDamageMod);
+
+            if (pkBattle)
+            {
+                PkDamageMod = Creature.GetPositiveRatingMod(attacker.GetPKDamageRating());
+                DamageRatingMod = Creature.AdditiveCombine(DamageRatingMod, PkDamageMod);
             }
 
             // damage before mitigation
-            DamageBeforeMitigation = BaseDamage * AttributeMod * PowerMod * SlayerMod * DamageRatingMod * extraDamageMod;
+            DamageBeforeMitigation = BaseDamage * AttributeMod * PowerMod * SlayerMod * DamageRatingMod;
 
             var attackSkill = attacker.GetCreatureSkill(attacker.GetCurrentWeaponSkill());
 
@@ -296,19 +293,16 @@ namespace ACE.Server.Entity
                     {
                         if (attackerTechniqueId == TacticAndTechniqueType.Opportunist)
                         {
-                            CriticalChance += playerAttacker.AccuracyLevel * 0.05f; // Extra 5% critical chance while using the Opportunist technique.
+                            CriticalChance += playerAttacker.GetPowerAccuracyBar() * 0.10f; // Extra critical chance while using the Opportunist technique.
 
-                            if (attacker != defender && ThreadSafeRandom.Next(0.0f, 1.0f) < 0.15) // Chance of inflicting self damage while using the Opportunist technique.
+                            if (attacker != defender && ThreadSafeRandom.Next(0.0f, 1.0f) < 0.15f + (playerAttacker.GetPowerAccuracyBar() * 0.15f)) // Chance of inflicting self damage while using the Opportunist technique.
                                 playerAttacker.DamageTarget(playerAttacker, damageSource);
                         }
 
                         if (CombatType != CombatType.Magic)
                         {
-                            // A full power/accuracy bar gives an extra 6% critical chance
-                            if (Weapon == null || !Weapon.IsAmmoLauncher)
-                                CriticalChance += playerAttacker.PowerLevel * 0.06f; // Power bar
-                            else
-                                CriticalChance += playerAttacker.AccuracyLevel * 0.06f; // Accuracy bar
+                            // A full power/accuracy bar doubles critical chance
+                            CriticalChance += playerAttacker.GetPowerAccuracyBar() * CriticalChance;
                         }
                     }
 
@@ -352,7 +346,7 @@ namespace ACE.Server.Entity
 
                     // recklessness excluded from crits
                     RecklessnessMod = 1.0f;
-                    DamageRatingMod = Creature.AdditiveCombine(DamageRatingBaseMod, CriticalDamageRatingMod, SneakAttackMod, HeritageMod);
+                    DamageRatingMod = Creature.AdditiveCombine(DamageRatingBaseMod, CriticalDamageRatingMod, SneakAttackMod, HeritageMod, extraDamageMod);
 
                     if (pkBattle)
                         DamageRatingMod = Creature.AdditiveCombine(DamageRatingMod, PkDamageMod);
@@ -472,8 +466,8 @@ namespace ACE.Server.Entity
 
                 if (playerAttacker != null)
                 {
-                    if (playerAttacker.AttackHeight == AttackHeight.Medium) // Medium height attacks gives players 5% extra attack skill.
-                        EffectiveAttackSkill = (uint)Math.Round(EffectiveAttackSkill * 1.05);
+                    if (playerAttacker.AttackHeight == AttackHeight.Medium) // Medium height attacks gives players 10% extra attack skill.
+                        EffectiveAttackSkill = (uint)Math.Round(EffectiveAttackSkill * 1.10f);
                 }
 
                 Player playerDefender = defender as Player;
@@ -483,8 +477,8 @@ namespace ACE.Server.Entity
                     if (defenderTechnique != null && defenderTechnique.TacticAndTechniqueId == (int)TacticAndTechniqueType.Reckless)
                         return 0.0f; // No evasion while using Reckless technique.
 
-                    if (playerDefender != null && playerDefender.AttackHeight == AttackHeight.Low) // While using low height attacks players get an 5% extra defence skill.
-                        EffectiveDefenseSkill = (uint)Math.Round(EffectiveDefenseSkill * 1.05);
+                    if (playerDefender != null && playerDefender.AttackHeight == AttackHeight.Low) // While using low height attacks players get an extra defence skill bonus.
+                        EffectiveDefenseSkill = (uint)Math.Round(EffectiveDefenseSkill * 1.10f);
                 }
 
                 // Evasion penalty for receiving too many attacks per second.

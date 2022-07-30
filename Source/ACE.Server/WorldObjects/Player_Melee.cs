@@ -350,7 +350,7 @@ namespace ACE.Server.WorldObjects
                     // handle target procs
                     if (damageEvent != null && damageEvent.HasDamage && !targetProc)
                     {
-                        TryProcEquippedItems(this, creature, false, weapon, PowerLevel);
+                        TryProcEquippedItems(this, creature, false, weapon, GetPowerAccuracyBar());
                         targetProc = true;
                     }
 
