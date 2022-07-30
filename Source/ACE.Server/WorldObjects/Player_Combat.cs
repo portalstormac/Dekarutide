@@ -508,6 +508,11 @@ namespace ACE.Server.WorldObjects
             return GetCombatType() == CombatType.Missile ? AccuracyLevel : PowerLevel;
         }
 
+        public float ScaleWithPowerAccuracyBar(float value)
+        {
+            return GetPowerAccuracyBar() * value;
+        }
+
         public Sound GetHitSound(WorldObject source, BodyPart bodyPart)
         {
             /*var creature = source as Creature;

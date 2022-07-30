@@ -22,7 +22,7 @@ namespace ACE.Server.WorldObjects
         /// <summary>
         /// Tries to proc any relevant items for the attack
         /// </summary>
-        public void TryProcEquippedItems(WorldObject attacker, Creature target, bool selfTarget, WorldObject weapon, float powerOrAccuracyLevel = 0.0f)
+        public void TryProcEquippedItems(WorldObject attacker, Creature target, bool selfTarget, WorldObject weapon)
         {
             // handle procs directly on this item -- ie. phials
             // this could also be monsters with the proc spell directly on the creature
@@ -30,7 +30,7 @@ namespace ACE.Server.WorldObjects
             {
                 // projectile
                 // monster
-                TryProcItem(attacker, target, powerOrAccuracyLevel);
+                TryProcItem(attacker, target);
             }
 
             // handle proc spells for weapon
@@ -38,14 +38,14 @@ namespace ACE.Server.WorldObjects
             if (weapon != null && weapon.HasProc && weapon.ProcSpellSelfTargeted == selfTarget)
             {
                 // weapon
-                weapon.TryProcItem(attacker, target, powerOrAccuracyLevel);
+                weapon.TryProcItem(attacker, target);
             }
 
             if (attacker != this && attacker.HasProc && attacker.ProcSpellSelfTargeted == selfTarget)
             {
                 // handle special case -- missile projectiles from monsters w/ a proc directly on the mob
                 // monster
-                attacker.TryProcItem(attacker, target, powerOrAccuracyLevel);
+                attacker.TryProcItem(attacker, target);
             }
 
             // handle aetheria procs
@@ -55,7 +55,7 @@ namespace ACE.Server.WorldObjects
 
                 // aetheria
                 foreach (var aetheria in equippedAetheria)
-                    aetheria.TryProcItem(attacker, target, powerOrAccuracyLevel);
+                    aetheria.TryProcItem(attacker, target);
             }
         }
     }

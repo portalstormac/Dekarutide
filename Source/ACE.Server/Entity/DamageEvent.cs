@@ -293,16 +293,16 @@ namespace ACE.Server.Entity
                     {
                         if (attackerTechniqueId == TacticAndTechniqueType.Opportunist)
                         {
-                            CriticalChance += playerAttacker.GetPowerAccuracyBar() * 0.10f; // Extra critical chance while using the Opportunist technique.
+                            CriticalChance += playerAttacker.ScaleWithPowerAccuracyBar(0.10f); // Extra critical chance while using the Opportunist technique.
 
-                            if (attacker != defender && ThreadSafeRandom.Next(0.0f, 1.0f) < 0.15f + (playerAttacker.GetPowerAccuracyBar() * 0.15f)) // Chance of inflicting self damage while using the Opportunist technique.
+                            if (attacker != defender && ThreadSafeRandom.Next(0.0f, 1.0f) < 0.15f + playerAttacker.ScaleWithPowerAccuracyBar(0.15f)) // Chance of inflicting self damage while using the Opportunist technique.
                                 playerAttacker.DamageTarget(playerAttacker, damageSource);
                         }
 
                         if (CombatType != CombatType.Magic)
                         {
                             // A full power/accuracy bar doubles critical chance
-                            CriticalChance += playerAttacker.GetPowerAccuracyBar() * CriticalChance;
+                            CriticalChance += playerAttacker.ScaleWithPowerAccuracyBar(CriticalChance);
                         }
                     }
 
