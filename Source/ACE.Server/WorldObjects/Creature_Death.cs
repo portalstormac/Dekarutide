@@ -259,7 +259,15 @@ namespace ACE.Server.WorldObjects
 
             double casterXp = baseXp * ((float)numSpellInSpellbook / 20);
 
-            return (int)Math.Round(baseXp + hitpointsXp + casterXp);
+            double xp = baseXp + hitpointsXp + casterXp;
+
+            // Reduce xp for the first 20 levels.
+            if (level < 15)
+                xp *= 0.4;
+            else if (level <= 20)
+                xp -= (20 - level)/5 * 0.4 * xp;
+
+            return (int)Math.Round(xp);
         }
 
         /// <summary>

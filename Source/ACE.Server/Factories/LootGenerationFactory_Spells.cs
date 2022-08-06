@@ -32,7 +32,7 @@ namespace ACE.Server.Factories
                 if(itemProc != SpellId.Undef)
                 {
                     Server.Entity.Spell spell = new Server.Entity.Spell(itemProc);
-                    wo.ProcSpellRate = 0.10f;
+                    wo.ProcSpellRate = 0.15f;
                     wo.ProcSpell = (uint)itemProc;
                     wo.ProcSpellSelfTargeted = spell.IsSelfTargeted;
 

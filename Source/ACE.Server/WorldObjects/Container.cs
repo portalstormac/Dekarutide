@@ -506,23 +506,23 @@ namespace ACE.Server.WorldObjects
         {
             // -1 means replace with a pseudorandom(based on wcid) level 1 proc and so on.
             // 0 means remove, positive values mean the spellId of the replacement spell.
-            { SpellId.BloodDrinkerSelf1, (int)SpellId.DrainHealth1 }, 
-            { SpellId.BloodDrinkerSelf2, (int)SpellId.DrainHealth2 },
-            { SpellId.BloodDrinkerSelf3, (int)SpellId.DrainHealth3 },
-            { SpellId.BloodDrinkerSelf4, (int)SpellId.DrainHealth4 },
-            { SpellId.BloodDrinkerSelf5, (int)SpellId.DrainHealth5 },
-            { SpellId.BloodDrinkerSelf6, (int)SpellId.DrainHealth6 },
-            { SpellId.BloodDrinkerSelf7, (int)SpellId.DrainHealth7 },
-            { SpellId.BloodDrinkerSelf8, (int)SpellId.DrainHealth8 },
+            { SpellId.BloodDrinkerSelf1, 0 }, 
+            { SpellId.BloodDrinkerSelf2, 0 },
+            { SpellId.BloodDrinkerSelf3, 0 },
+            { SpellId.BloodDrinkerSelf4, 0 },
+            { SpellId.BloodDrinkerSelf5, 0 },
+            { SpellId.BloodDrinkerSelf6, 0 },
+            { SpellId.BloodDrinkerSelf7, 0 },
+            { SpellId.BloodDrinkerSelf8, 0 },
 
-            { SpellId.BloodDrinkerOther1, (int)SpellId.DrainHealth1 },
-            { SpellId.BloodDrinkerOther2, (int)SpellId.DrainHealth2 },
-            { SpellId.BloodDrinkerOther3, (int)SpellId.DrainHealth3 },
-            { SpellId.BloodDrinkerOther4, (int)SpellId.DrainHealth4 },
-            { SpellId.BloodDrinkerOther5, (int)SpellId.DrainHealth5 },
-            { SpellId.BloodDrinkerOther6, (int)SpellId.DrainHealth6 },
-            { SpellId.BloodDrinkerOther7, (int)SpellId.DrainHealth7 },
-            { SpellId.BloodDrinkerOther8, (int)SpellId.DrainHealth8 },
+            { SpellId.BloodDrinkerOther1, 0 },
+            { SpellId.BloodDrinkerOther2, 0 },
+            { SpellId.BloodDrinkerOther3, 0 },
+            { SpellId.BloodDrinkerOther4, 0 },
+            { SpellId.BloodDrinkerOther5, 0 },
+            { SpellId.BloodDrinkerOther6, 0 },
+            { SpellId.BloodDrinkerOther7, 0 },
+            { SpellId.BloodDrinkerOther8, 0 },
 
             { SpellId.SpiritDrinkerSelf1, 0 }, 
             { SpellId.SpiritDrinkerSelf2, 0 },
@@ -679,7 +679,7 @@ namespace ACE.Server.WorldObjects
                                     var procSpellId = SpellLevelProgression.GetSpellAtLevel(procSpellLevel1Id, level);
 
                                     Spell spell = new Spell(procSpellId);
-                                    worldObject.ProcSpellRate = 0.10f;
+                                    worldObject.ProcSpellRate = 0.15f;
                                     worldObject.ProcSpell = (uint)procSpellId;
                                     worldObject.ProcSpellSelfTargeted = spell.IsSelfTargeted;
 
@@ -696,7 +696,7 @@ namespace ACE.Server.WorldObjects
                                     }
                                     else
                                     {
-                                        worldObject.ProcSpellRate = 0.10f;
+                                        worldObject.ProcSpellRate = 0.15f;
                                         worldObject.ProcSpell = (uint)replacementId;
                                         worldObject.ProcSpellSelfTargeted = spell.IsSelfTargeted;
 

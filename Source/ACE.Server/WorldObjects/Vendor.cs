@@ -938,7 +938,7 @@ namespace ACE.Server.WorldObjects
                 default:
                 case 1:
                     if (IsStarterOutpostVendor)
-                        MerchandiseMaxValue = 1500;
+                        MerchandiseMaxValue = 1000;
                     else
                         MerchandiseMaxValue = 3000;
                     break;
