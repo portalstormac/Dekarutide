@@ -2276,7 +2276,7 @@ namespace ACE.Server.Command.Handlers
         /// Returns a weenie for a wcid or classname for /create, /createliveops, and /ci
         /// Performs some basic verifications for weenie types that are safe to spawn with these commands
         /// </summary>
-        private static Weenie GetWeenieForCreate(Session session, string weenieDesc, bool forInventory = false)
+        public static Weenie GetWeenieForCreate(Session session, string weenieDesc, bool forInventory = false)
         {
             Weenie weenie = null;
 

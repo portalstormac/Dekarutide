@@ -244,6 +244,22 @@ namespace ACE.Database
             }
         }
 
+        public Dictionary<uint, int> GetAllWeenieTypes(WorldDbContext context)
+        {
+            return context.Weenie
+                .ToDictionary(r => r.ClassId, r => r.Type);
+        }
+
+        public Dictionary<uint, int> GetAllWeenieTypes()
+        {
+            using (var context = new WorldDbContext())
+            {
+                context.ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
+
+                return GetAllWeenieTypes(context);
+            }
+        }
+
 
         public List<HouseListResults> GetHousesAll()
         {

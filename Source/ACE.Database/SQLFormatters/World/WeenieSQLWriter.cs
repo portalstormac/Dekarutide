@@ -15,11 +15,13 @@ namespace ACE.Database.SQLFormatters.World
         /// <summary>
         /// Default is formed from: input.ClassId.ToString("00000") + " " + name
         /// </summary>
-        public string GetDefaultFileName(Weenie input)
+        public string GetDefaultFileName(Weenie input, string appendText = "")
         {
             var name = input.WeeniePropertiesString.FirstOrDefault(r => r.Type == (int)PropertyString.Name);
 
             var fileName = input.ClassId.ToString("00000") + " " + (name != null ? name.Value : "");
+            if (appendText.Length > 0)
+                fileName += appendText;
             fileName = IllegalInFileName.Replace(fileName, "_");
             fileName += ".sql";
 

@@ -3040,5 +3040,565 @@ namespace ACE.Server.Command.Handlers.Processors
                 CommandHandlerHelper.WriteOutputInfo(session, $"Invalid Landblock ID: {parameters[0]}\nLandblock ID should be in the hex format such as this: @vloc2loc 0xAB94");
             }
         }
+
+        [CommandHandler("scaleweenielevel", AccessLevel.Developer, CommandHandlerFlag.None, 2, "Scales the level and all attributes/skills of the a weenieId/WeenieClassName", "<weenieId/WeenieClassName> <newLevel>")]
+        public static void HandleScaleWeenieLevel(Session session, params string[] parameters)
+        {
+            var weenie = AdminCommands.GetWeenieForCreate(session, parameters[0]);
+            if(weenie == null)
+            {
+                CommandHandlerHelper.WriteOutputInfo(session, "Invalid weenie.");
+                return;
+            }
+
+            var obj = WorldObjectFactory.CreateNewWorldObject(weenie);
+
+            Creature creature = obj as Creature;
+
+            if (creature == null)
+            {
+                if(obj != null)
+                    obj.Destroy();
+                CommandHandlerHelper.WriteOutputInfo(session, "Invalid weenie.");
+                return;
+            }
+
+            uint newLevel;
+            if (parameters.Length < 2 || !uint.TryParse(parameters[1], out newLevel))
+            {
+                CommandHandlerHelper.WriteOutputInfo(session, "Invalid parameters.");
+                return;
+            }
+
+            uint oldLevel = (uint)(creature.Level ?? 1);
+            if (newLevel == oldLevel)
+            {
+                if (obj != null)
+                    obj.Destroy();
+                CommandHandlerHelper.WriteOutputInfo(session, "Can't scale a creature to same level it already is.");
+                return;
+            }
+
+            CommandHandlerHelper.WriteOutputInfo(session, $"Scaling {creature.Name}({creature.WeenieClassId}) from level {oldLevel} to {newLevel}.");
+            ScaleLevel(creature, newLevel, true, session);
+
+            creature.Destroy();
+        }
+
+        [CommandHandler("scalecreaturelevel", AccessLevel.Developer, CommandHandlerFlag.RequiresWorld, 1, "Scales the level and all attributes/skills of the last appraised creature", "<newLevel>")]
+        public static void HandleScaleCreatureLevel(Session session, params string[] parameters)
+        {
+            var obj = CommandHandlerHelper.GetLastAppraisedObject(session);
+
+            Creature creature = obj as Creature;
+
+            if (creature == null)
+            {
+                CommandHandlerHelper.WriteOutputInfo(session, "Invalid target.");
+                return;
+            }
+
+            uint newLevel;
+            if (parameters.Length < 1 || !uint.TryParse(parameters[0], out newLevel))
+            {
+                CommandHandlerHelper.WriteOutputInfo(session, "Invalid parameters.");
+                return;
+            }
+
+            uint oldLevel = (uint)(creature.Level ?? 1);
+            if (newLevel == oldLevel)
+            {
+                CommandHandlerHelper.WriteOutputInfo(session, "Can't scale a creature to same level it already is.");
+                return;
+            }
+
+            CommandHandlerHelper.WriteOutputInfo(session, $"Scaling {creature.Name}({creature.WeenieClassId}) from level {oldLevel} to {newLevel}.");
+            ScaleLevel(creature, newLevel, false, session);
+        }
+
+        public static void ScaleLevel(Creature creature, uint newLevel, bool toSql, Session session)
+        {
+            // TODO: Scale body table armor and damage.
+            if (creature == null)
+                return;
+
+            if (creature.Level == newLevel)
+                return;
+
+            var xpTable = DatLoader.DatManager.PortalDat.XpTable.CharacterLevelXPList;
+            var attributeTable = DatLoader.DatManager.PortalDat.XpTable.AttributeXpList;
+            var vitalTable = DatLoader.DatManager.PortalDat.XpTable.VitalXpList;
+            var skillTable = DatLoader.DatManager.PortalDat.XpTable.SpecializedSkillXpList;
+
+            ulong newLevelTotalXp = 0;
+            ulong totalXp = 0;
+            uint highestCombatSkillValue = 0;
+            ulong highestCombatSkillTotalXp = 0;
+
+            uint health = creature.Health.StartingValue;
+            uint stamina = creature.Stamina.StartingValue;
+            uint mana = creature.Mana.StartingValue;
+
+            uint strength = creature.Strength.StartingValue;
+            uint endurance = creature.Endurance.StartingValue;
+            uint coordination = creature.Coordination.StartingValue;
+            uint quickness = creature.Quickness.StartingValue;
+            uint focus = creature.Focus.StartingValue;
+            uint self = creature.Self.StartingValue;
+
+            ulong healthTotalXp = GetTotalXP(vitalTable, health);
+            ulong staminaTotalXp = GetTotalXP(vitalTable, stamina);
+            ulong manaTotalXp = GetTotalXP(vitalTable, mana);
+            totalXp += healthTotalXp;
+            totalXp += staminaTotalXp;
+            totalXp += manaTotalXp;
+
+            ulong strengthTotalXp = GetTotalXP(attributeTable, strength);
+            ulong enduranceTotalXp = GetTotalXP(attributeTable, endurance);
+            ulong coordinationTotalXp = GetTotalXP(attributeTable, coordination);
+            ulong quicknessTotalXp = GetTotalXP(attributeTable, quickness);
+            ulong focusTotalXp = GetTotalXP(attributeTable, focus);
+            ulong selfTotalXp = GetTotalXP(attributeTable, self);
+
+            totalXp += strengthTotalXp;
+            totalXp += enduranceTotalXp;
+            totalXp += coordinationTotalXp;
+            totalXp += quicknessTotalXp;
+            totalXp += focusTotalXp;
+            totalXp += selfTotalXp;
+
+            Dictionary<Skill, ulong> skillTotalXpMap = new Dictionary<Skill, ulong>();
+
+            ulong skillTotalXp = 0;
+            foreach (var skillEntry in creature.Skills)
+            {
+                var skill = skillEntry.Value;
+                switch (skill.Skill)
+                {
+                    case Skill.Axe:
+                    case Skill.Dagger:
+                    case Skill.Mace:
+                    case Skill.Spear:
+                    case Skill.Staff:
+                    case Skill.Sword:
+                    case Skill.UnarmedCombat:
+                    case Skill.Bow:
+                    case Skill.Crossbow:
+                    case Skill.ThrownWeapon:
+                        var skillValue = skill.InitLevel;
+                        skillTotalXp = GetTotalXP(skillTable, skillValue);
+                        skillTotalXpMap.Add(skill.Skill, skillTotalXp);
+                        //Do not add this to totalXp, we will only add the highest one below.
+
+                        if (skillValue > highestCombatSkillValue)
+                        {
+                            highestCombatSkillValue = skillValue;
+                            highestCombatSkillTotalXp = skillTotalXp;
+                        }
+                        break;
+                    default:
+                        skillTotalXp = GetTotalXP(skillTable, skill.InitLevel);
+                        totalXp += skillTotalXp;
+                        skillTotalXpMap.Add(skill.Skill, skillTotalXp);
+                        break;
+                }
+            }
+
+            if (highestCombatSkillValue > 0)
+                totalXp += highestCombatSkillTotalXp;
+
+            double levelRatio = GetXpRatioBetweenLevels(xpTable, (uint)(creature.Level ?? 1), newLevel);
+            newLevelTotalXp = (ulong)(totalXp * levelRatio);
+
+            double healthRatio = (double)healthTotalXp / totalXp;
+            double staminaRatio = (double)staminaTotalXp / totalXp;
+            double manaRatio = (double)manaTotalXp / totalXp;
+
+            double strengthRatio = (double)strengthTotalXp / totalXp;
+            double enduranceRatio = (double)enduranceTotalXp / totalXp;
+            double coordinationRatio = (double)coordinationTotalXp / totalXp;
+            double quicknessRatio = (double)quicknessTotalXp / totalXp;
+            double focusRatio = (double)focusTotalXp / totalXp;
+            double selfRatio = (double)selfTotalXp / totalXp;
+
+            Dictionary<Skill, double> skillRatioMap = new Dictionary<Skill, double>();
+            foreach (var entry in skillTotalXpMap)
+            {
+                double skillRatio = (double)entry.Value / totalXp;
+                skillRatioMap.Add(entry.Key, skillRatio);
+            }
+
+            uint newHealth = GetLevel(vitalTable, (ulong)Math.Round(healthRatio * newLevelTotalXp));
+            uint newStamina = GetLevel(vitalTable, (ulong)Math.Round(staminaRatio * newLevelTotalXp));
+            uint newMana = GetLevel(vitalTable, (ulong)Math.Round(manaRatio * newLevelTotalXp));
+
+            uint newStrength = GetLevel(attributeTable, (ulong)Math.Round(strengthRatio * newLevelTotalXp));
+            uint newEndurance = GetLevel(attributeTable, (ulong)Math.Round(enduranceRatio * newLevelTotalXp));
+            uint newCoordination = GetLevel(attributeTable, (ulong)Math.Round(coordinationRatio * newLevelTotalXp));
+            uint newQuickness = GetLevel(attributeTable, (ulong)Math.Round(quicknessRatio * newLevelTotalXp));
+            uint newFocus = GetLevel(attributeTable, (ulong)Math.Round(focusRatio * newLevelTotalXp));
+            uint newSelf = GetLevel(attributeTable, (ulong)Math.Round(selfRatio * newLevelTotalXp));
+
+            Dictionary<Skill, uint> skillNewValueMap = new Dictionary<Skill, uint>();
+            foreach (var entry in skillRatioMap)
+            {
+                uint newValue = GetLevel(skillTable, (ulong)Math.Round(entry.Value * newLevelTotalXp));
+                skillNewValueMap.Add(entry.Key, newValue);
+            }
+
+            if (!toSql)
+            {
+                creature.Level = (int)newLevel;
+
+                creature.Health.StartingValue = newHealth;
+                creature.Stamina.StartingValue = newStamina;
+                creature.Mana.StartingValue = newMana;
+                creature.SetMaxVitals();
+
+                creature.Strength.StartingValue = newStrength;
+                creature.Endurance.StartingValue = newEndurance;
+                creature.Coordination.StartingValue = newCoordination;
+                creature.Quickness.StartingValue = newQuickness;
+                creature.Focus.StartingValue = newFocus;
+                creature.Self.StartingValue = newSelf;
+
+                foreach (var entry in skillNewValueMap)
+                {
+                    if (creature.Skills.TryGetValue(entry.Key, out var skill))
+                        skill.InitLevel = entry.Value;
+                }
+            }
+            else
+            {
+                DirectoryInfo di = VerifyContentFolder(session, false);
+
+                var sep = Path.DirectorySeparatorChar;
+
+                var sql_folder = $"{di.FullName}{sep}sql{sep}weenies{sep}";
+
+                di = new DirectoryInfo(sql_folder);
+
+                if (!di.Exists)
+                    di.Create();
+
+                if (WeenieSQLWriter == null)
+                {
+                    WeenieSQLWriter = new WeenieSQLWriter();
+                    WeenieSQLWriter.WeenieNames = DatabaseManager.World.GetAllWeenieNames();
+                    WeenieSQLWriter.SpellNames = DatabaseManager.World.GetAllSpellNames();
+                    WeenieSQLWriter.TreasureDeath = DatabaseManager.World.GetAllTreasureDeath();
+                    WeenieSQLWriter.TreasureWielded = DatabaseManager.World.GetAllTreasureWielded();
+                    WeenieSQLWriter.PacketOpCodes = PacketOpCodeNames.Values;
+                }
+
+                Weenie weenie = DatabaseManager.World.GetWeenie(creature.WeenieClassId);
+                Weenie weenieOriginal = DatabaseManager.World.GetWeenie(creature.WeenieClassId);
+
+                WeeniePropertiesInt weenieLevel = (from x in weenie.WeeniePropertiesInt where x.Type == (int)PropertyInt.Level select x).FirstOrDefault();
+                if (weenieLevel != null)
+                    weenieLevel.Value = (int)newLevel;
+
+                WeeniePropertiesAttribute2nd weenieHealth = (from x in weenie.WeeniePropertiesAttribute2nd where x.Type == (int)PropertyAttribute2nd.MaxHealth select x).FirstOrDefault();
+                if (weenieHealth != null)
+                {
+                    weenieHealth.InitLevel = newHealth;
+                    weenieHealth.CurrentLevel = newHealth + AttributeFormula.GetFormula(DatLoader.DatManager.PortalDat.SecondaryAttributeTable.MaxHealth.Formula, newEndurance);
+                }
+                WeeniePropertiesAttribute2nd weenieStamina = (from x in weenie.WeeniePropertiesAttribute2nd where x.Type == (int)PropertyAttribute2nd.MaxStamina select x).FirstOrDefault();
+                if (weenieStamina != null)
+                {
+                    weenieStamina.InitLevel = newStamina;
+                    weenieStamina.CurrentLevel = newStamina + AttributeFormula.GetFormula(DatLoader.DatManager.PortalDat.SecondaryAttributeTable.MaxStamina.Formula, newEndurance);
+                }
+                WeeniePropertiesAttribute2nd weenieMana = (from x in weenie.WeeniePropertiesAttribute2nd where x.Type == (int)PropertyAttribute2nd.MaxMana select x).FirstOrDefault();
+                if (weenieMana != null)
+                {
+                    weenieMana.InitLevel = newMana;
+                    weenieMana.CurrentLevel = newMana + AttributeFormula.GetFormula(DatLoader.DatManager.PortalDat.SecondaryAttributeTable.MaxMana.Formula, newSelf);
+                }
+
+                WeeniePropertiesAttribute weenieStrength = (from x in weenie.WeeniePropertiesAttribute where x.Type == (int)PropertyAttribute.Strength select x).FirstOrDefault();
+                if (weenieStrength != null)
+                    weenieStrength.InitLevel = newStrength;
+                WeeniePropertiesAttribute weenieEndurance = (from x in weenie.WeeniePropertiesAttribute where x.Type == (int)PropertyAttribute.Endurance select x).FirstOrDefault();
+                if (weenieEndurance != null)
+                    weenieEndurance.InitLevel = newEndurance;
+                WeeniePropertiesAttribute weenieCoordination = (from x in weenie.WeeniePropertiesAttribute where x.Type == (int)PropertyAttribute.Coordination select x).FirstOrDefault();
+                if (weenieCoordination != null)
+                    weenieCoordination.InitLevel = newCoordination;
+                WeeniePropertiesAttribute weenieQuickness = (from x in weenie.WeeniePropertiesAttribute where x.Type == (int)PropertyAttribute.Quickness select x).FirstOrDefault();
+                if (weenieQuickness != null)
+                    weenieQuickness.InitLevel = newQuickness;
+                WeeniePropertiesAttribute weenieFocus = (from x in weenie.WeeniePropertiesAttribute where x.Type == (int)PropertyAttribute.Focus select x).FirstOrDefault();
+                if (weenieFocus != null)
+                    weenieFocus.InitLevel = newFocus;
+                WeeniePropertiesAttribute weenieSelf = (from x in weenie.WeeniePropertiesAttribute where x.Type == (int)PropertyAttribute.Self select x).FirstOrDefault();
+                if (weenieSelf != null)
+                    weenieSelf.InitLevel = newSelf;
+
+                foreach (var entry in skillNewValueMap)
+                {
+                    WeeniePropertiesSkill weenieSkill = (from x in weenie.WeeniePropertiesSkill where x.Type == (int)entry.Key select x).FirstOrDefault();
+                    if (weenieSkill != null)
+                        weenieSkill.InitLevel = entry.Value;
+                }
+
+                var sql_filename = WeenieSQLWriter.GetDefaultFileName(weenie, $" - Scaled from level {creature.Level} to {newLevel}");
+
+                var writer = new StreamWriter(sql_folder + sql_filename);
+
+                try
+                {
+                    WeenieSQLWriter.CreateSQLDELETEStatement(weenie, writer);
+                    writer.WriteLine();
+                    WeenieSQLWriter.CreateSQLINSERTStatement(weenie, writer);
+                    writer.Close();
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
+                    CommandHandlerHelper.WriteOutputInfo(session, $"Failed to export {sql_folder}{sql_filename}");
+                    return;
+                }
+
+                CommandHandlerHelper.WriteOutputInfo(session, $"Exported {sql_folder}{sql_filename}");
+
+                sql_filename = WeenieSQLWriter.GetDefaultFileName(weenieOriginal);
+                writer = new StreamWriter(sql_folder + sql_filename);
+
+                try
+                {
+                    WeenieSQLWriter.CreateSQLDELETEStatement(weenieOriginal, writer);
+                    writer.WriteLine();
+                    WeenieSQLWriter.CreateSQLINSERTStatement(weenieOriginal, writer);
+                    writer.Close();
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
+                    CommandHandlerHelper.WriteOutputInfo(session, $"Failed to export {sql_folder}{sql_filename}");
+                    return;
+                }
+
+                CommandHandlerHelper.WriteOutputInfo(session, $"Exported {sql_folder}{sql_filename}");
+            }
+        }
+
+        public static double GetXpRatioBetweenLevels(List<ulong> table, uint levelA, uint levelB)
+        {
+            uint maxLevel = (uint)(table.Count - 1);
+
+            levelA = Math.Clamp(levelA, 1, maxLevel);
+            levelB = Math.Clamp(levelB, 1, maxLevel);
+
+            var levelA_totalXP = table[(int)levelA];
+            var levelB_totalXP = table[(int)levelB];
+
+            return (double)levelB_totalXP / levelA_totalXP;
+        }
+
+        private static uint GetLevel(List<uint> table, ulong totalXp)
+        {
+            int level = 0;
+            while (totalXp >= table[level + 1])
+            {
+                level++;
+
+                if (level == table.Count - 1)
+                {
+                    ulong lastLevelTotalXP = table[table.Count - 1];
+                    ulong lastLevelXpDiff = table[table.Count - 1] - table[table.Count - 2];
+                    int extraLevels = (int)((totalXp - lastLevelTotalXP) / lastLevelXpDiff);
+
+                    level += extraLevels;
+                    break;
+                }
+            }
+
+            return (uint)level * 2;
+        }
+
+        private static ulong GetTotalXP(List<uint> table, uint level)
+        {
+            level /= 2;
+
+            if (level < table.Count - 1)
+            {
+                return table[(int)level];
+            }
+            else
+            {
+                uint lastLevelXp = table[table.Count - 1] - table[table.Count - 2];
+                int extraLevels = (int)level - (table.Count - 1);
+                ulong extraXp = (ulong)(lastLevelXp * extraLevels);
+
+                return table[table.Count - 1] + extraXp;
+            }
+        }
+
+        [CommandHandler("exportlevelstofile", AccessLevel.Developer, CommandHandlerFlag.None, 0, "", "")]
+        public static void HandleExportLevelsToFile(Session session, params string[] parameters)
+        {
+            CommandHandlerHelper.WriteOutputInfo(session, "Exporting all creature levels to creatureLevels.txt...");
+
+            var contentFolder = VerifyContentFolder(session, false);
+
+            var sep = Path.DirectorySeparatorChar;
+            var folder = new DirectoryInfo($"{contentFolder.FullName}{sep}reports{sep}");
+
+            if (!folder.Exists)
+                folder.Create();
+
+            var filename = $"{folder.FullName}{sep}creatureLevels.txt";
+
+            var fileWriter = new StreamWriter(filename);
+
+            //fileWriter.WriteLine("level\tcalculated level\tlevel difference\tname\tweenieClassId\tweenieClassName\ttype");
+            fileWriter.WriteLine("level\tname\tweenieClassId\tweenieClassName\ttype");
+
+            var WeenieTypes = DatabaseManager.World.GetAllWeenieTypes();
+            foreach (var entry in WeenieTypes)
+            {
+                if (entry.Value != (int)WeenieType.Creature)
+                    continue;
+
+                var obj = WorldObjectFactory.CreateNewWorldObject(entry.Key);
+                var creature = obj as Creature;
+                if (creature.WeenieClassId != 1 && creature.PlayerKillerStatus != PlayerKillerStatus.RubberGlue && creature.PlayerKillerStatus != PlayerKillerStatus.Protected)
+                {
+                    //var level = CalculateLevel(creature);
+                    //fileWriter.WriteLine($"{creature.Level}\t{level}\t{level - creature.Level}\t{creature.Name}\t{creature.WeenieClassId}\t{creature.WeenieClassName}\t{creature.CreatureType}");
+                    fileWriter.WriteLine($"{creature.Level}\t{creature.Name}\t{creature.WeenieClassId}\t{creature.WeenieClassName}\t{creature.CreatureType}");
+                    fileWriter.Flush();
+                }
+
+                creature.Destroy();
+            }
+
+            fileWriter.Close();
+            CommandHandlerHelper.WriteOutputInfo(session, "Done.");
+        }
+
+        //[CommandHandler("calculatelevel", AccessLevel.Developer, CommandHandlerFlag.RequiresWorld, 0, "", "")]
+        //public static void HandleCalculateLevel(Session session, params string[] parameters)
+        //{
+        //    var obj = CommandHandlerHelper.GetLastAppraisedObject(session);
+
+        //    Creature creature = obj as Creature;
+
+        //    if (creature == null)
+        //    {
+        //        CommandHandlerHelper.WriteOutputInfo(session, "Invalid target.");
+        //        return;
+        //    }
+
+        //    var level = CalculateLevel(creature);
+
+        //    CommandHandlerHelper.WriteOutputInfo(session, $"-- Creature: {creature.Name}({creature.WeenieClassId}) --");
+        //    CommandHandlerHelper.WriteOutputInfo(session, $"Current Level: {creature.Level}");
+        //    CommandHandlerHelper.WriteOutputInfo(session, $"Calculated Level: {level}");
+        //}
+
+        //public static int CalculateLevel(Creature creature)
+        //{
+        //    if (creature == null)
+        //        return 0;
+
+        //    var xpTable = DatLoader.DatManager.PortalDat.XpTable.CharacterLevelXPList;
+
+        //    var attributeTable = DatLoader.DatManager.PortalDat.XpTable.AttributeXpList;
+        //    var vitalTable = DatLoader.DatManager.PortalDat.XpTable.VitalXpList;
+        //    var skillTable = DatLoader.DatManager.PortalDat.XpTable.SpecializedSkillXpList;
+
+        //    ulong totalXp = 0;
+        //    uint highestCombatSkillValue = 0;
+
+        //    uint health = creature.Health.StartingValue + creature.Health.Base;
+        //    uint stamina = creature.Stamina.StartingValue + creature.Stamina.Ranks;
+        //    uint mana = creature.Mana.StartingValue + creature.Mana.Ranks;
+
+        //    uint strength = creature.Strength.Base;
+        //    uint endurance = creature.Endurance.Base;
+        //    uint coordination = creature.Coordination.Base;
+        //    uint quickness = creature.Quickness.Base;
+        //    uint focus = creature.Focus.Base;
+        //    uint self = creature.Self.Base;
+
+        //    uint totalAttributes = strength + endurance + coordination + quickness + focus + self;
+        //    uint totalInnate = Math.Min(totalAttributes, 330);
+        //    uint strengthInnate = (uint)Math.Round((float)strength / totalAttributes * totalInnate);
+        //    uint enduranceInnate = (uint)Math.Round((float)endurance / totalAttributes * totalInnate);
+        //    uint coordinationInnate = (uint)Math.Round((float)coordination / totalAttributes * totalInnate);
+        //    uint quicknessInnate = (uint)Math.Round((float)quickness / totalAttributes * totalInnate);
+        //    uint focusInnate = (uint)Math.Round((float)focus / totalAttributes * totalInnate);
+        //    uint selfInnate = (uint)Math.Round((float)self / totalAttributes * totalInnate);
+
+        //    strength -= strengthInnate;
+        //    endurance -= enduranceInnate;
+        //    coordination -= coordinationInnate;
+        //    quickness -= quicknessInnate;
+        //    focus -= focusInnate;
+        //    self -= selfInnate;
+
+        //    health = Math.Min(health, 250);
+        //    stamina = Math.Min(stamina, 500);
+        //    mana = Math.Min(mana, 250);
+
+        //    totalXp += GetTotalXP(vitalTable, health);
+        //    totalXp += GetTotalXP(vitalTable, stamina);
+        //    totalXp += GetTotalXP(vitalTable, mana);
+
+        //    totalXp += GetTotalXP(attributeTable, strength);
+        //    totalXp += GetTotalXP(attributeTable, endurance);
+        //    totalXp += GetTotalXP(attributeTable, coordination);
+        //    totalXp += GetTotalXP(attributeTable, quickness);
+        //    totalXp += GetTotalXP(attributeTable, focus);
+        //    totalXp += GetTotalXP(attributeTable, self);
+
+        //    foreach (var skillEntry in creature.Skills)
+        //    {
+        //        var skill = skillEntry.Value;
+        //        switch (skill.Skill)
+        //        {
+        //            case Skill.Axe:
+        //            case Skill.Dagger:
+        //            case Skill.Mace:
+        //            case Skill.Spear:
+        //            case Skill.Staff:
+        //            case Skill.Sword:
+        //            case Skill.UnarmedCombat:
+        //            case Skill.Bow:
+        //            case Skill.Crossbow:
+        //            case Skill.ThrownWeapon:
+        //                if (skill.InitLevel + skill.Ranks > highestCombatSkillValue)
+        //                    highestCombatSkillValue = skill.InitLevel + skill.Ranks;
+        //                break;
+        //            default:
+        //                totalXp += GetTotalXP(skillTable, skill.InitLevel + skill.Ranks);
+        //                break;
+        //        }
+        //    }
+
+        //    if (highestCombatSkillValue > 0)
+        //        totalXp += GetTotalXP(skillTable, highestCombatSkillValue);
+
+        //    int level = 1;
+        //    while (totalXp >= xpTable[level + 1])
+        //    {
+        //        level++;
+
+        //        if (level == xpTable.Count - 1)
+        //        {
+        //            ulong lastLevelTotalXP = xpTable[xpTable.Count - 1];
+        //            ulong lastLevelXpDiff = xpTable[xpTable.Count - 1] - xpTable[xpTable.Count - 2];
+        //            int extraLevels = (int)((totalXp - lastLevelTotalXP) / lastLevelXpDiff);
+
+        //            level += extraLevels;
+        //            break;
+        //        }
+        //    }
+
+        //    return level;
+        //}
     }
 }
