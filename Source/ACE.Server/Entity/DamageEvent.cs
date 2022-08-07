@@ -565,7 +565,7 @@ namespace ACE.Server.Entity
         public void GetBodyPart(Creature defender, Quadrant quadrant)
         {
             // get cached body parts table
-            var bodyParts = Creature.GetBodyParts(defender.WeenieClassId);
+            var bodyParts = !defender.IsModified ? Creature.GetBodyParts(defender.WeenieClassId) : Creature.GetBodyParts(defender); // If we're modified(our level has been altered) get our custom body parts instead of the generic one.
 
             // rng roll for body part
             var bodyPart = bodyParts.RollBodyPart(quadrant);

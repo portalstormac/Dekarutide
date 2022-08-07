@@ -195,6 +195,8 @@ namespace ACE.Entity.Enum.Properties
 
         [Ephemeral][ServerOnly]
         IsPseudoRandomGenerator          = 9011,
+        [ServerOnly]
+        IsModified                       = 9012,
     }
 
     public static class PropertyBoolExtensions

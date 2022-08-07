@@ -3066,8 +3066,8 @@ namespace ACE.Server.Command.Handlers.Processors
             }
         }
 
-        [CommandHandler("scaleweenielevel", AccessLevel.Developer, CommandHandlerFlag.None, 2, "Scales the level and all attributes/skills of the a weenieId/WeenieClassName", "<weenieId/WeenieClassName> <newLevel>")]
-        public static void HandleScaleWeenieLevel(Session session, params string[] parameters)
+        [CommandHandler("scaleweeniestats", AccessLevel.Developer, CommandHandlerFlag.None, 2, "Scales the level and all attributes/skills of the a weenieId/WeenieClassName", "<weenieId/WeenieClassName> <newLevel> [keepLevel = false]")]
+        public static void HandleScaleWeenieStats(Session session, params string[] parameters)
         {
             var weenie = AdminCommands.GetWeenieForCreate(session, parameters[0]);
             if(weenie == null)
@@ -3095,23 +3095,27 @@ namespace ACE.Server.Command.Handlers.Processors
                 return;
             }
 
+            bool keepLevel = false;
+            if (parameters.Length > 2)
+                bool.TryParse(parameters[2], out keepLevel);
+
             uint oldLevel = (uint)(creature.Level ?? 1);
             if (newLevel == oldLevel)
             {
                 if (obj != null)
                     obj.Destroy();
-                CommandHandlerHelper.WriteOutputInfo(session, "Can't scale a creature to same level it already is.");
+                CommandHandlerHelper.WriteOutputInfo(session, "Can't scale a creature to the same level it already is.");
                 return;
             }
 
-            CommandHandlerHelper.WriteOutputInfo(session, $"Scaling {creature.Name}({creature.WeenieClassId}) from level {oldLevel} to {newLevel}.");
-            ScaleLevel(creature, newLevel, true, session);
+            CommandHandlerHelper.WriteOutputInfo(session, $"Scaling {creature.Name}({creature.WeenieClassId}) stats from level {oldLevel} to {newLevel}" + (keepLevel ? $" but keeping its level at {oldLevel}." : "."));
+            ScaleStats(creature, newLevel, true, keepLevel, session);
 
             creature.Destroy();
         }
 
-        [CommandHandler("scalecreaturelevel", AccessLevel.Developer, CommandHandlerFlag.RequiresWorld, 1, "Scales the level and all attributes/skills of the last appraised creature", "<newLevel>")]
-        public static void HandleScaleCreatureLevel(Session session, params string[] parameters)
+        [CommandHandler("scalecreaturestats", AccessLevel.Developer, CommandHandlerFlag.RequiresWorld, 1, "Scales the level and all attributes/skills of the last appraised creature", "<newLevel> [keepLevel = false]")]
+        public static void HandleScaleCreatureStats(Session session, params string[] parameters)
         {
             var obj = CommandHandlerHelper.GetLastAppraisedObject(session);
 
@@ -3130,18 +3134,22 @@ namespace ACE.Server.Command.Handlers.Processors
                 return;
             }
 
+            bool keepLevel = false;
+            if (parameters.Length > 1)
+                bool.TryParse(parameters[1], out keepLevel);
+
             uint oldLevel = (uint)(creature.Level ?? 1);
             if (newLevel == oldLevel)
             {
-                CommandHandlerHelper.WriteOutputInfo(session, "Can't scale a creature to same level it already is.");
+                CommandHandlerHelper.WriteOutputInfo(session, "Can't scale a creature to the same level it already is.");
                 return;
             }
 
-            CommandHandlerHelper.WriteOutputInfo(session, $"Scaling {creature.Name}({creature.WeenieClassId}) from level {oldLevel} to {newLevel}.");
-            ScaleLevel(creature, newLevel, false, session);
+            CommandHandlerHelper.WriteOutputInfo(session, $"Scaling {creature.Name}({creature.WeenieClassId}) stats from level {oldLevel} to {newLevel}" + (keepLevel ? $" but keeping its level at {oldLevel}." : "."));
+            ScaleStats(creature, newLevel, false, keepLevel, session);
         }
 
-        public static void ScaleLevel(Creature creature, uint newLevel, bool toSql, Session session)
+        public static void ScaleStats(Creature creature, uint newLevel, bool toSql, bool keepLevel, Session session)
         {
             if (creature == null)
                 return;
@@ -3272,12 +3280,12 @@ namespace ACE.Server.Command.Handlers.Processors
 
             if (!toSql)
             {
-                creature.Level = (int)newLevel;
+                creature.IsModified = true;
 
-                creature.Health.StartingValue = newHealth;
-                creature.Stamina.StartingValue = newStamina;
-                creature.Mana.StartingValue = newMana;
-                creature.SetMaxVitals();
+                creature.PlayParticleEffect(PlayScript.AetheriaLevelUp, creature.Guid);
+
+                if(!keepLevel)
+                    creature.Level = (int)newLevel;
 
                 creature.Strength.StartingValue = newStrength;
                 creature.Endurance.StartingValue = newEndurance;
@@ -3285,6 +3293,11 @@ namespace ACE.Server.Command.Handlers.Processors
                 creature.Quickness.StartingValue = newQuickness;
                 creature.Focus.StartingValue = newFocus;
                 creature.Self.StartingValue = newSelf;
+
+                creature.Health.StartingValue = newHealth;
+                creature.Stamina.StartingValue = newStamina;
+                creature.Mana.StartingValue = newMana;
+                creature.SetMaxVitals();
 
                 foreach (var entry in skillNewValueMap)
                 {
@@ -3317,7 +3330,7 @@ namespace ACE.Server.Command.Handlers.Processors
                     }
                 }
 
-                creature.Weenie.PropertiesBodyPart = newBodyParts; //Todo: a way for this particular creature to use the new body parts and spellbook instead of the cached pre-modifications ones it does now.
+                creature.Weenie.PropertiesBodyPart = newBodyParts;
 
                 if (creature.Weenie.PropertiesSpellBook != null)
                 {
@@ -3521,9 +3534,12 @@ namespace ACE.Server.Command.Handlers.Processors
                     }
                 }
 
-                WeeniePropertiesInt weenieLevel = (from x in weenie.WeeniePropertiesInt where x.Type == (int)PropertyInt.Level select x).FirstOrDefault();
-                if (weenieLevel != null)
-                    weenieLevel.Value = (int)newLevel;
+                if (!keepLevel)
+                {
+                    WeeniePropertiesInt weenieLevel = (from x in weenie.WeeniePropertiesInt where x.Type == (int)PropertyInt.Level select x).FirstOrDefault();
+                    if (weenieLevel != null)
+                        weenieLevel.Value = (int)newLevel;
+                }
 
                 WeeniePropertiesAttribute2nd weenieHealth = (from x in weenie.WeeniePropertiesAttribute2nd where x.Type == (int)PropertyAttribute2nd.MaxHealth select x).FirstOrDefault();
                 if (weenieHealth != null)
@@ -3570,7 +3586,7 @@ namespace ACE.Server.Command.Handlers.Processors
                         weenieSkill.InitLevel = entry.Value;
                 }
 
-                var sql_filename = WeenieSQLWriter.GetDefaultFileName(weenie, $" - Scaled from level {creature.Level} to {newLevel}");
+                var sql_filename = WeenieSQLWriter.GetDefaultFileName(weenie, $" - Scaled from level {creature.Level} to {newLevel}" + (keepLevel ? " - keepLevel" : ""));
 
                 var writer = new StreamWriter(sql_folder + sql_filename);
 
