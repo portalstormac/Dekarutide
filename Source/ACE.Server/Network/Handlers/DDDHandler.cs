@@ -79,14 +79,22 @@ namespace ACE.Server.Network.Handlers
 
             var dddErrorMsg = new GameMessageDDDErrorMessage(resourceType, dataId, errorType);
 
-            if (session.Player.FirstEnterWorldDone) // Boot client with msg
+            if(PropertyManager.GetBool("enforce_player_movement").Item)
+            {
+                session.Network.EnqueueSend(popupMsg, chatMsg, transientMsg, dddErrorMsg);
+                if (session.Player.FirstEnterWorldDone)
+                {
+                    var player = session.Player;
+                    player.Teleport(player.SnapPos);
+                }
+            }
+            else if (session.Player.FirstEnterWorldDone) // Boot client with msg
             {
                 session.Network.EnqueueSend(new GameMessageBootAccount($"\n{msg}"), dddErrorMsg);
                 session.LogOffPlayer(true);
             }
             else // cannot cleanly boot player that hasn't completed first login, client crashes so msg wouldn't be seen, instead spam msgs until server auto boots them or they disconnect.
                 session.Network.EnqueueSend(popupMsg, chatMsg, transientMsg, dddErrorMsg);
-
         }
     }
 }
