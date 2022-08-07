@@ -2127,7 +2127,31 @@ namespace ACE.Server.Command.Handlers.Processors
         public static void HandleExportSqlFolder(Session session, params string[] parameters)
         {
             var param = parameters[0];
-            ExportSQLWeenie(session, param, true);
+
+            WeenieType weenieType = WeenieType.Undef;
+            if (param == "all" || Enum.TryParse(param, true, out weenieType))
+            {
+                var WeenieTypes = DatabaseManager.World.GetAllWeenieTypes();
+                if (param == "all")
+                {
+                    foreach (var entry in WeenieTypes)
+                    {
+                        ExportSQLWeenie(session, entry.Key.ToString(), true);
+                    }
+                }
+                else if(weenieType != WeenieType.Undef)
+                {
+                    foreach (var entry in WeenieTypes)
+                    {
+                        if(entry.Value == (int)weenieType)
+                            ExportSQLWeenie(session, entry.Key.ToString(), true);
+                    }
+                }
+                else
+                    CommandHandlerHelper.WriteOutputInfo(session, $"Invalid parameter: '{parameters[0]}'");
+            }
+            else
+                ExportSQLWeenie(session, param, true);
         }
 
         [CommandHandler("export-sql", AccessLevel.Developer, CommandHandlerFlag.None, 1, "Exports content from database to SQL file", "<wcid> [content-type]")]
@@ -3639,10 +3663,10 @@ namespace ACE.Server.Command.Handlers.Processors
             }
         }
 
-        [CommandHandler("exportlevelstofile", AccessLevel.Developer, CommandHandlerFlag.None, 0, "", "")]
-        public static void HandleExportLevelsToFile(Session session, params string[] parameters)
+        [CommandHandler("export-creature-levels", AccessLevel.Developer, CommandHandlerFlag.None, 0, "", "")]
+        public static void HandleExportCreatureLevels(Session session, params string[] parameters)
         {
-            CommandHandlerHelper.WriteOutputInfo(session, "Exporting all creature levels to creatureLevels.txt...");
+            CommandHandlerHelper.WriteOutputInfo(session, "Exporting creature levels to reports/CreatureLevels.txt...");
 
             var contentFolder = VerifyContentFolder(session, false);
 
@@ -3652,12 +3676,12 @@ namespace ACE.Server.Command.Handlers.Processors
             if (!folder.Exists)
                 folder.Create();
 
-            var filename = $"{folder.FullName}{sep}creatureLevels.txt";
+            var filename = $"{folder.FullName}{sep}CreatureLevels.txt";
 
             var fileWriter = new StreamWriter(filename);
 
             //fileWriter.WriteLine("level\tcalculated level\tlevel difference\tname\tweenieClassId\tweenieClassName\ttype");
-            fileWriter.WriteLine("level\tname\tweenieClassId\tweenieClassName\ttype");
+            fileWriter.WriteLine("Name\tLevel\tType\tWeenieClassId\tWeenieClassName");
 
             var WeenieTypes = DatabaseManager.World.GetAllWeenieTypes();
             foreach (var entry in WeenieTypes)
@@ -3671,7 +3695,7 @@ namespace ACE.Server.Command.Handlers.Processors
                 {
                     //var level = CalculateLevel(creature);
                     //fileWriter.WriteLine($"{creature.Level}\t{level}\t{level - creature.Level}\t{creature.Name}\t{creature.WeenieClassId}\t{creature.WeenieClassName}\t{creature.CreatureType}");
-                    fileWriter.WriteLine($"{creature.Level}\t{creature.Name}\t{creature.WeenieClassId}\t{creature.WeenieClassName}\t{creature.CreatureType}");
+                    fileWriter.WriteLine($"{creature.Name}\t{creature.Level}\t{creature.CreatureType}\t{creature.WeenieClassId}\t{creature.WeenieClassName}");
                     fileWriter.Flush();
                 }
 
