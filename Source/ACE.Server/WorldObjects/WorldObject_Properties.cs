@@ -2670,6 +2670,15 @@ namespace ACE.Server.WorldObjects
             set { if (value == null) RemoveProperty(PropertyString.ActivationTalk); else SetProperty(PropertyString.ActivationTalk, value); }
         }
 
+        /// <summary>
+        /// The string that is sent to the player when activation fails due to the ResetInterval cooldown.
+        /// </summary>
+        public string ActivationFailure
+        {
+            get => GetProperty(PropertyString.ActivationFailure);
+            set { if (value == null) RemoveProperty(PropertyString.ActivationFailure); else SetProperty(PropertyString.ActivationFailure, value); }
+        }
+
         public Sound UseSound
         {
             get => (Sound)(GetProperty(PropertyDataId.UseSound) ?? 0);
