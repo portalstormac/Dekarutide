@@ -21,6 +21,14 @@ namespace ACE.Database.SQLFormatters
 
         /// <summary>
         /// Set this to enable auto commenting when creating SQL statements.<para />
+        /// If a weenie id is found in the dictionary, the level will be added in the form of a /* Friendly Weenie Level */
+        /// </summary>
+        public IDictionary<uint, int> WeenieLevels;
+
+        public IDictionary<uint, int> WeenieTypes;
+
+        /// <summary>
+        /// Set this to enable auto commenting when creating SQL statements.<para />
         /// If a spell id is found in the dictionary, the name will be added in the form of a /* Friendly Spell Name */
         /// </summary>
         public IDictionary<uint, string> SpellNames;
@@ -281,7 +289,7 @@ namespace ACE.Database.SQLFormatters
 
         protected string GetValueForTreasureData(uint weenieOrType, bool isWeenieClassID = false)
         {
-            string label = "UNKNOWN RANDOMLY GENERATED TREASURE";
+            string label = "Random Loot: Unknown Tier";
 
             uint? deathTreasureType = null;
             uint? wieldedTreasureType = null;
@@ -304,7 +312,7 @@ namespace ACE.Database.SQLFormatters
             {
                 if (TreasureDeath != null && TreasureDeath.ContainsKey(deathTreasureType.Value))
                 {
-                    label = $"RANDOMLY GENERATED TREASURE from Loot Tier {TreasureDeath[deathTreasureType.Value].Tier} from Death Treasure Table id: {deathTreasureType}";
+                    label = $"Random Loot: Tier {TreasureDeath[deathTreasureType.Value].Tier} - DeathTreasureType: {deathTreasureType}";
                 }
                 else if (TreasureWielded != null && TreasureWielded.ContainsKey(wieldedTreasureType.Value))
                 {
@@ -317,7 +325,7 @@ namespace ACE.Database.SQLFormatters
 
                         label += $"{(item.StackSize > 0 ? $"{item.StackSize}" : "1")}x {wName} ({item.WeenieClassId}), ";
                     }
-                    label = label.Substring(0, label.Length - 2) + $" from Wielded Treasure Table id: {wieldedTreasureType}";
+                    label = label.Substring(0, label.Length - 2) + $" - WieldedTreasureType: {wieldedTreasureType}";
                 }
             }
             else

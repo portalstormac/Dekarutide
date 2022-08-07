@@ -32,9 +32,16 @@ namespace ACE.Database.SQLFormatters.World
             var lineGenerator = new Func<int, string>(i =>
             {
                 string label = null;
+                var level = 0;
 
                 if (WeenieNames != null)
                     WeenieNames.TryGetValue(input[i].WeenieClassId, out label);
+
+                if (WeenieLevels != null)
+                    WeenieLevels.TryGetValue(input[i].WeenieClassId, out level);
+
+                if (level > 0)
+                    label += $" - Level: {level}";
 
                 return $"0x{input[i].Landblock:X4}, {input[i].WeenieClassId}, {input[i].CellX}, {input[i].CellY}, '{input[i].LastModified:yyyy-MM-dd HH:mm:ss}') /* {label} */";
             });

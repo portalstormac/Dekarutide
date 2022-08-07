@@ -4,6 +4,9 @@ using System.IO;
 using System.Linq;
 
 using ACE.Database.Models.World;
+using ACE.Entity.Enum;
+using ACE.Entity.Enum.Properties;
+using ACE.Entity.Models;
 
 namespace ACE.Database.SQLFormatters.World
 {
@@ -41,9 +44,104 @@ namespace ACE.Database.SQLFormatters.World
                 writer.WriteLine("INSERT INTO `landblock_instance` (`guid`, `weenie_Class_Id`, `obj_Cell_Id`, `origin_X`, `origin_Y`, `origin_Z`, `angles_W`, `angles_X`, `angles_Y`, `angles_Z`, `is_Link_Child`, `last_Modified`)");
 
                 string label = null;
+                var level = 0;
+                var type = 0;
 
                 if (WeenieNames != null)
                     WeenieNames.TryGetValue(value.WeenieClassId, out label);
+
+                if (WeenieLevels != null)
+                    WeenieLevels.TryGetValue(value.WeenieClassId, out level);
+
+                if (WeenieTypes != null)
+                    WeenieTypes.TryGetValue(value.WeenieClassId, out type);
+
+                if (level > 0)
+                    label += $" - Level: {level}";
+
+                if (type == (int)WeenieType.Chest || type == (int)WeenieType.Container)
+                {
+                    var weenie = DatabaseManager.World.GetCachedWeenie(value.WeenieClassId);
+                    var locked = weenie.GetProperty(PropertyBool.DefaultLocked) ?? false;
+                    var resistLockpick = weenie.GetProperty(PropertyInt.ResistLockpick) ?? 0;
+                    var key = weenie.GetProperty(PropertyString.LockCode) ?? "";
+
+                    if (locked)
+                        label += $" - Locked({resistLockpick}{(key.Length > 0 ? $"/{key})" : ")")}";
+
+                    var content = "";
+                    bool isFirst = true;
+                    if (TreasureDeath != null && weenie.PropertiesGenerator != null)
+                    {
+                        foreach (var entry in weenie.PropertiesGenerator)
+                        {
+                            if (!isFirst)
+                                content += " / ";
+
+                            if (entry.WhereCreate.HasFlag(RegenLocationType.Treasure))
+                            {
+                                content += GetValueForTreasureData(entry.WeenieClassId, false);
+                                isFirst = false;
+                            }
+                            else
+                            {
+                                if (WeenieNames != null)
+                                {
+                                    WeenieNames.TryGetValue(entry.WeenieClassId, out var weenieName);
+                                    content += $"{weenieName}({entry.WeenieClassId})";
+                                    isFirst = false;
+                                }
+                                else
+                                    content += entry.WeenieClassId;
+                            }
+                        }
+                    }
+
+                    if (content.Length > 0)
+                        label += $" - Content - {content}";
+                }
+                else if (type == (int)WeenieType.Generic)
+                {
+                    var weenie = DatabaseManager.World.GetCachedWeenie(value.WeenieClassId);
+
+                    var generated = "";
+                    bool isFirst = true;
+                    if (TreasureDeath != null && weenie.PropertiesGenerator != null)
+                    {
+                        foreach (var entry in weenie.PropertiesGenerator)
+                        {
+                            if (!isFirst)
+                                generated += " / ";
+
+                            if (entry.WhereCreate.HasFlag(RegenLocationType.Treasure))
+                            {
+                                generated += GetValueForTreasureData(entry.WeenieClassId, false);
+                                isFirst = false;
+                            }
+                            else
+                            {
+                                if (WeenieNames != null)
+                                {
+                                    WeenieNames.TryGetValue(entry.WeenieClassId, out var weenieName);
+                                    generated += $"{weenieName}({entry.WeenieClassId})";
+                                    if (WeenieLevels != null)
+                                    {
+                                        WeenieLevels.TryGetValue(entry.WeenieClassId, out var generatedLevel);
+                                        if (generatedLevel > 0)
+                                            generated += $" - Level: {generatedLevel}";
+                                    }
+
+                                    isFirst = false;
+                                }
+                                else
+                                    generated += entry.WeenieClassId;
+                            }
+                        }
+                    }
+
+                    if (generated.Length > 0)
+                        label += $" - Generates - {generated}";
+                }
 
                 var output = "VALUES (" +
                              $"0x{value.Guid.ToString("X8")}, " +
@@ -82,7 +180,12 @@ namespace ACE.Database.SQLFormatters.World
                 string label = null;
 
                 if (WeenieNames != null && instanceWcids.TryGetValue(input[i].ChildGuid, out var wcid) && WeenieNames.TryGetValue(wcid, out var weenieName))
-                    label = $" /* {weenieName} ({wcid}) */";
+                {
+                    if (WeenieLevels != null && WeenieLevels.TryGetValue(wcid, out var weenieLevel) && weenieLevel != 0)
+                        label = $" /* {weenieName} ({wcid}) - Level: {weenieLevel} */";
+                    else
+                        label = $" /* {weenieName} ({wcid}) */";
+                }
 
                 return $"0x{input[i].ParentGuid.ToString("X8")}, 0x{input[i].ChildGuid.ToString("X8")}, '{input[i].LastModified.ToString("yyyy-MM-dd HH:mm:ss")}'){label}";
             });

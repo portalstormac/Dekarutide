@@ -228,6 +228,23 @@ namespace ACE.Database
             }
         }
 
+        public Dictionary<uint, int> GetAllWeenieLevels(WorldDbContext context)
+        {
+            return context.Weenie
+                .Include(r => r.WeeniePropertiesInt)
+                .ToDictionary(r => r.ClassId, r => r.WeeniePropertiesInt.FirstOrDefault(p => p.Type == (int)PropertyInt.Level)?.Value ?? 0);
+        }
+
+        public Dictionary<uint, int> GetAllWeenieLevels()
+        {
+            using (var context = new WorldDbContext())
+            {
+                context.ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
+
+                return GetAllWeenieLevels(context);
+            }
+        }
+
         public Dictionary<uint, string> GetAllWeenieClassNames(WorldDbContext context)
         {
             return context.Weenie

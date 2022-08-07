@@ -760,11 +760,18 @@ namespace ACE.Database.SQLFormatters.World
             var lineGenerator = new Func<int, string>(i =>
             {
                 string weenieName = null;
+                var level = 0;
 
                 if (WeenieNames != null)
                     WeenieNames.TryGetValue(input[i].WeenieClassId, out weenieName);
 
+                if (WeenieLevels != null)
+                    WeenieLevels.TryGetValue(input[i].WeenieClassId, out level);
+
                 var label = weenieName + $" ({input[i].WeenieClassId})";
+
+                if (level > 0)
+                    label += $" - Level: {level}";
 
                 if ((input[i].WhereCreate & (int)RegenLocationType.Treasure) != 0)
                 {
