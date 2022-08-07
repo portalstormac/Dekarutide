@@ -8425,6 +8425,20 @@ namespace ACE.Server.Factories.Tables
             return spellProgression.TryGetValue(spellId, out var progression) ? progression : null;
         }
 
+        public static SpellId GetLevel1SpellId(SpellId spellId)
+        {
+            foreach(var spellProgressionEntry in spellProgression)
+            {
+                foreach(var entry in spellProgressionEntry.Value)
+                {
+                    if (spellId == entry)
+                        return spellProgressionEntry.Key;
+                }
+            }
+
+            return SpellId.Undef;
+        }
+
         public static SpellId GetSpellAtLevel(SpellId level1SpellId, int level, bool ifNoMatchReturnLowestPossibleLevel = false)
         {
             var spellLevels = GetSpellLevels(level1SpellId);

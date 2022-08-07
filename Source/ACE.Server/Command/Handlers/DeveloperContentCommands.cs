@@ -25,6 +25,7 @@ using ACE.Server.Network;
 using ACE.Server.Network.GameMessages.Messages;
 using ACE.Server.Physics.Extensions;
 using ACE.Server.WorldObjects;
+using ACE.Server.Factories.Tables;
 
 namespace ACE.Server.Command.Handlers.Processors
 {
@@ -3118,7 +3119,6 @@ namespace ACE.Server.Command.Handlers.Processors
 
         public static void ScaleLevel(Creature creature, uint newLevel, bool toSql, Session session)
         {
-            // TODO: Scale body table armor and damage.
             if (creature == null)
                 return;
 
@@ -3207,8 +3207,8 @@ namespace ACE.Server.Command.Handlers.Processors
             if (highestCombatSkillValue > 0)
                 totalXp += highestCombatSkillTotalXp;
 
-            double levelRatio = GetXpRatioBetweenLevels(xpTable, (uint)(creature.Level ?? 1), newLevel);
-            newLevelTotalXp = (ulong)(totalXp * levelRatio);
+            double levelXpRatio = GetXpRatioBetweenLevels(xpTable, (uint)(creature.Level ?? 1), newLevel);
+            newLevelTotalXp = (ulong)(totalXp * levelXpRatio);
 
             double healthRatio = (double)healthTotalXp / totalXp;
             double staminaRatio = (double)staminaTotalXp / totalXp;
@@ -3267,6 +3267,106 @@ namespace ACE.Server.Command.Handlers.Processors
                     if (creature.Skills.TryGetValue(entry.Key, out var skill))
                         skill.InitLevel = entry.Value;
                 }
+
+                var newBodyParts = new Dictionary<CombatBodyPart, ACE.Entity.Models.PropertiesBodyPart>(creature.Weenie.PropertiesBodyPart);
+                foreach (var entry in newBodyParts)
+                {
+                    var bodyPart = entry.Value;
+                    if (bodyPart.BaseArmor != 0)
+                    {
+                        double armorRatio = (double)bodyPart.BaseArmor / (creature.Level ?? 1);
+                        bodyPart.BaseArmor = (int)Math.Round(newLevel * armorRatio);
+                        bodyPart.ArmorVsSlash = (int)Math.Round(bodyPart.BaseArmor * (creature.ArmorModVsSlash ?? 0.0));
+                        bodyPart.ArmorVsPierce = (int)Math.Round(bodyPart.BaseArmor * (creature.ArmorModVsPierce ?? 0.0));
+                        bodyPart.ArmorVsBludgeon = (int)Math.Round(bodyPart.BaseArmor * (creature.ArmorModVsBludgeon ?? 0.0));
+                        bodyPart.ArmorVsCold = (int)Math.Round(bodyPart.BaseArmor * (creature.ArmorModVsCold ?? 0.0));
+                        bodyPart.ArmorVsFire = (int)Math.Round(bodyPart.BaseArmor * (creature.ArmorModVsFire ?? 0.0));
+                        bodyPart.ArmorVsElectric = (int)Math.Round(bodyPart.BaseArmor * (creature.ArmorModVsElectric ?? 0.0));
+                        bodyPart.ArmorVsAcid = (int)Math.Round(bodyPart.BaseArmor * (creature.ArmorModVsAcid ?? 0.0));
+                        bodyPart.ArmorVsNether = (int)Math.Round(bodyPart.BaseArmor * (creature.ArmorModVsNether ?? 0.0));
+                    }
+
+                    if (bodyPart.DVal != 0)
+                    {
+                        double damageRatio = (double)bodyPart.DVal / (creature.Level ?? 1);
+                        bodyPart.DVal = (int)Math.Round(newLevel * damageRatio);
+                    }
+                }
+
+                var newSpells = new Dictionary<int, float>();
+
+                uint warMagicSkill = 0;
+                uint lifeMagicSkill = 0;
+                uint creatureEnchantmentSkill = 0;
+                uint itemEnchantmentSkill = 0;
+                skillNewValueMap.TryGetValue(Skill.WarMagic, out warMagicSkill);
+                skillNewValueMap.TryGetValue(Skill.LifeMagic, out lifeMagicSkill);
+                skillNewValueMap.TryGetValue(Skill.CreatureEnchantment, out creatureEnchantmentSkill);
+                skillNewValueMap.TryGetValue(Skill.ItemEnchantment, out itemEnchantmentSkill);
+
+                foreach (var entry in creature.Weenie.PropertiesSpellBook)
+                {
+                    Entity.Spell currentSpell = new Entity.Spell(entry.Key);
+
+                    uint magicSkill = 0;
+                    switch (currentSpell.School)
+                    {
+                        case MagicSchool.WarMagic:
+                            magicSkill = warMagicSkill;
+                            break;
+                        case MagicSchool.LifeMagic:
+                            magicSkill = lifeMagicSkill;
+                            break;
+                        case MagicSchool.CreatureEnchantment:
+                            magicSkill = creatureEnchantmentSkill;
+                            break;
+                        case MagicSchool.ItemEnchantment:
+                            magicSkill = itemEnchantmentSkill;
+                            break;
+                    }
+
+                    var level1SpellId = SpellLevelProgression.GetLevel1SpellId((SpellId)entry.Key);
+                    if (level1SpellId != SpellId.Undef)
+                    {
+                        SpellId newSpellId = SpellId.Undef;
+                        int newSpellLevel = 0;
+
+                        for (int level = 1; level <= 7; level++)
+                        {
+                            SpellId newSpellIdAttempt = SpellLevelProgression.GetSpellAtLevel(level1SpellId, level, true);
+                            Entity.Spell newSpellAttempt = new Entity.Spell(newSpellIdAttempt);
+
+                            if (magicSkill >= (currentSpell.IsSelfTargeted ? (int)newSpellAttempt.Power : (int)newSpellAttempt.Power - 50)) // Creatures tend to cast lower level self spells.
+                            {
+                                newSpellId = newSpellIdAttempt;
+                                newSpellLevel = level;
+                            }
+                            else
+                                break;
+                        }
+
+                        while (newSpellId != SpellId.Undef && newSpellLevel > 0)
+                        {
+                            if (newSpells.ContainsKey((int)newSpellId))
+                            {
+                                // Let's try a lower level version of the same spell.
+                                newSpellLevel--;
+                                if (newSpellLevel > 0)
+                                    newSpellId = SpellLevelProgression.GetSpellAtLevel(level1SpellId, newSpellLevel, true);
+                                else
+                                    newSpells.Add((int)level1SpellId, entry.Value); // Let's go ahead and add it at level 1 anyway to keep it in the spellbook.
+                            }
+                            else
+                            {
+                                newSpells.Add((int)newSpellId, entry.Value);
+                                break;
+                            }
+                        }
+                    }
+                }
+
+                creature.Weenie.PropertiesBodyPart = newBodyParts; //Todo: a way for this particular creature to use the new body parts and spellbook instead of the cached pre-modifications ones it does now.
+                creature.Weenie.PropertiesSpellBook = newSpells;
             }
             else
             {
@@ -3293,6 +3393,102 @@ namespace ACE.Server.Command.Handlers.Processors
 
                 Weenie weenie = DatabaseManager.World.GetWeenie(creature.WeenieClassId);
                 Weenie weenieOriginal = DatabaseManager.World.GetWeenie(creature.WeenieClassId);
+
+                foreach (var bodyPart in weenie.WeeniePropertiesBodyPart)
+                {
+                    if (bodyPart.BaseArmor != 0)
+                    {
+                        double armorRatio = (double)bodyPart.BaseArmor / (creature.Level ?? 1);
+                        bodyPart.BaseArmor = (int)Math.Round(newLevel * armorRatio);
+                        bodyPart.ArmorVsSlash = (int)Math.Round(bodyPart.BaseArmor * (creature.ArmorModVsSlash ?? 0.0));
+                        bodyPart.ArmorVsPierce = (int)Math.Round(bodyPart.BaseArmor * (creature.ArmorModVsPierce ?? 0.0));
+                        bodyPart.ArmorVsBludgeon = (int)Math.Round(bodyPart.BaseArmor * (creature.ArmorModVsBludgeon ?? 0.0));
+                        bodyPart.ArmorVsCold = (int)Math.Round(bodyPart.BaseArmor * (creature.ArmorModVsCold ?? 0.0));
+                        bodyPart.ArmorVsFire = (int)Math.Round(bodyPart.BaseArmor * (creature.ArmorModVsFire ?? 0.0));
+                        bodyPart.ArmorVsElectric = (int)Math.Round(bodyPart.BaseArmor * (creature.ArmorModVsElectric ?? 0.0));
+                        bodyPart.ArmorVsAcid = (int)Math.Round(bodyPart.BaseArmor * (creature.ArmorModVsAcid ?? 0.0));
+                        bodyPart.ArmorVsNether = (int)Math.Round(bodyPart.BaseArmor * (creature.ArmorModVsNether ?? 0.0));
+                    }
+
+                    if (bodyPart.DVal != 0)
+                    {
+                        double damageRatio = (double)bodyPart.DVal / (creature.Level ?? 1);
+                        bodyPart.DVal = (int)Math.Round(newLevel * damageRatio);
+                    }
+                }
+
+                uint warMagicSkill = 0;
+                uint lifeMagicSkill = 0;
+                uint creatureEnchantmentSkill = 0;
+                uint itemEnchantmentSkill = 0;
+                skillNewValueMap.TryGetValue(Skill.WarMagic, out warMagicSkill);
+                skillNewValueMap.TryGetValue(Skill.LifeMagic, out lifeMagicSkill);
+                skillNewValueMap.TryGetValue(Skill.CreatureEnchantment, out creatureEnchantmentSkill);
+                skillNewValueMap.TryGetValue(Skill.ItemEnchantment, out itemEnchantmentSkill);
+
+                var newSpells = new List<SpellId>();
+
+                foreach (var entry in weenie.WeeniePropertiesSpellBook)
+                {
+                    Entity.Spell currentSpell = new Entity.Spell(entry.Spell);
+
+                    uint magicSkill = 0;
+                    switch (currentSpell.School)
+                    {
+                        case MagicSchool.WarMagic:
+                            magicSkill = warMagicSkill;
+                            break;
+                        case MagicSchool.LifeMagic:
+                            magicSkill = lifeMagicSkill;
+                            break;
+                        case MagicSchool.CreatureEnchantment:
+                            magicSkill = creatureEnchantmentSkill;
+                            break;
+                        case MagicSchool.ItemEnchantment:
+                            magicSkill = itemEnchantmentSkill;
+                            break;
+                    }
+
+                    var level1SpellId = SpellLevelProgression.GetLevel1SpellId((SpellId)entry.Spell);
+                    if (level1SpellId != SpellId.Undef)
+                    {
+                        SpellId newSpellId = SpellId.Undef;
+                        int newSpellLevel = 0;
+
+                        for (int level = 1; level <= 7; level++)
+                        {
+                            SpellId newSpellIdAttempt = SpellLevelProgression.GetSpellAtLevel(level1SpellId, level, true);
+                            Entity.Spell newSpellAttempt = new Entity.Spell(newSpellIdAttempt);
+
+                            if (magicSkill >= (currentSpell.IsSelfTargeted ? (int)newSpellAttempt.Power : (int)newSpellAttempt.Power - 50)) // Creatures tend to cast lower level self spells.
+                            {
+                                newSpellId = newSpellIdAttempt;
+                                newSpellLevel = level;
+                            }
+                            else
+                                break;
+                        }
+
+                        while (newSpellId != SpellId.Undef && newSpellLevel > 0)
+                        {
+                            if (newSpells.Contains(newSpellId))
+                            {
+                                // Let's try a lower level version of the same spell.
+                                newSpellLevel--;
+                                if (newSpellLevel > 0)
+                                    newSpellId = SpellLevelProgression.GetSpellAtLevel(level1SpellId, newSpellLevel, true);
+                                else
+                                    entry.Spell = (int)level1SpellId; // Let's go ahead and add it at level 1 anyway to keep it in the spellbook.
+                            }
+                            else
+                            {
+                                entry.Spell = (int)newSpellId;
+                                newSpells.Add(newSpellId);
+                                break;
+                            }
+                        }
+                    }
+                }
 
                 WeeniePropertiesInt weenieLevel = (from x in weenie.WeeniePropertiesInt where x.Type == (int)PropertyInt.Level select x).FirstOrDefault();
                 if (weenieLevel != null)
