@@ -3173,7 +3173,7 @@ namespace ACE.Server.Command.Handlers.Processors
             if (creature.Level == newLevel)
                 return;
 
-            var xpTable = DatLoader.DatManager.PortalDat.XpTable.CharacterLevelXPList;
+            var xpTable = DatLoader.DatManager.PortalDat.XpTableFull.CharacterLevelXPList;
             var attributeTable = DatLoader.DatManager.PortalDat.XpTable.AttributeXpList;
             var vitalTable = DatLoader.DatManager.PortalDat.XpTable.VitalXpList;
             var skillTable = DatLoader.DatManager.PortalDat.XpTable.SpecializedSkillXpList;
@@ -3764,7 +3764,7 @@ namespace ACE.Server.Command.Handlers.Processors
         //    if (creature == null)
         //        return 0;
 
-        //    var xpTable = DatLoader.DatManager.PortalDat.XpTable.CharacterLevelXPList;
+        //    var xpTable = DatLoader.DatManager.PortalDat.XpTableFull.CharacterLevelXPList;
 
         //    var attributeTable = DatLoader.DatManager.PortalDat.XpTable.AttributeXpList;
         //    var vitalTable = DatLoader.DatManager.PortalDat.XpTable.VitalXpList;
