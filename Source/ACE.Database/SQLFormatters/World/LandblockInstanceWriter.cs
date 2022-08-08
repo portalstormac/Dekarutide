@@ -59,6 +59,14 @@ namespace ACE.Database.SQLFormatters.World
                 if (level > 0)
                     label += $" - Level: {level}";
 
+                if (TreasureDeath != null)
+                {
+                    var weenie = DatabaseManager.World.GetCachedWeenie(value.WeenieClassId);
+                    var deathTreasureType = weenie.GetProperty(PropertyDataId.DeathTreasureType) ?? 0;
+                    if (deathTreasureType != 0 && TreasureDeath.TryGetValue(deathTreasureType, out var treasureDeath))
+                        label += $" - {GetValueForTreasureData(treasureDeath.TreasureType)}";
+                }
+
                 if (type == (int)WeenieType.Chest || type == (int)WeenieType.Container)
                 {
                     var weenie = DatabaseManager.World.GetCachedWeenie(value.WeenieClassId);
@@ -70,25 +78,57 @@ namespace ACE.Database.SQLFormatters.World
                         label += $" - Locked({resistLockpick}{(key.Length > 0 ? $"/{key})" : ")")}";
 
                     var content = "";
-                    bool isFirst = true;
-                    if (TreasureDeath != null && weenie.PropertiesGenerator != null)
+                    if (TreasureDeath != null)
                     {
-                        foreach (var entry in weenie.PropertiesGenerator)
+                        if (weenie.PropertiesGenerator != null)
                         {
-                            if (!isFirst)
-                                content += " / ";
+                            bool isFirst = true;
+                            foreach (var entry in weenie.PropertiesGenerator)
+                            {
+                                if (!isFirst)
+                                    content += " / ";
 
-                            if (entry.WhereCreate.HasFlag(RegenLocationType.Treasure))
-                            {
-                                content += GetValueForTreasureData(entry.WeenieClassId, false);
-                                isFirst = false;
+                                if (entry.WhereCreate.HasFlag(RegenLocationType.Treasure))
+                                {
+                                    content += GetValueForTreasureData(entry.WeenieClassId);
+                                    isFirst = false;
+                                }
+                                else
+                                {
+                                    if (WeenieNames != null)
+                                    {
+                                        WeenieNames.TryGetValue(entry.WeenieClassId, out var weenieName);
+                                        content += $"{weenieName}({entry.WeenieClassId})";
+                                        isFirst = false;
+                                    }
+                                    else
+                                        content += entry.WeenieClassId;
+                                }
                             }
-                            else
+                        }
+
+                        if (weenie.PropertiesCreateList != null)
+                        {
+                            bool isFirst = true;
+                            foreach (var entry in weenie.PropertiesCreateList)
                             {
+                                if (entry.WeenieClassId == 0)
+                                    continue;
+
+                                if (!isFirst)
+                                    content += " / ";
+
                                 if (WeenieNames != null)
                                 {
-                                    WeenieNames.TryGetValue(entry.WeenieClassId, out var weenieName);
-                                    content += $"{weenieName}({entry.WeenieClassId})";
+                                    WeenieNames.TryGetValue(entry.WeenieClassId, out var entryWeenieName);
+                                    content += $"{entryWeenieName}({entry.WeenieClassId})";
+                                    if (WeenieLevels != null)
+                                    {
+                                        WeenieLevels.TryGetValue(entry.WeenieClassId, out var generatedLevel);
+                                        if (generatedLevel > 0)
+                                            content += $" - Level: {generatedLevel}";
+                                    }
+
                                     isFirst = false;
                                 }
                                 else
@@ -100,30 +140,62 @@ namespace ACE.Database.SQLFormatters.World
                     if (content.Length > 0)
                         label += $" - Content - {content}";
                 }
-                else if (type == (int)WeenieType.Generic)
+                else// if (type == (int)WeenieType.Generic)
                 {
                     var weenie = DatabaseManager.World.GetCachedWeenie(value.WeenieClassId);
 
                     var generated = "";
-                    bool isFirst = true;
-                    if (TreasureDeath != null && weenie.PropertiesGenerator != null)
+                    if (TreasureDeath != null)
                     {
-                        foreach (var entry in weenie.PropertiesGenerator)
+                        if (weenie.PropertiesGenerator != null)
                         {
-                            if (!isFirst)
-                                generated += " / ";
+                            bool isFirst = true;
+                            foreach (var entry in weenie.PropertiesGenerator)
+                            {
+                                if (!isFirst)
+                                    generated += " / ";
 
-                            if (entry.WhereCreate.HasFlag(RegenLocationType.Treasure))
-                            {
-                                generated += GetValueForTreasureData(entry.WeenieClassId, false);
-                                isFirst = false;
+                                if (entry.WhereCreate.HasFlag(RegenLocationType.Treasure))
+                                {
+                                    generated += GetValueForTreasureData(entry.WeenieClassId);
+                                    isFirst = false;
+                                }
+                                else
+                                {
+                                    if (WeenieNames != null)
+                                    {
+                                        WeenieNames.TryGetValue(entry.WeenieClassId, out var weenieName);
+                                        generated += $"{weenieName}({entry.WeenieClassId})";
+                                        if (WeenieLevels != null)
+                                        {
+                                            WeenieLevels.TryGetValue(entry.WeenieClassId, out var generatedLevel);
+                                            if (generatedLevel > 0)
+                                                generated += $" - Level: {generatedLevel}";
+                                        }
+
+                                        isFirst = false;
+                                    }
+                                    else
+                                        generated += entry.WeenieClassId;
+                                }
                             }
-                            else
+                        }
+
+                        if (weenie.PropertiesCreateList != null)
+                        {
+                            bool isFirst = true;
+                            foreach (var entry in weenie.PropertiesCreateList)
                             {
+                                if (entry.WeenieClassId == 0)
+                                    continue;
+
+                                if (!isFirst)
+                                    generated += " / ";
+
                                 if (WeenieNames != null)
                                 {
-                                    WeenieNames.TryGetValue(entry.WeenieClassId, out var weenieName);
-                                    generated += $"{weenieName}({entry.WeenieClassId})";
+                                    WeenieNames.TryGetValue(entry.WeenieClassId, out var entryWeenieName);
+                                    generated += $"{entryWeenieName}({entry.WeenieClassId})";
                                     if (WeenieLevels != null)
                                     {
                                         WeenieLevels.TryGetValue(entry.WeenieClassId, out var generatedLevel);
@@ -181,10 +253,172 @@ namespace ACE.Database.SQLFormatters.World
 
                 if (WeenieNames != null && instanceWcids.TryGetValue(input[i].ChildGuid, out var wcid) && WeenieNames.TryGetValue(wcid, out var weenieName))
                 {
+                    label = $" /* {weenieName} ({wcid})";
+
                     if (WeenieLevels != null && WeenieLevels.TryGetValue(wcid, out var weenieLevel) && weenieLevel != 0)
-                        label = $" /* {weenieName} ({wcid}) - Level: {weenieLevel} */";
-                    else
-                        label = $" /* {weenieName} ({wcid}) */";
+                        label += $" - Level: {weenieLevel}";
+
+                    if (TreasureDeath != null)
+                    {
+                        var weenie = DatabaseManager.World.GetCachedWeenie(wcid);
+                        var deathTreasureType = weenie.GetProperty(PropertyDataId.DeathTreasureType) ?? 0;
+                        if (deathTreasureType != 0 && TreasureDeath.TryGetValue(deathTreasureType, out var treasureDeath))
+                            label += $" - {GetValueForTreasureData(treasureDeath.TreasureType)}";
+                    }
+
+                    var type = 0;
+                    if (WeenieTypes != null)
+                        WeenieTypes.TryGetValue(wcid, out type);
+
+                    if (type == (int)WeenieType.Chest || type == (int)WeenieType.Container)
+                    {
+                        var weenie = DatabaseManager.World.GetCachedWeenie(wcid);
+                        var locked = weenie.GetProperty(PropertyBool.DefaultLocked) ?? false;
+                        var resistLockpick = weenie.GetProperty(PropertyInt.ResistLockpick) ?? 0;
+                        var key = weenie.GetProperty(PropertyString.LockCode) ?? "";
+
+                        if (locked)
+                            label += $" - Locked({resistLockpick}{(key.Length > 0 ? $"/{key})" : ")")}";
+
+                        var content = "";
+                        if (TreasureDeath != null)
+                        {
+                            if (weenie.PropertiesGenerator != null)
+                            {
+                                bool isFirst = true;
+                                foreach (var entry in weenie.PropertiesGenerator)
+                                {
+                                    if (!isFirst)
+                                        content += " / ";
+
+                                    if (entry.WhereCreate.HasFlag(RegenLocationType.Treasure))
+                                    {
+                                        content += GetValueForTreasureData(entry.WeenieClassId);
+                                        isFirst = false;
+                                    }
+                                    else
+                                    {
+                                        if (WeenieNames != null)
+                                        {
+                                            WeenieNames.TryGetValue(entry.WeenieClassId, out var entryWeenieName);
+                                            content += $"{entryWeenieName}({entry.WeenieClassId})";
+                                            isFirst = false;
+                                        }
+                                        else
+                                            content += entry.WeenieClassId;
+                                    }
+                                }
+                            }
+
+                            if (weenie.PropertiesCreateList != null)
+                            {
+                                bool isFirst = true;
+                                foreach (var entry in weenie.PropertiesCreateList)
+                                {
+                                    if (entry.WeenieClassId == 0)
+                                        continue;
+
+                                    if (!isFirst)
+                                        content += " / ";
+
+                                    if (WeenieNames != null)
+                                    {
+                                        WeenieNames.TryGetValue(entry.WeenieClassId, out var entryWeenieName);
+                                        content += $"{entryWeenieName}({entry.WeenieClassId})";
+                                        if (WeenieLevels != null)
+                                        {
+                                            WeenieLevels.TryGetValue(entry.WeenieClassId, out var generatedLevel);
+                                            if (generatedLevel > 0)
+                                                content += $" - Level: {generatedLevel}";
+                                        }
+
+                                        isFirst = false;
+                                    }
+                                    else
+                                        content += entry.WeenieClassId;
+                                }
+                            }
+                        }
+
+                        if (content.Length > 0)
+                            label += $" - Content - {content}";
+                    }
+                    else// if (type == (int)WeenieType.Generic)
+                    {
+                        var weenie = DatabaseManager.World.GetCachedWeenie(wcid);
+
+                        var generated = "";
+                        if (TreasureDeath != null)
+                        {
+                            if (weenie.PropertiesGenerator != null)
+                            {
+                                bool isFirst = true;
+                                foreach (var entry in weenie.PropertiesGenerator)
+                                {
+                                    if (!isFirst)
+                                        generated += " / ";
+
+                                    if (entry.WhereCreate.HasFlag(RegenLocationType.Treasure))
+                                    {
+                                        generated += GetValueForTreasureData(entry.WeenieClassId);
+                                        isFirst = false;
+                                    }
+                                    else
+                                    {
+                                        if (WeenieNames != null)
+                                        {
+                                            WeenieNames.TryGetValue(entry.WeenieClassId, out var entryWeenieName);
+                                            generated += $"{entryWeenieName}({entry.WeenieClassId})";
+                                            if (WeenieLevels != null)
+                                            {
+                                                WeenieLevels.TryGetValue(entry.WeenieClassId, out var generatedLevel);
+                                                if (generatedLevel > 0)
+                                                    generated += $" - Level: {generatedLevel}";
+                                            }
+
+                                            isFirst = false;
+                                        }
+                                        else
+                                            generated += entry.WeenieClassId;
+                                    }
+                                }
+                            }
+
+                            if (weenie.PropertiesCreateList != null)
+                            {
+                                bool isFirst = true;
+                                foreach (var entry in weenie.PropertiesCreateList)
+                                {
+                                    if (entry.WeenieClassId == 0)
+                                        continue;
+
+                                    if (!isFirst)
+                                        generated += " / ";
+        
+                                    if (WeenieNames != null)
+                                    {
+                                        WeenieNames.TryGetValue(entry.WeenieClassId, out var entryWeenieName);
+                                        generated += $"{entryWeenieName}({entry.WeenieClassId})";
+                                        if (WeenieLevels != null)
+                                        {
+                                            WeenieLevels.TryGetValue(entry.WeenieClassId, out var generatedLevel);
+                                            if (generatedLevel > 0)
+                                                generated += $" - Level: {generatedLevel}";
+                                        }
+
+                                        isFirst = false;
+                                    }
+                                    else
+                                        generated += entry.WeenieClassId;
+                                }
+                            }
+                        }
+
+                        if (generated.Length > 0)
+                            label += $" - Generates - {generated}";
+                    }
+
+                    label += " */";
                 }
 
                 return $"0x{input[i].ParentGuid.ToString("X8")}, 0x{input[i].ChildGuid.ToString("X8")}, '{input[i].LastModified.ToString("yyyy-MM-dd HH:mm:ss")}'){label}";

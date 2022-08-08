@@ -1794,6 +1794,7 @@ namespace ACE.Server.Command.Handlers.Processors
                     LandblockEncounterWriter = new EncounterSQLWriter();
                     LandblockEncounterWriter.WeenieNames = DatabaseManager.World.GetAllWeenieNames();
                     LandblockEncounterWriter.WeenieLevels = DatabaseManager.World.GetAllWeenieLevels();
+                    LandblockEncounterWriter.TreasureDeath = DatabaseManager.World.GetAllTreasureDeath();
                 }
 
                 LandblockEncounterWriter.CreateSQLDELETEStatement(encounters, fileWriter);

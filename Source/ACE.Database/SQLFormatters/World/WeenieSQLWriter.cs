@@ -773,9 +773,17 @@ namespace ACE.Database.SQLFormatters.World
                 if (level > 0)
                     label += $" - Level: {level}";
 
+                if (TreasureDeath != null)
+                {
+                    var weenie = DatabaseManager.World.GetCachedWeenie(input[i].WeenieClassId);
+                    var deathTreasureType = ACE.Entity.Models.WeenieExtensions.GetProperty(weenie,PropertyDataId.DeathTreasureType) ?? 0;
+                    if (deathTreasureType != 0 && TreasureDeath.TryGetValue(deathTreasureType, out var treasureDeath))
+                        label += $" - {GetValueForTreasureData(treasureDeath.TreasureType)}";
+                }
+
                 if ((input[i].WhereCreate & (int)RegenLocationType.Treasure) != 0)
                 {
-                    label = GetValueForTreasureData(input[i].WeenieClassId, false);
+                    label = GetValueForTreasureData(input[i].WeenieClassId);
                 }
 
                 return  $"{weenieClassID}, " +

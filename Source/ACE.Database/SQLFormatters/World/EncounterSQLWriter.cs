@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.IO;
 
 using ACE.Database.Models.World;
+using ACE.Entity.Enum.Properties;
+using ACE.Entity.Models;
 
 namespace ACE.Database.SQLFormatters.World
 {
@@ -42,6 +44,14 @@ namespace ACE.Database.SQLFormatters.World
 
                 if (level > 0)
                     label += $" - Level: {level}";
+
+                if (TreasureDeath != null)
+                {
+                    var weenie = DatabaseManager.World.GetCachedWeenie(input[i].WeenieClassId);
+                    var deathTreasureType = weenie.GetProperty(PropertyDataId.DeathTreasureType) ?? 0;
+                    if (deathTreasureType != 0 && TreasureDeath.TryGetValue(deathTreasureType, out var treasureDeath))
+                        label += $" - {GetValueForTreasureData(treasureDeath.TreasureType)}";
+                }
 
                 return $"0x{input[i].Landblock:X4}, {input[i].WeenieClassId}, {input[i].CellX}, {input[i].CellY}, '{input[i].LastModified:yyyy-MM-dd HH:mm:ss}') /* {label} */";
             });

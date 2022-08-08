@@ -615,7 +615,7 @@ namespace ACE.Database.SQLFormatters.Shard
 
                 if ((input[i].WhereCreate & (int)RegenLocationType.Treasure) != 0)
                 {
-                    label = GetValueForTreasureData(input[i].WeenieClassId, false);
+                    label = GetValueForTreasureData(input[i].WeenieClassId);
                 }
 
                 return $"{id}, " +
