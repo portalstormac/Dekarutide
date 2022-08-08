@@ -1130,8 +1130,8 @@
   </location>
   <location>
     <id>72</id>
-    <latitude>-56.8</latitude>
-    <longitude>38.3</longitude>
+    <latitude>-56.7</latitude>
+    <longitude>38.5</longitude>
     <name>Colier Mine Portal</name>
     <type>Dungeon</type>
     <arrival_latitude>0</arrival_latitude>
@@ -1442,38 +1442,6 @@
     <date_added>1999-07-29T00:00:00.0000000-07:00</date_added>
     <last_update>2005-02-16T17:14:19.0970000-08:00</last_update>
     <dungeon_id>01E0</dungeon_id>
-    <retired>N</retired>
-    <tod_req>0</tod_req>
-  </location>
-  <location>
-    <id>92</id>
-    <latitude>-40.8</latitude>
-    <longitude>36.5</longitude>
-    <name>Drudge Farm</name>
-    <type>Landmark</type>
-    <arrival_latitude>0</arrival_latitude>
-    <arrival_longitude>0</arrival_longitude>
-    <description>Good farming land.  Drudges and cows.&lt;BR&gt;Changed, the cows are still there with cabbage growing in the pin. The house has a peddler inside who seems to be baking a rather large pie. lol (Should be changed to a shop now) &lt;I&gt;	-- Logan the Wyz 12/6/2000 &lt;/I&gt;&lt;BR&gt;Selling cabbage and killing cows are some stuff to do for brand-new characters. Watch out for sharks, golems, shreths, and mattekars in the area, however. Makes for great low-teen level hunting in combination with the adjacent Golem Hill. &lt;I&gt; -- Wylfghar 12/7/2001 &lt;/I&gt;</description>
-    <date_added>1999-07-29T00:00:00.0000000-07:00</date_added>
-    <last_update>2005-02-16T17:14:19.0970000-08:00</last_update>
-    <dungeon_id>
-    </dungeon_id>
-    <retired>N</retired>
-    <tod_req>0</tod_req>
-  </location>
-  <location>
-    <id>93</id>
-    <latitude>-39.1</latitude>
-    <longitude>37.4</longitude>
-    <name>Drudge Camp</name>
-    <type>Landmark</type>
-    <arrival_latitude>0</arrival_latitude>
-    <arrival_longitude>0</arrival_longitude>
-    <description>Roasting drudges over an open fire...&lt;BR&gt;Spotted mud golems here. They spotted me, too. &lt;I&gt;	-- Ghiradella 1/10/00 &lt;/i&gt;&lt;BR&gt;They spotted me also but it was too late for them, all 4 of them. The spawn rate seems to be about 10 minutes. 4 Mud golems spawn around the pillar and a 5th just a bit south. &lt;I&gt;	-- Nestor  3/3/00 3/2/2000 &lt;/i&gt;</description>
-    <date_added>1999-07-29T00:00:00.0000000-07:00</date_added>
-    <last_update>2005-02-16T17:14:19.0970000-08:00</last_update>
-    <dungeon_id>
-    </dungeon_id>
     <retired>N</retired>
     <tod_req>0</tod_req>
   </location>
@@ -9464,11 +9432,11 @@
     <id>593</id>
     <latitude>-34.6</latitude>
     <longitude>41.2</longitude>
-    <name>The Obsidian Bridge</name>
+    <name>The Obsidian Span</name>
     <type>Landmark</type>
     <arrival_latitude>0</arrival_latitude>
     <arrival_longitude>0</arrival_longitude>
-    <description>That huge Obsidian Bridge, the old coords entered put it somewhere near Plateau Village.  Between Holrburg and Cragstone, you know the rest....or should! &lt;I&gt; -- Krltplps&lt;/i&gt;&lt;BR&gt;Even though I should, I dont, tell me more? &lt;I&gt;	-- Yulof 3/15/2000 &lt;/i&gt;&lt;BR&gt;The Obsidian span was only recently rediscovered after the powerful magics that hid it from sight were dispelled. Current theory holds that the Span was rendered invisible by the Emperyans in a futile attempt to hold back the Olthoi invasion, since Olthoi are known to fear open water. &lt;I&gt;	-- Necron 3/24/2000 &lt;/i&gt;</description>
+    <description>That huge Obsidian Bridge between Holtburg and Cragstone, you know the rest....or should! &lt;I&gt; -- Krltplps&lt;/i&gt;&lt;BR&gt;Even though I should, I dont, tell me more? &lt;I&gt;	-- Yulof 3/15/2000 &lt;/i&gt;&lt;BR&gt;The Obsidian span was only recently rediscovered after the powerful magics that hid it from sight were dispelled. Current theory holds that the Span was rendered invisible by the Emperyans in a futile attempt to hold back the Olthoi invasion, since Olthoi are known to fear open water. &lt;I&gt;	-- Necron 3/24/2000 &lt;/i&gt;</description>
     <date_added>2000-02-17T00:00:00.0000000-08:00</date_added>
     <last_update>2005-02-16T17:14:19.0970000-08:00</last_update>
     <dungeon_id>
@@ -9520,38 +9488,6 @@
     <date_added>2000-02-18T00:00:00.0000000-08:00</date_added>
     <last_update>2005-02-16T17:14:19.0970000-08:00</last_update>
     <dungeon_id>0136</dungeon_id>
-    <retired>N</retired>
-    <tod_req>0</tod_req>
-  </location>
-  <location>
-    <id>597</id>
-    <latitude>-34.6</latitude>
-    <longitude>41.2</longitude>
-    <name>Bridge</name>
-    <type>Landmark</type>
-    <arrival_latitude>0</arrival_latitude>
-    <arrival_longitude>0</arrival_longitude>
-    <description>This is the Cragstone side of the new bridge - gets you to Arwic and back. Nice design  very 1960s :-) &lt;I&gt; -- Ostan&lt;/I&gt;cragstone side begins at 34.6N,40.4E &lt;I&gt;	-- Ragnarok II 4/17/2000 &lt;/I&gt;</description>
-    <date_added>2000-02-18T00:00:00.0000000-08:00</date_added>
-    <last_update>2005-02-16T17:14:19.0970000-08:00</last_update>
-    <dungeon_id>
-    </dungeon_id>
-    <retired>N</retired>
-    <tod_req>0</tod_req>
-  </location>
-  <location>
-    <id>598</id>
-    <latitude>-34.6</latitude>
-    <longitude>41.2</longitude>
-    <name>Bridge</name>
-    <type>Landmark</type>
-    <arrival_latitude>0</arrival_latitude>
-    <arrival_longitude>0</arrival_longitude>
-    <description>Arwac side of Bridge. &lt;I&gt; -- Ostan&lt;/i&gt;</description>
-    <date_added>2000-02-18T00:00:00.0000000-08:00</date_added>
-    <last_update>2005-02-16T17:14:19.0970000-08:00</last_update>
-    <dungeon_id>
-    </dungeon_id>
     <retired>N</retired>
     <tod_req>0</tod_req>
   </location>
@@ -10234,22 +10170,6 @@
     <arrival_latitude>0</arrival_latitude>
     <arrival_longitude>0</arrival_longitude>
     <description>A dungeon portal entrance rock, but with no portal in it.  It does, however, have lots of mites in it. &lt;I&gt; -- Doc Feelgood&lt;/i&gt;</description>
-    <date_added>2000-02-28T00:00:00.0000000-08:00</date_added>
-    <last_update>2005-02-16T17:14:19.0970000-08:00</last_update>
-    <dungeon_id>
-    </dungeon_id>
-    <retired>N</retired>
-    <tod_req>0</tod_req>
-  </location>
-  <location>
-    <id>642</id>
-    <latitude>-41</latitude>
-    <longitude>43</longitude>
-    <name>Drudge Plain</name>
-    <type>Landmark</type>
-    <arrival_latitude>0</arrival_latitude>
-    <arrival_longitude>0</arrival_longitude>
-    <description>This area north east of Holtburg, beyond the river, seems to be thick with drudges and little else. &lt;I&gt; -- Doc Feelgood&lt;/i&gt;</description>
     <date_added>2000-02-28T00:00:00.0000000-08:00</date_added>
     <last_update>2005-02-16T17:14:19.0970000-08:00</last_update>
     <dungeon_id>
@@ -11570,7 +11490,7 @@
     <id>725</id>
     <latitude>-41.9</latitude>
     <longitude>33.3</longitude>
-    <name>Empyrean Stones</name>
+    <name>Menhir Ring</name>
     <type>Landmark</type>
     <arrival_latitude>0</arrival_latitude>
     <arrival_longitude>0</arrival_longitude>
@@ -11659,21 +11579,6 @@
     <last_update>2005-02-16T17:14:19.0970000-08:00</last_update>
     <dungeon_id>
     </dungeon_id>
-    <retired>N</retired>
-    <tod_req>0</tod_req>
-  </location>
-  <location>
-    <id>731</id>
-    <latitude>-18.4</latitude>
-    <longitude>58.2</longitude>
-    <name>Cave</name>
-    <type>Dungeon</type>
-    <arrival_latitude>0</arrival_latitude>
-    <arrival_longitude>0</arrival_longitude>
-    <description>A small cave with 4 outcast monougas.  When you come back out, youll be near Cragstone. &lt;I&gt; -- Xyblea&lt;/i&gt;&lt;BR&gt;The exit does NOT drop you near Cragstone but at 18.4E, 62.1E. It shares this destination with the cave closest too the drop point. Perhaps a usefull way for a burdened warrior to make it back to Eastham but little else. &lt;I&gt;	-- Sundoro Taal 6/8/2000 &lt;/i&gt; This is actually the same dungeon as the one to the east of here, I tested by dropping a gem in this one and going into the other one, lo and behold, the gem was there. It simply has two entrances, one exit. A truly pointless dungeon in any case. &lt;I&gt;-- Halcyon 9/12/2003&lt;/i&gt;</description>
-    <date_added>2000-05-02T00:00:00.0000000-07:00</date_added>
-    <last_update>2005-02-16T17:14:19.0970000-08:00</last_update>
-    <dungeon_id>01BD</dungeon_id>
     <retired>N</retired>
     <tod_req>0</tod_req>
   </location>
@@ -13359,22 +13264,6 @@
     <arrival_latitude>0</arrival_latitude>
     <arrival_longitude>0</arrival_longitude>
     <description>Entry is courtesy of   -- &lt;I&gt;Polecat&lt;/i&gt;Static spawn of 8 Shallows slayers and 6 Shore dillos just south of them. &lt;I&gt;-- Chupon 8/19/2004&lt;/i&gt;</description>
-    <date_added>2000-07-06T00:00:00.0000000-07:00</date_added>
-    <last_update>2005-02-16T17:14:19.0970000-08:00</last_update>
-    <dungeon_id>
-    </dungeon_id>
-    <retired>N</retired>
-    <tod_req>0</tod_req>
-  </location>
-  <location>
-    <id>838</id>
-    <latitude>-56.6</latitude>
-    <longitude>38.9</longitude>
-    <name>Banderling Barn</name>
-    <type>Landmark</type>
-    <arrival_latitude>0</arrival_latitude>
-    <arrival_longitude>0</arrival_longitude>
-    <description>Entry is courtesy of   -- &lt;I&gt;Polecat&lt;/i&gt;</description>
     <date_added>2000-07-06T00:00:00.0000000-07:00</date_added>
     <last_update>2005-02-16T17:14:19.0970000-08:00</last_update>
     <dungeon_id>
@@ -15927,22 +15816,6 @@
     <arrival_latitude>0</arrival_latitude>
     <arrival_longitude>0</arrival_longitude>
     <description>The new and improved lifestone near Dryreach added with the August 2000 update. &lt;I&gt; -- Khaos&lt;/i&gt;&lt;BR&gt;Completely surrounded by Banderlings, Reedsharks, and Small Shadowchilds.  A low level character could get killed trying to use it. &lt;I&gt;	-- Jann 9/30/2000 &lt;/i&gt;</description>
-    <date_added>2000-08-10T00:00:00.0000000-07:00</date_added>
-    <last_update>2005-02-16T17:14:19.0970000-08:00</last_update>
-    <dungeon_id>
-    </dungeon_id>
-    <retired>N</retired>
-    <tod_req>0</tod_req>
-  </location>
-  <location>
-    <id>999</id>
-    <latitude>-41</latitude>
-    <longitude>52.2</longitude>
-    <name>Hill of Bones</name>
-    <type>Landmark</type>
-    <arrival_latitude>0</arrival_latitude>
-    <arrival_longitude>0</arrival_longitude>
-    <description>A field of bones that leads up a hill to a statue of Baelzharon. The dead are not peaceful here though as a horde of skeletons, skeleton captains and lords guard this strange place. &lt;I&gt; -- Tekkiw&lt;/i&gt;&lt;BR&gt;No statue or undead. Copper and Ice golems, as well as mid-level drudges (i.e. Lurkers and Stalkers.) Also groups of low level Bandies (Gaurds, Raiders and Ravenors.) &lt;I&gt; -- Jake the Dog 6/21/2001 &lt;/i&gt;&lt;BR&gt;As of 1/24/2002, no golems, just drudges, manougas and lugians &lt;I&gt; -- Ognam 1/24/2002 &lt;/i&gt;</description>
     <date_added>2000-08-10T00:00:00.0000000-07:00</date_added>
     <last_update>2005-02-16T17:14:19.0970000-08:00</last_update>
     <dungeon_id>
@@ -29879,96 +29752,6 @@
     <tod_req>0</tod_req>
   </location>
   <location>
-    <id>1875</id>
-    <latitude>33.2</latitude>
-    <longitude>73.1</longitude>
-    <name>Shoushi Cooking Forge</name>
-    <type>Landmark</type>
-    <arrival_latitude>0</arrival_latitude>
-    <arrival_longitude>0</arrival_longitude>
-    <description>Casts: Master Chefs Boon - Increases the targets Cooking skill by 45 points.
-&lt;br&gt;
-&lt;br&gt; &lt;I&gt;-- CapFan 12/10/2004&lt;/i&gt;</description>
-    <date_added>2004-12-10T19:38:11.4200000-08:00</date_added>
-    <last_update>2005-02-16T17:14:19.0970000-08:00</last_update>
-    <dungeon_id>
-    </dungeon_id>
-    <retired>N</retired>
-    <tod_req>0</tod_req>
-  </location>
-  <location>
-    <id>1876</id>
-    <latitude>33.3</latitude>
-    <longitude>72.5</longitude>
-    <name>Shoushi Fletching Forge</name>
-    <type>Landmark</type>
-    <arrival_latitude>0</arrival_latitude>
-    <arrival_longitude>0</arrival_longitude>
-    <description>Casts: Fletching Masters Boon - Increases the targets Fletching skill by 45 points.
-&lt;br&gt;
-&lt;br&gt; &lt;I&gt;-- CapFan 12/10/2004&lt;/i&gt;</description>
-    <date_added>2004-12-10T19:39:16.8270000-08:00</date_added>
-    <last_update>2005-02-16T17:14:19.0970000-08:00</last_update>
-    <dungeon_id>
-    </dungeon_id>
-    <retired>N</retired>
-    <tod_req>0</tod_req>
-  </location>
-  <location>
-    <id>1877</id>
-    <latitude>33.6</latitude>
-    <longitude>72.6</longitude>
-    <name>Shoushi Salvaging Forge</name>
-    <type>Landmark</type>
-    <arrival_latitude>0</arrival_latitude>
-    <arrival_longitude>0</arrival_longitude>
-    <description>Casts: Master Salvagers Boon - Increases the casters Salvaging skill by 45 points.
-&lt;br&gt;
-&lt;br&gt; &lt;I&gt;-- CapFan 12/10/2004&lt;/i&gt;</description>
-    <date_added>2004-12-10T19:40:28.6570000-08:00</date_added>
-    <last_update>2005-02-16T17:14:19.0970000-08:00</last_update>
-    <dungeon_id>
-    </dungeon_id>
-    <retired>N</retired>
-    <tod_req>0</tod_req>
-  </location>
-  <location>
-    <id>1878</id>
-    <latitude>33.7</latitude>
-    <longitude>72.6</longitude>
-    <name>Shoushi Alchemy Forge</name>
-    <type>Landmark</type>
-    <arrival_latitude>0</arrival_latitude>
-    <arrival_longitude>0</arrival_longitude>
-    <description>Casts: Master Alchemists Boon - Increases the casters Alchemy skill by 45 points.
-&lt;br&gt;
-&lt;br&gt; &lt;I&gt;-- CapFan 12/10/2004&lt;/i&gt;</description>
-    <date_added>2004-12-10T19:41:27.0030000-08:00</date_added>
-    <last_update>2005-02-16T17:14:19.0970000-08:00</last_update>
-    <dungeon_id>
-    </dungeon_id>
-    <retired>N</retired>
-    <tod_req>0</tod_req>
-  </location>
-  <location>
-    <id>1879</id>
-    <latitude>33.4</latitude>
-    <longitude>72.9</longitude>
-    <name>Shoushi Lockpick Forge</name>
-    <type>Landmark</type>
-    <arrival_latitude>0</arrival_latitude>
-    <arrival_longitude>0</arrival_longitude>
-    <description>Casts: Master Lockpickers Boon - Increases the targets Lockpick skill by 45 points.
-&lt;br&gt;
-&lt;br&gt; &lt;I&gt;-- CapFan 12/10/2004&lt;/i&gt;</description>
-    <date_added>2004-12-10T19:42:21.2070000-08:00</date_added>
-    <last_update>2005-02-16T17:14:19.0970000-08:00</last_update>
-    <dungeon_id>
-    </dungeon_id>
-    <retired>N</retired>
-    <tod_req>0</tod_req>
-  </location>
-  <location>
     <id>1880</id>
     <latitude>33.6</latitude>
     <longitude>72.4</longitude>
@@ -29996,87 +29779,6 @@
 &lt;br&gt;
 &lt;br&gt;using this sign in Zaikhal fills your mind with thoughts, starts you gesturing and entices you to start a quest.... &lt;I&gt;-- Seeker 1/3/2005&lt;/i&gt;</description>
     <date_added>2005-01-03T20:43:39.7700000-08:00</date_added>
-    <last_update>2005-02-16T17:14:19.0970000-08:00</last_update>
-    <dungeon_id>
-    </dungeon_id>
-    <retired>N</retired>
-    <tod_req>0</tod_req>
-  </location>
-  <location>
-    <id>1882</id>
-    <latitude>-42.6</latitude>
-    <longitude>33.7</longitude>
-    <name>Holtburg Fletching Forge</name>
-    <type>Landmark</type>
-    <arrival_latitude>0</arrival_latitude>
-    <arrival_longitude>0</arrival_longitude>
-    <description>Adds +5 stackable to your skill for 3 minutes &lt;I&gt;-- Taarna Blood SC 1/16/2005&lt;/i&gt;</description>
-    <date_added>2005-01-16T18:02:03.9530000-08:00</date_added>
-    <last_update>2005-02-16T17:14:19.0970000-08:00</last_update>
-    <dungeon_id>
-    </dungeon_id>
-    <retired>N</retired>
-    <tod_req>0</tod_req>
-  </location>
-  <location>
-    <id>1883</id>
-    <latitude>-42.6</latitude>
-    <longitude>33.8</longitude>
-    <name>Holtburg Alchemy Forge</name>
-    <type>Landmark</type>
-    <arrival_latitude>0</arrival_latitude>
-    <arrival_longitude>0</arrival_longitude>
-    <description>Adds +5 stackable to your skill for 3 minutes &lt;I&gt;-- Taarna Blood SC 1/16/2005&lt;/i&gt;</description>
-    <date_added>2005-01-16T18:02:36.1430000-08:00</date_added>
-    <last_update>2005-02-16T17:14:19.0970000-08:00</last_update>
-    <dungeon_id>
-    </dungeon_id>
-    <retired>N</retired>
-    <tod_req>0</tod_req>
-  </location>
-  <location>
-    <id>1884</id>
-    <latitude>-42.2</latitude>
-    <longitude>33.6</longitude>
-    <name>Holtburg Cooking Forge</name>
-    <type>Landmark</type>
-    <arrival_latitude>0</arrival_latitude>
-    <arrival_longitude>0</arrival_longitude>
-    <description>Adds +5 stackable to your skill for 3 minutes &lt;I&gt;-- Taarna Blood SC 1/16/2005&lt;/i&gt;</description>
-    <date_added>2005-01-16T18:03:43.6600000-08:00</date_added>
-    <last_update>2005-02-16T17:14:19.0970000-08:00</last_update>
-    <dungeon_id>
-    </dungeon_id>
-    <retired>N</retired>
-    <tod_req>0</tod_req>
-  </location>
-  <location>
-    <id>1885</id>
-    <latitude>-42.6</latitude>
-    <longitude>33.5</longitude>
-    <name>Holtburg Salvaging Forge</name>
-    <type>Landmark</type>
-    <arrival_latitude>0</arrival_latitude>
-    <arrival_longitude>0</arrival_longitude>
-    <description>Adds +5 stackable to your skill for 3 minutes &lt;I&gt;-- Taarna Blood SC 
-&lt;br&gt;&lt;br&gt;1/16/2005&lt;/i&gt;</description>
-    <date_added>2005-01-16T18:04:25.0000000-08:00</date_added>
-    <last_update>2005-02-16T17:14:19.0970000-08:00</last_update>
-    <dungeon_id>
-    </dungeon_id>
-    <retired>N</retired>
-    <tod_req>0</tod_req>
-  </location>
-  <location>
-    <id>1886</id>
-    <latitude>-42.1</latitude>
-    <longitude>33.8</longitude>
-    <name>Holtburg Lockpick Forge</name>
-    <type>Landmark</type>
-    <arrival_latitude>0</arrival_latitude>
-    <arrival_longitude>0</arrival_longitude>
-    <description>Adds +5 stackable to your skill for 3 minutes &lt;I&gt;-- Taarna Blood SC 1/16/2005&lt;/i&gt;</description>
-    <date_added>2005-01-16T18:05:17.7400000-08:00</date_added>
     <last_update>2005-02-16T17:14:19.0970000-08:00</last_update>
     <dungeon_id>
     </dungeon_id>
@@ -37944,23 +37646,6 @@ Fadsahil al-Tashbi the Master Archmage tells you, "May the wind be always at you
     <tod_req>0</tod_req>
   </location>
   <location>
-    <id>2297</id>
-    <latitude>-35.7</latitude>
-    <longitude>33.3</longitude>
-    <name>Farmer</name>
-    <type>Vendor</type>
-    <arrival_latitude>0.000</arrival_latitude>
-    <arrival_longitude>0.000</arrival_longitude>
-    <description>
-    </description>
-    <date_added>2005-09-18 00:00:00</date_added>
-    <last_update>0000-00-00 00:00:00</last_update>
-    <dungeon_id>
-    </dungeon_id>
-    <retired>N</retired>
-    <tod_req>0</tod_req>
-  </location>
-  <location>
     <id>2298</id>
     <latitude>-68.7</latitude>
     <longitude>-21.6</longitude>
@@ -44521,28 +44206,6 @@ Only a menhir ring now remains of the former dungeon.</description>
     <arrival_latitude>0.000</arrival_latitude>
     <arrival_longitude>0.000</arrival_longitude>
     <description>The home of Faladaha the Emmissary and Gateway to Aerlinthe.  Bring a C Note if you wish to use his services to gain access to the island.  The Castle is guarded by a variety of undead and Diamond Golems.</description>
-    <date_added>2000-11-24 00:00:00</date_added>
-    <last_update>0000-00-00 00:00:00</last_update>
-    <dungeon_id>
-    </dungeon_id>
-    <retired>N</retired>
-    <tod_req>0</tod_req>
-  </location>
-  <location>
-    <id>2677</id>
-    <latitude>-39</latitude>
-    <longitude>35.6</longitude>
-    <name>Eternal Flame</name>
-    <type>Landmark</type>
-    <arrival_latitude>0.000</arrival_latitude>
-    <arrival_longitude>0.000</arrival_longitude>
-    <description>The Eternal Flame burns in memory of those slain at the Holtburg Redoubt during the Tumerok invasions. A Historical Marker placed nearby reads:
-
-The Old Redoubt:
-
-In the 6th year of our freedom from the Olthoi, the people of Holtburg were besieged and slaughtered here by Tumeroks. Only the children were spared, thanks to the heroism of the mage Celcynd. This eternal flame burns in their memory, and their mortal remains have been left interred here in tribute. Disturb not their rest.
-
-Find out more in the Holtburg Starter quests and the quest for Brogord's Axe.</description>
     <date_added>2000-11-24 00:00:00</date_added>
     <last_update>0000-00-00 00:00:00</last_update>
     <dungeon_id>
