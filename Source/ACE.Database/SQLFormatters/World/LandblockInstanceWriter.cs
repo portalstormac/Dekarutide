@@ -50,6 +50,9 @@ namespace ACE.Database.SQLFormatters.World
                 if (WeenieNames != null)
                     WeenieNames.TryGetValue(value.WeenieClassId, out label);
 
+                if (WeenieClassNames != null && WeenieClassNames.TryGetValue(value.WeenieClassId, out var className))
+                    label += $"({value.WeenieClassId}/{className})";
+
                 if (WeenieLevels != null)
                     WeenieLevels.TryGetValue(value.WeenieClassId, out level);
 
@@ -87,19 +90,19 @@ namespace ACE.Database.SQLFormatters.World
                             {
                                 if (!isFirst)
                                     content += " / ";
+                                isFirst = false;
 
                                 if (entry.WhereCreate.HasFlag(RegenLocationType.Treasure))
-                                {
                                     content += GetValueForTreasureData(entry.WeenieClassId);
-                                    isFirst = false;
-                                }
                                 else
                                 {
                                     if (WeenieNames != null)
                                     {
-                                        WeenieNames.TryGetValue(entry.WeenieClassId, out var weenieName);
-                                        content += $"{weenieName}({entry.WeenieClassId})";
-                                        isFirst = false;
+                                        WeenieNames.TryGetValue(entry.WeenieClassId, out var entryWeenieName);
+                                        if (WeenieClassNames != null && WeenieClassNames.TryGetValue(entry.WeenieClassId, out var entryClassName))
+                                            content += $"{entryWeenieName}({entry.WeenieClassId}/{entryClassName})";
+                                        else
+                                            content += $"{entryWeenieName}({entry.WeenieClassId})";
                                     }
                                     else
                                         content += entry.WeenieClassId;
@@ -117,19 +120,22 @@ namespace ACE.Database.SQLFormatters.World
 
                                 if (!isFirst)
                                     content += " / ";
+                                isFirst = false;
 
                                 if (WeenieNames != null)
                                 {
                                     WeenieNames.TryGetValue(entry.WeenieClassId, out var entryWeenieName);
-                                    content += $"{entryWeenieName}({entry.WeenieClassId})";
+                                    if (WeenieClassNames != null && WeenieClassNames.TryGetValue(entry.WeenieClassId, out var entryClassName))
+                                        content += $"{entryWeenieName}({entry.WeenieClassId}/{entryClassName})";
+                                    else
+                                        content += $"{entryWeenieName}({entry.WeenieClassId})";
+
                                     if (WeenieLevels != null)
                                     {
                                         WeenieLevels.TryGetValue(entry.WeenieClassId, out var generatedLevel);
                                         if (generatedLevel > 0)
                                             content += $" - Level: {generatedLevel}";
                                     }
-
-                                    isFirst = false;
                                 }
                                 else
                                     content += entry.WeenieClassId;
@@ -154,26 +160,26 @@ namespace ACE.Database.SQLFormatters.World
                             {
                                 if (!isFirst)
                                     generated += " / ";
+                                isFirst = false;
 
                                 if (entry.WhereCreate.HasFlag(RegenLocationType.Treasure))
-                                {
                                     generated += GetValueForTreasureData(entry.WeenieClassId);
-                                    isFirst = false;
-                                }
                                 else
                                 {
                                     if (WeenieNames != null)
                                     {
-                                        WeenieNames.TryGetValue(entry.WeenieClassId, out var weenieName);
-                                        generated += $"{weenieName}({entry.WeenieClassId})";
+                                        WeenieNames.TryGetValue(entry.WeenieClassId, out var entryWeenieName);
+                                        if (WeenieClassNames != null && WeenieClassNames.TryGetValue(entry.WeenieClassId, out var entryClassName))
+                                            generated += $"{entryWeenieName}({entry.WeenieClassId}/{entryClassName})";
+                                        else
+                                            generated += $"{entryWeenieName}({entry.WeenieClassId})";
+
                                         if (WeenieLevels != null)
                                         {
                                             WeenieLevels.TryGetValue(entry.WeenieClassId, out var generatedLevel);
                                             if (generatedLevel > 0)
                                                 generated += $" - Level: {generatedLevel}";
                                         }
-
-                                        isFirst = false;
                                     }
                                     else
                                         generated += entry.WeenieClassId;
@@ -191,19 +197,22 @@ namespace ACE.Database.SQLFormatters.World
 
                                 if (!isFirst)
                                     generated += " / ";
+                                isFirst = false;
 
                                 if (WeenieNames != null)
                                 {
                                     WeenieNames.TryGetValue(entry.WeenieClassId, out var entryWeenieName);
-                                    generated += $"{entryWeenieName}({entry.WeenieClassId})";
+                                    if (WeenieClassNames != null && WeenieClassNames.TryGetValue(entry.WeenieClassId, out var entryClassName))
+                                        generated += $"{entryWeenieName}({entry.WeenieClassId}/{entryClassName})";
+                                    else
+                                        generated += $"{entryWeenieName}({entry.WeenieClassId})";
+
                                     if (WeenieLevels != null)
                                     {
                                         WeenieLevels.TryGetValue(entry.WeenieClassId, out var generatedLevel);
                                         if (generatedLevel > 0)
                                             generated += $" - Level: {generatedLevel}";
                                     }
-
-                                    isFirst = false;
                                 }
                                 else
                                     generated += entry.WeenieClassId;
@@ -253,7 +262,10 @@ namespace ACE.Database.SQLFormatters.World
 
                 if (WeenieNames != null && instanceWcids.TryGetValue(input[i].ChildGuid, out var wcid) && WeenieNames.TryGetValue(wcid, out var weenieName))
                 {
-                    label = $" /* {weenieName} ({wcid})";
+                    if (WeenieClassNames != null && WeenieClassNames.TryGetValue(wcid, out var className))
+                        label += $"/* {weenieName} ({wcid}/{className})";
+                    else
+                        label = $" /* {weenieName} ({wcid})";
 
                     if (WeenieLevels != null && WeenieLevels.TryGetValue(wcid, out var weenieLevel) && weenieLevel != 0)
                         label += $" - Level: {weenieLevel}";
@@ -290,19 +302,19 @@ namespace ACE.Database.SQLFormatters.World
                                 {
                                     if (!isFirst)
                                         content += " / ";
+                                    isFirst = false;
 
                                     if (entry.WhereCreate.HasFlag(RegenLocationType.Treasure))
-                                    {
                                         content += GetValueForTreasureData(entry.WeenieClassId);
-                                        isFirst = false;
-                                    }
                                     else
                                     {
                                         if (WeenieNames != null)
                                         {
                                             WeenieNames.TryGetValue(entry.WeenieClassId, out var entryWeenieName);
-                                            content += $"{entryWeenieName}({entry.WeenieClassId})";
-                                            isFirst = false;
+                                            if (WeenieClassNames != null && WeenieClassNames.TryGetValue(entry.WeenieClassId, out var entryClassName))
+                                                content += $"{entryWeenieName}({entry.WeenieClassId}/{entryClassName})";
+                                            else
+                                                content += $"{entryWeenieName}({entry.WeenieClassId})";
                                         }
                                         else
                                             content += entry.WeenieClassId;
@@ -320,19 +332,22 @@ namespace ACE.Database.SQLFormatters.World
 
                                     if (!isFirst)
                                         content += " / ";
+                                    isFirst = false;
 
                                     if (WeenieNames != null)
                                     {
                                         WeenieNames.TryGetValue(entry.WeenieClassId, out var entryWeenieName);
-                                        content += $"{entryWeenieName}({entry.WeenieClassId})";
+                                        if (WeenieClassNames != null && WeenieClassNames.TryGetValue(entry.WeenieClassId, out var entryClassName))
+                                            content += $"{entryWeenieName}({entry.WeenieClassId}/{entryClassName})";
+                                        else
+                                            content += $"{entryWeenieName}({entry.WeenieClassId})";
+
                                         if (WeenieLevels != null)
                                         {
                                             WeenieLevels.TryGetValue(entry.WeenieClassId, out var generatedLevel);
                                             if (generatedLevel > 0)
                                                 content += $" - Level: {generatedLevel}";
                                         }
-
-                                        isFirst = false;
                                     }
                                     else
                                         content += entry.WeenieClassId;
@@ -357,26 +372,26 @@ namespace ACE.Database.SQLFormatters.World
                                 {
                                     if (!isFirst)
                                         generated += " / ";
+                                    isFirst = false;
 
                                     if (entry.WhereCreate.HasFlag(RegenLocationType.Treasure))
-                                    {
                                         generated += GetValueForTreasureData(entry.WeenieClassId);
-                                        isFirst = false;
-                                    }
                                     else
                                     {
                                         if (WeenieNames != null)
                                         {
                                             WeenieNames.TryGetValue(entry.WeenieClassId, out var entryWeenieName);
-                                            generated += $"{entryWeenieName}({entry.WeenieClassId})";
+                                            if (WeenieClassNames != null && WeenieClassNames.TryGetValue(entry.WeenieClassId, out var entryClassName))
+                                                generated += $"{entryWeenieName}({entry.WeenieClassId}/{entryClassName})";
+                                            else
+                                                generated += $"{entryWeenieName}({entry.WeenieClassId})";
+
                                             if (WeenieLevels != null)
                                             {
                                                 WeenieLevels.TryGetValue(entry.WeenieClassId, out var generatedLevel);
                                                 if (generatedLevel > 0)
                                                     generated += $" - Level: {generatedLevel}";
                                             }
-
-                                            isFirst = false;
                                         }
                                         else
                                             generated += entry.WeenieClassId;
@@ -394,19 +409,22 @@ namespace ACE.Database.SQLFormatters.World
 
                                     if (!isFirst)
                                         generated += " / ";
-        
+                                    isFirst = false;
+
                                     if (WeenieNames != null)
                                     {
                                         WeenieNames.TryGetValue(entry.WeenieClassId, out var entryWeenieName);
-                                        generated += $"{entryWeenieName}({entry.WeenieClassId})";
+                                        if (WeenieClassNames != null && WeenieClassNames.TryGetValue(entry.WeenieClassId, out var entryClassName))
+                                            generated += $"{entryWeenieName}({entry.WeenieClassId}/{entryClassName})";
+                                        else
+                                            generated += $"{entryWeenieName}({entry.WeenieClassId})";
+
                                         if (WeenieLevels != null)
                                         {
                                             WeenieLevels.TryGetValue(entry.WeenieClassId, out var generatedLevel);
                                             if (generatedLevel > 0)
                                                 generated += $" - Level: {generatedLevel}";
                                         }
-
-                                        isFirst = false;
                                     }
                                     else
                                         generated += entry.WeenieClassId;

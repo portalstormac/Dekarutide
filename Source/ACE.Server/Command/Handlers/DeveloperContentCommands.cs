@@ -576,6 +576,7 @@ namespace ACE.Server.Command.Handlers.Processors
                 {
                     WeenieSQLWriter = new WeenieSQLWriter();
                     WeenieSQLWriter.WeenieNames = DatabaseManager.World.GetAllWeenieNames();
+                    WeenieSQLWriter.WeenieClassNames = DatabaseManager.World.GetAllWeenieClassNames();
                     WeenieSQLWriter.WeenieLevels = DatabaseManager.World.GetAllWeenieLevels();
                     WeenieSQLWriter.WeenieTypes = DatabaseManager.World.GetAllWeenieTypes();
                     WeenieSQLWriter.SpellNames = DatabaseManager.World.GetAllSpellNames();
@@ -760,6 +761,7 @@ namespace ACE.Server.Command.Handlers.Processors
                 {
                     LandblockInstanceWriter = new LandblockInstanceWriter();
                     LandblockInstanceWriter.WeenieNames = DatabaseManager.World.GetAllWeenieNames();
+                    LandblockInstanceWriter.WeenieClassNames = DatabaseManager.World.GetAllWeenieClassNames();
                     LandblockInstanceWriter.WeenieLevels = DatabaseManager.World.GetAllWeenieLevels();
                     LandblockInstanceWriter.WeenieTypes = DatabaseManager.World.GetAllWeenieTypes();
                     LandblockInstanceWriter.TreasureDeath = DatabaseManager.World.GetAllTreasureDeath();
@@ -1322,6 +1324,7 @@ namespace ACE.Server.Command.Handlers.Processors
                 {
                     LandblockInstanceWriter = new LandblockInstanceWriter();
                     LandblockInstanceWriter.WeenieNames = DatabaseManager.World.GetAllWeenieNames();
+                    LandblockInstanceWriter.WeenieClassNames = DatabaseManager.World.GetAllWeenieClassNames();
                     LandblockInstanceWriter.WeenieLevels = DatabaseManager.World.GetAllWeenieLevels();
                     LandblockInstanceWriter.WeenieTypes = DatabaseManager.World.GetAllWeenieTypes();
                     LandblockInstanceWriter.TreasureDeath = DatabaseManager.World.GetAllTreasureDeath();
@@ -1793,6 +1796,7 @@ namespace ACE.Server.Command.Handlers.Processors
                 {
                     LandblockEncounterWriter = new EncounterSQLWriter();
                     LandblockEncounterWriter.WeenieNames = DatabaseManager.World.GetAllWeenieNames();
+                    LandblockEncounterWriter.WeenieClassNames = DatabaseManager.World.GetAllWeenieClassNames();
                     LandblockEncounterWriter.WeenieLevels = DatabaseManager.World.GetAllWeenieLevels();
                     LandblockEncounterWriter.TreasureDeath = DatabaseManager.World.GetAllTreasureDeath();
                 }
@@ -2263,6 +2267,7 @@ namespace ACE.Server.Command.Handlers.Processors
             {
                 WeenieSQLWriter = new WeenieSQLWriter();
                 WeenieSQLWriter.WeenieNames = DatabaseManager.World.GetAllWeenieNames();
+                WeenieSQLWriter.WeenieClassNames = DatabaseManager.World.GetAllWeenieClassNames();
                 WeenieSQLWriter.WeenieLevels = DatabaseManager.World.GetAllWeenieLevels();
                 WeenieSQLWriter.SpellNames = DatabaseManager.World.GetAllSpellNames();
                 WeenieSQLWriter.TreasureDeath = DatabaseManager.World.GetAllTreasureDeath();
@@ -2395,6 +2400,7 @@ namespace ACE.Server.Command.Handlers.Processors
                 {
                     LandblockInstanceWriter = new LandblockInstanceWriter();
                     LandblockInstanceWriter.WeenieNames = DatabaseManager.World.GetAllWeenieNames();
+                    LandblockInstanceWriter.WeenieClassNames = DatabaseManager.World.GetAllWeenieClassNames();
                     LandblockInstanceWriter.WeenieLevels = DatabaseManager.World.GetAllWeenieLevels();
                     LandblockInstanceWriter.WeenieTypes = DatabaseManager.World.GetAllWeenieTypes();
                     LandblockInstanceWriter.TreasureDeath = DatabaseManager.World.GetAllTreasureDeath();
@@ -2483,6 +2489,8 @@ namespace ACE.Server.Command.Handlers.Processors
                     mode = CacheType.Weenie;
                 if (parameters[0].Contains("wield", StringComparison.OrdinalIgnoreCase))
                     mode = CacheType.WieldedTreasure;
+                if (parameters[0].Contains("death", StringComparison.OrdinalIgnoreCase))
+                    mode = CacheType.DeathTreasure;
                 if (parameters[0].Contains("encounter", StringComparison.OrdinalIgnoreCase))
                     mode = CacheType.Encounter;
             }
@@ -2518,6 +2526,12 @@ namespace ACE.Server.Command.Handlers.Processors
                 DatabaseManager.World.ClearWieldedTreasureCache();
             }
 
+            if (mode.HasFlag(CacheType.DeathTreasure))
+            {
+                CommandHandlerHelper.WriteOutputInfo(session, "Clearing death treasure cache");
+                DatabaseManager.World.ClearDeathTreasureCache();
+            }
+
             if (mode.HasFlag(CacheType.Encounter))
             {
                 CommandHandlerHelper.WriteOutputInfo(session, "Clearing encounter cache");
@@ -2534,7 +2548,8 @@ namespace ACE.Server.Command.Handlers.Processors
             Spell           = 0x4,
             Weenie          = 0x8,
             WieldedTreasure = 0x10,
-            Encounter       = 0x01,
+            DeathTreasure   = 0x01,
+            Encounter       = 0x02,
             All             = 0xFFFF
         };
 
@@ -3443,6 +3458,7 @@ namespace ACE.Server.Command.Handlers.Processors
                 {
                     WeenieSQLWriter = new WeenieSQLWriter();
                     WeenieSQLWriter.WeenieNames = DatabaseManager.World.GetAllWeenieNames();
+                    WeenieSQLWriter.WeenieClassNames = DatabaseManager.World.GetAllWeenieClassNames();
                     WeenieSQLWriter.WeenieLevels = DatabaseManager.World.GetAllWeenieLevels();
                     WeenieSQLWriter.SpellNames = DatabaseManager.World.GetAllSpellNames();
                     WeenieSQLWriter.TreasureDeath = DatabaseManager.World.GetAllTreasureDeath();
@@ -3604,28 +3620,10 @@ namespace ACE.Server.Command.Handlers.Processors
                         weenieSkill.InitLevel = entry.Value;
                 }
 
-                var sql_filename = WeenieSQLWriter.GetDefaultFileName(weenie, $" - Scaled from level {creature.Level} to {newLevel}" + (keepLevel ? " - keepLevel" : ""));
 
+                // Export the original weenie for comparison/backup purposes.
+                var sql_filename = WeenieSQLWriter.GetDefaultFileName(weenieOriginal);
                 var writer = new StreamWriter(sql_folder + sql_filename);
-
-                try
-                {
-                    WeenieSQLWriter.CreateSQLDELETEStatement(weenie, writer);
-                    writer.WriteLine();
-                    WeenieSQLWriter.CreateSQLINSERTStatement(weenie, writer);
-                    writer.Close();
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine(e);
-                    CommandHandlerHelper.WriteOutputInfo(session, $"Failed to export {sql_folder}{sql_filename}");
-                    return;
-                }
-
-                CommandHandlerHelper.WriteOutputInfo(session, $"Exported {sql_folder}{sql_filename}");
-
-                sql_filename = WeenieSQLWriter.GetDefaultFileName(weenieOriginal);
-                writer = new StreamWriter(sql_folder + sql_filename);
 
                 try
                 {
@@ -3641,7 +3639,25 @@ namespace ACE.Server.Command.Handlers.Processors
                     return;
                 }
 
-                CommandHandlerHelper.WriteOutputInfo(session, $"Exported {sql_folder}{sql_filename}");
+                // And finally export the modified weenie.
+                var sql_filename_new = WeenieSQLWriter.GetDefaultFileName(weenie, $" - Scaled from level {creature.Level} to {newLevel}" + (keepLevel ? " - keepLevel" : ""));
+                writer = new StreamWriter(sql_folder + sql_filename_new);
+
+                try
+                {
+                    WeenieSQLWriter.CreateSQLDELETEStatement(weenie, writer);
+                    writer.WriteLine();
+                    WeenieSQLWriter.CreateSQLINSERTStatement(weenie, writer);
+                    writer.Close();
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
+                    CommandHandlerHelper.WriteOutputInfo(session, $"Failed to export {sql_folder}{sql_filename_new}");
+                    return;
+                }
+
+                CommandHandlerHelper.WriteOutputInfo(session, $"Exported \"{sql_folder}{sql_filename}\" and \"{sql_filename_new}\"");
             }
         }
 

@@ -837,6 +837,11 @@ namespace ACE.Database
             }
         }
 
+        public void ClearDeathTreasureCache()
+        {
+            cachedDeathTreasure.Clear();
+        }
+
 
         // =====================================
         // TreasureMaterial

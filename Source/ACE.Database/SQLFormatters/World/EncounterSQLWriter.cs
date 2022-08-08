@@ -39,6 +39,9 @@ namespace ACE.Database.SQLFormatters.World
                 if (WeenieNames != null)
                     WeenieNames.TryGetValue(input[i].WeenieClassId, out label);
 
+                if (WeenieClassNames != null && WeenieClassNames.TryGetValue(input[i].WeenieClassId, out var className))
+                    label += $"({input[i].WeenieClassId}/{className})";
+
                 if (WeenieLevels != null)
                     WeenieLevels.TryGetValue(input[i].WeenieClassId, out level);
 

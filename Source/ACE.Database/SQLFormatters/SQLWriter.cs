@@ -19,6 +19,8 @@ namespace ACE.Database.SQLFormatters
         /// </summary>
         public IDictionary<uint, string> WeenieNames;
 
+        public IDictionary<uint, string> WeenieClassNames;
+
         /// <summary>
         /// Set this to enable auto commenting when creating SQL statements.<para />
         /// If a weenie id is found in the dictionary, the level will be added in the form of a /* Friendly Weenie Level */

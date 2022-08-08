@@ -768,7 +768,11 @@ namespace ACE.Database.SQLFormatters.World
                 if (WeenieLevels != null)
                     WeenieLevels.TryGetValue(input[i].WeenieClassId, out level);
 
-                var label = weenieName + $" ({input[i].WeenieClassId})";
+                var label = "";
+                if (WeenieClassNames != null && WeenieClassNames.TryGetValue(input[i].WeenieClassId, out var className))
+                    label += weenieName + $"({input[i].WeenieClassId}/{className})";
+                else
+                    label = weenieName + $" ({input[i].WeenieClassId})";
 
                 if (level > 0)
                     label += $" - Level: {level}";
