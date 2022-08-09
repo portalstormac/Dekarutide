@@ -70,7 +70,7 @@ namespace ACE.Database.SQLFormatters.World
                         label += $" - {GetValueForTreasureData(treasureDeath.TreasureType)}";
                 }
 
-                if (type == (int)WeenieType.Chest || type == (int)WeenieType.Container)
+                if (type == (int)WeenieType.Chest || type == (int)WeenieType.Container || type == (int)WeenieType.Door)
                 {
                     var weenie = DatabaseManager.World.GetCachedWeenie(value.WeenieClassId);
                     var locked = weenie.GetProperty(PropertyBool.DefaultLocked) ?? false;
@@ -282,7 +282,7 @@ namespace ACE.Database.SQLFormatters.World
                     if (WeenieTypes != null)
                         WeenieTypes.TryGetValue(wcid, out type);
 
-                    if (type == (int)WeenieType.Chest || type == (int)WeenieType.Container)
+                    if (type == (int)WeenieType.Chest || type == (int)WeenieType.Container || type == (int)WeenieType.Door)
                     {
                         var weenie = DatabaseManager.World.GetCachedWeenie(wcid);
                         var locked = weenie.GetProperty(PropertyBool.DefaultLocked) ?? false;
