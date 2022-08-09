@@ -476,38 +476,6 @@
     <tod_req>0</tod_req>
   </location>
   <location>
-    <id>31</id>
-    <latitude>36.2</latitude>
-    <longitude>60.3</longitude>
-    <name>A Mosswart Nest</name>
-    <type>Dungeon</type>
-    <arrival_latitude>0</arrival_latitude>
-    <arrival_longitude>0</arrival_longitude>
-    <description>One main room, two smaller sub rooms.  Very small dungeon.  Several mosswarts, feeders and creepers mostly.  Nothing special. &lt;I&gt;	-- Rhaz Darlin 4/14/2000 &lt;/i&gt;</description>
-    <date_added>1999-05-16T00:00:00.0000000-07:00</date_added>
-    <last_update>2005-02-16T17:14:19.0970000-08:00</last_update>
-    <dungeon_id>
-    </dungeon_id>
-    <retired>N</retired>
-    <tod_req>0</tod_req>
-  </location>
-  <location>
-    <id>32</id>
-    <latitude>36.3</latitude>
-    <longitude>61.2</longitude>
-    <name>Mosswart Cave</name>
-    <type>Landmark</type>
-    <arrival_latitude>0</arrival_latitude>
-    <arrival_longitude>0</arrival_longitude>
-    <description>There's a peddler and a lifestone just north, and a lot of high lvl monsters in the area also. &lt;I&gt;	-- Mabelrode 1/11/00 &lt;/I&gt;&lt;BR&gt;Near the chief at the bottom of the cave there is a weapon/armor generator.  Saw some decent weapon and armor for low level players.  But if you can clean the place alone, those items are definitely not worth it.  Better items on the chief tough... &lt;I&gt;	-- Tatsuidaya 6/14/2000 &lt;/I&gt;</description>
-    <date_added>1999-05-16T00:00:00.0000000-07:00</date_added>
-    <last_update>2005-02-16T17:14:19.0970000-08:00</last_update>
-    <dungeon_id>
-    </dungeon_id>
-    <retired>N</retired>
-    <tod_req>0</tod_req>
-  </location>
-  <location>
     <id>33</id>
     <latitude>12.1</latitude>
     <longitude>46.3</longitude>
@@ -2276,8 +2244,8 @@
   </location>
   <location>
     <id>145</id>
-    <latitude>34.4</latitude>
-    <longitude>70.4</longitude>
+    <latitude>34.8</latitude>
+    <longitude>71.2</longitude>
     <name>Stone Cathedral</name>
     <type>Dungeon</type>
     <arrival_latitude>0</arrival_latitude>
@@ -3718,22 +3686,6 @@
     <tod_req>0</tod_req>
   </location>
   <location>
-    <id>235</id>
-    <latitude>55.9</latitude>
-    <longitude>73.5</longitude>
-    <name>Zombie Cave</name>
-    <type>Landmark</type>
-    <arrival_latitude>0</arrival_latitude>
-    <arrival_longitude>0</arrival_longitude>
-    <description>A cave with a lone zombie...  Nice one on one.&lt;BR&gt;Caves here, but no zombie (or other bad guys). &lt;I&gt;	-- Dunc 12/18/99 &lt;/i&gt;&lt;BR&gt;I couldnt find the cave &lt;I&gt;	-- Rimgar 3/8/2000 &lt;/i&gt;&lt;BR&gt;both the cave and the zombie are here but I cant see why anyone would come all this way just to kill one zombie... &lt;I&gt;	-- Sega Slayer 11/28/2000 &lt;/i&gt;</description>
-    <date_added>1999-09-02T00:00:00.0000000-07:00</date_added>
-    <last_update>2005-02-16T17:14:19.0970000-08:00</last_update>
-    <dungeon_id>
-    </dungeon_id>
-    <retired>N</retired>
-    <tod_req>0</tod_req>
-  </location>
-  <location>
     <id>236</id>
     <latitude>54</latitude>
     <longitude>73.9</longitude>
@@ -4309,22 +4261,6 @@
     <date_added>1999-09-07T00:00:00.0000000-07:00</date_added>
     <last_update>2005-02-17T16:36:14.5630000-08:00</last_update>
     <dungeon_id>0162</dungeon_id>
-    <retired>N</retired>
-    <tod_req>0</tod_req>
-  </location>
-  <location>
-    <id>272</id>
-    <latitude>34.4</latitude>
-    <longitude>64.8</longitude>
-    <name>small village</name>
-    <type>Landmark</type>
-    <arrival_latitude>0</arrival_latitude>
-    <arrival_longitude>0</arrival_longitude>
-    <description>2 houses, a portal to rithwic, good hunting, --Paaa&lt;BR&gt;Portal to Eastham..not rithwic..doh! &lt;I&gt;	-- Grainger 12/9/99 &lt;/i&gt;</description>
-    <date_added>1999-09-09T00:00:00.0000000-07:00</date_added>
-    <last_update>2005-02-16T17:14:19.0970000-08:00</last_update>
-    <dungeon_id>
-    </dungeon_id>
     <retired>N</retired>
     <tod_req>0</tod_req>
   </location>
@@ -6201,22 +6137,6 @@
     <tod_req>0</tod_req>
   </location>
   <location>
-    <id>391</id>
-    <latitude>2.3</latitude>
-    <longitude>63.2</longitude>
-    <name>RiverBend Tower</name>
-    <type>Landmark</type>
-    <arrival_latitude>0</arrival_latitude>
-    <arrival_longitude>0</arrival_longitude>
-    <description>Abandoned Tower thats good for staging.   &lt;I&gt; -- Yoshimura&lt;/i&gt;</description>
-    <date_added>1999-10-31T00:00:00.0000000-07:00</date_added>
-    <last_update>2005-02-16T17:14:19.0970000-08:00</last_update>
-    <dungeon_id>
-    </dungeon_id>
-    <retired>N</retired>
-    <tod_req>0</tod_req>
-  </location>
-  <location>
     <id>392</id>
     <latitude>4.5</latitude>
     <longitude>23.5</longitude>
@@ -6492,9 +6412,9 @@
   </location>
   <location>
     <id>409</id>
-    <latitude>34.4</latitude>
+    <latitude>33.9</latitude>
     <longitude>64.9</longitude>
-    <name>Mountaintop Lifestone</name>
+    <name>Fycheck Outpost Lifestone</name>
     <type>Lifestone</type>
     <arrival_latitude>0</arrival_latitude>
     <arrival_longitude>0</arrival_longitude>
@@ -6909,7 +6829,7 @@
     <id>435</id>
     <latitude>2.3</latitude>
     <longitude>63.2</longitude>
-    <name>River Bend Tower</name>
+    <name>Riverbend Tower</name>
     <type>Landmark</type>
     <arrival_latitude>0</arrival_latitude>
     <arrival_longitude>0</arrival_longitude>
@@ -6929,7 +6849,7 @@
     <type>Portal</type>
     <arrival_latitude>2.3</arrival_latitude>
     <arrival_longitude>63.2</arrival_longitude>
-    <description>Portal to the River Bend Tower, in the Dryreach Wilderness &lt;I&gt; -- RFH&lt;/i&gt;&lt;BR&gt;The portal drops you at coords:  &lt;I&gt;-- RFH 11/29/99 &lt;/i&gt;</description>
+    <description>Portal to the Riverbend Tower, in the Dryreach Wilderness &lt;I&gt; -- RFH&lt;/i&gt;&lt;BR&gt;The portal drops you at coords:  &lt;I&gt;-- RFH 11/29/99 &lt;/i&gt;</description>
     <date_added>1999-11-29T00:00:00.0000000-08:00</date_added>
     <last_update>2005-02-16T17:14:19.0970000-08:00</last_update>
     <dungeon_id>
@@ -9205,8 +9125,8 @@
   </location>
   <location>
     <id>579</id>
-    <latitude>-1.1</latitude>
-    <longitude>49.1</longitude>
+    <latitude>-0.8</latitude>
+    <longitude>51.6</longitude>
     <name>Lytelthorpe Meeting Hall</name>
     <type>Landmark</type>
     <arrival_latitude>0</arrival_latitude>
@@ -9994,22 +9914,6 @@
     <arrival_latitude>0</arrival_latitude>
     <arrival_longitude>0</arrival_longitude>
     <description>Bunker-like building full of black rats &lt;I&gt; -- Finn Djhala&lt;/i&gt;&lt;BR&gt;Now its three Mountain rats, and a Silver rat in a underground Tomb. &lt;I&gt; -- Zen Tek Ken 6/21/2003 &lt;/i&gt;</description>
-    <date_added>2000-02-27T00:00:00.0000000-08:00</date_added>
-    <last_update>2005-02-16T17:14:19.0970000-08:00</last_update>
-    <dungeon_id>
-    </dungeon_id>
-    <retired>N</retired>
-    <tod_req>0</tod_req>
-  </location>
-  <location>
-    <id>631</id>
-    <latitude>36</latitude>
-    <longitude>64.9</longitude>
-    <name>Zefir Ruins</name>
-    <type>Landmark</type>
-    <arrival_latitude>0</arrival_latitude>
-    <arrival_longitude>0</arrival_longitude>
-    <description>Just southeast of the Shoushi portal to Eastham. The area contains a tower with three to four Zombies and a couple of small dungeons populated by Zefirs and Black Rats.  White and Snowy Mattekars, a Spikey Dillo, and a Laigas Lugian stand guard to the east of the buildings. Wood Golems can be found a little further to the southeast. &lt;I&gt; -- Minas Tirith&lt;/i&gt;&lt;BR&gt;This spot appears to broken.  :(  The only monsters that spawn there now, as of 01/14/02, appear to be a Liagus Lugian + Amploth, one Barker Mossie in the western most bunker, and a random spawn farther to the west still on the little hill of Wood Golems and Jade Gromnie.  Reedsharks may occasionally spawn next to the lugians guarding the tower. &lt;I&gt; -- Dazar Tae--DT 1/14/2002 &lt;/i&gt;</description>
     <date_added>2000-02-27T00:00:00.0000000-08:00</date_added>
     <last_update>2005-02-16T17:14:19.0970000-08:00</last_update>
     <dungeon_id>
@@ -14183,22 +14087,6 @@
     <tod_req>0</tod_req>
   </location>
   <location>
-    <id>896</id>
-    <latitude>15</latitude>
-    <longitude>49.1</longitude>
-    <name>Statue Circle</name>
-    <type>Landmark</type>
-    <arrival_latitude>0</arrival_latitude>
-    <arrival_longitude>0</arrival_longitude>
-    <description>Entry is courtesy of   -- &lt;I&gt;Polecat&lt;/i&gt;&lt;BR&gt;This rock circle is midway along a section of standing stones running North South.  Its filled with mushrooms. &lt;I&gt;	-- Doc Feelgood 8/25/2000 &lt;/i&gt;</description>
-    <date_added>2000-07-06T00:00:00.0000000-07:00</date_added>
-    <last_update>2005-02-16T17:14:19.0970000-08:00</last_update>
-    <dungeon_id>
-    </dungeon_id>
-    <retired>N</retired>
-    <tod_req>0</tod_req>
-  </location>
-  <location>
     <id>897</id>
     <latitude>14.8</latitude>
     <longitude>48</longitude>
@@ -16212,7 +16100,7 @@
   <location>
     <id>1024</id>
     <latitude>33.34</latitude>
-    <longitude>67.95</longitude>
+    <longitude>68</longitude>
     <name>Drudge Grotto</name>
     <type>Landmark</type>
     <arrival_latitude>0</arrival_latitude>
@@ -16986,22 +16874,6 @@
     <arrival_longitude>0</arrival_longitude>
     <description>Small temple structure in the swamp, inhabited by a shaman and some mudlurks.  If you fight inside the temple expect lots of helpers to come in from the surrounding mire. &lt;I&gt; -- Doc Feelgood&lt;/i&gt;</description>
     <date_added>2000-10-07T00:00:00.0000000-07:00</date_added>
-    <last_update>2005-02-16T17:14:19.0970000-08:00</last_update>
-    <dungeon_id>
-    </dungeon_id>
-    <retired>N</retired>
-    <tod_req>0</tod_req>
-  </location>
-  <location>
-    <id>1073</id>
-    <latitude>34.4</latitude>
-    <longitude>64.9</longitude>
-    <name>Lifestone at Fycheck</name>
-    <type>Landmark</type>
-    <arrival_latitude>0</arrival_latitude>
-    <arrival_longitude>0</arrival_longitude>
-    <description>I have seen two rumors regarding Fycheck (one was handed to me by someone in Holtburg...didnt get his name... and the other I found on the ground near the West Shoushi Lifestone). Both rumors were entitled The Fycheck Outpost. Here are the two rumors, as written on the parchments. Fycheck was a Noble Sho warrior, known for his skill with the blade and for his being prone to wanderlust as no other Sho ever has. Indeed a great warrior, it is rumored he met his demise on a mountain plateau west of Shoushi. Hidetaki, his faithful Sifu heard of his students death and summoned warriors throughout the land to extract revenge on the creatures that caused the demise of his friend and student. Hidetakis forces were never seen alive again. As Hidetaki and his band of loyal warriors were extracting revenge on the creatures that killed the noble Fyckeck, four of the warriors panicked and fled the battlefield. After discovering a safe haven in an abandoned tower far to the south, the dishonored warriors were grief stricken that they had dishonored themselves by fleeing. Before they could commit Sepuku, to regain their honor, they were killed by a nearby wisp. Since they died with dishonor, they now haunt that tower as undead, hating the living with great passion. &lt;I&gt; -- Grundak&lt;/i&gt;</description>
-    <date_added>2000-10-08T00:00:00.0000000-07:00</date_added>
     <last_update>2005-02-16T17:14:19.0970000-08:00</last_update>
     <dungeon_id>
     </dungeon_id>
@@ -18605,22 +18477,6 @@
     <arrival_latitude>0</arrival_latitude>
     <arrival_longitude>0</arrival_longitude>
     <description>This is the tower four of Hidetakis warriors hid in after fleeing the battle field to avenge Fychecks death.  The warriors were killed by a nearby wisp and now haunt the tower as zombies. &lt;I&gt; -- Cuttler Strngmd&lt;/i&gt;</description>
-    <date_added>2000-12-30T00:00:00.0000000-08:00</date_added>
-    <last_update>2005-02-16T17:14:19.0970000-08:00</last_update>
-    <dungeon_id>
-    </dungeon_id>
-    <retired>N</retired>
-    <tod_req>0</tod_req>
-  </location>
-  <location>
-    <id>1175</id>
-    <latitude>36.2</latitude>
-    <longitude>65.1</longitude>
-    <name>Fycheck Outpost Stone Monument</name>
-    <type>Landmark</type>
-    <arrival_latitude>0</arrival_latitude>
-    <arrival_longitude>0</arrival_longitude>
-    <description>A stone monument south of Fychecks outpost that spawns 2 zefirs. &lt;I&gt; -- Cuttler Strngmd&lt;/i&gt;</description>
     <date_added>2000-12-30T00:00:00.0000000-08:00</date_added>
     <last_update>2005-02-16T17:14:19.0970000-08:00</last_update>
     <dungeon_id>
@@ -43757,22 +43613,6 @@ The best source of lore about the battle at Ayn Tayan is from Aerfalle's Letter.
     <tod_req>0</tod_req>
   </location>
   <location>
-    <id>2649</id>
-    <latitude>2.3</latitude>
-    <longitude>63.7</longitude>
-    <name>Riverbend Tower</name>
-    <type>Landmark</type>
-    <arrival_latitude>0.000</arrival_latitude>
-    <arrival_longitude>0.000</arrival_longitude>
-    <description>An empty tower with a view of the river, some trees and the hills. Scenic.</description>
-    <date_added>2000-08-10 00:00:00</date_added>
-    <last_update>0000-00-00 00:00:00</last_update>
-    <dungeon_id>
-    </dungeon_id>
-    <retired>N</retired>
-    <tod_req>0</tod_req>
-  </location>
-  <location>
     <id>2650</id>
     <latitude>5</latitude>
     <longitude>1.7</longitude>
@@ -43891,7 +43731,7 @@ The Naquib of Suntik hereby requests all available mercenaries to assist in the 
   </location>
   <location>
     <id>2657</id>
-    <latitude>36.4</latitude>
+    <latitude>36.25</latitude>
     <longitude>61.2</longitude>
     <name>Mosswart Cave</name>
     <type>Landmark</type>
@@ -44044,22 +43884,6 @@ Only a menhir ring now remains of the former dungeon.</description>
     <arrival_latitude>0.000</arrival_latitude>
     <arrival_longitude>0.000</arrival_longitude>
     <description>Quest(s): Nen Ai's Pet Drudge.</description>
-    <date_added>2000-10-13 00:00:00</date_added>
-    <last_update>0000-00-00 00:00:00</last_update>
-    <dungeon_id>
-    </dungeon_id>
-    <retired>N</retired>
-    <tod_req>0</tod_req>
-  </location>
-  <location>
-    <id>2667</id>
-    <latitude>33.4</latitude>
-    <longitude>68</longitude>
-    <name>Drudge Cave</name>
-    <type>Landmark</type>
-    <arrival_latitude>0.000</arrival_latitude>
-    <arrival_longitude>0.000</arrival_longitude>
-    <description>A cave directly west of the Shoushi west outpost. Formerly the location of Lou Ka's Yaoji and before that, Lou Ka lived in this cave himself. Now all that remains is a chest with low quality treasure.</description>
     <date_added>2000-10-13 00:00:00</date_added>
     <last_update>0000-00-00 00:00:00</last_update>
     <dungeon_id>
@@ -44606,9 +44430,9 @@ Image submitted by Kyn. Thanks!
   </location>
   <location>
     <id>2699</id>
-    <latitude>55.8</latitude>
-    <longitude>73.6</longitude>
-    <name>Zombie Cave</name>
+    <latitude>56.0</latitude>
+    <longitude>73.5</longitude>
+    <name>Runed Chest</name>
     <type>Landmark</type>
     <arrival_latitude>0.000</arrival_latitude>
     <arrival_longitude>0.000</arrival_longitude>
@@ -45753,7 +45577,7 @@ As you sit and pray at the small shrine you see a small note resting on the top.
     <type>Landmark</type>
     <arrival_latitude>0.000</arrival_latitude>
     <arrival_longitude>0.000</arrival_longitude>
-    <description>A runed chest at the old abandoned Sho outpost near the Eastham portal.  There used to be a nearby Lifestone, but it was moved into the center of Shoushi.</description>
+    <description>A runed chest at the old abandoned Sho outpost near the Eastham portal.</description>
     <date_added>2004-01-29 00:00:00</date_added>
     <last_update>0000-00-00 00:00:00</last_update>
     <dungeon_id>
