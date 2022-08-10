@@ -3739,17 +3739,17 @@ namespace ACE.Server.Command.Handlers.Processors
                 if (entry.Value != (int)WeenieType.Creature)
                     continue;
 
-                var obj = WorldObjectFactory.CreateNewWorldObject(entry.Key);
-                var creature = obj as Creature;
-                if (creature.WeenieClassId != 1 && creature.PlayerKillerStatus != PlayerKillerStatus.RubberGlue && creature.PlayerKillerStatus != PlayerKillerStatus.Protected)
+                var weenie = DatabaseManager.World.GetWeenie(entry.Key);
+                var playerKillerStatus = (PlayerKillerStatus?)weenie.GetProperty(PropertyInt.PlayerKillerStatus) ?? PlayerKillerStatus.NPK;
+                if (weenie.ClassId != 1 && playerKillerStatus != PlayerKillerStatus.RubberGlue && playerKillerStatus != PlayerKillerStatus.Protected)
                 {
-                    //var level = CalculateLevel(creature);
-                    //fileWriter.WriteLine($"{creature.Level}\t{level}\t{level - creature.Level}\t{creature.Name}\t{creature.WeenieClassId}\t{creature.WeenieClassName}\t{creature.CreatureType}");
-                    fileWriter.WriteLine($"{creature.Name}\t{creature.Level}\t{creature.CreatureType}\t{creature.WeenieClassId}\t{creature.WeenieClassName}");
+                    var name = weenie.GetProperty(PropertyString.Name);
+                    var level = weenie.GetProperty(PropertyInt.Level);
+                    var creatureType = (CreatureType?)weenie.GetProperty(PropertyInt.CreatureType);
+
+                    fileWriter.WriteLine($"{name}\t{level}\t{creatureType}\t{weenie.ClassId}\t{weenie.ClassName}");
                     fileWriter.Flush();
                 }
-
-                creature.Destroy();
             }
 
             fileWriter.Close();
@@ -3877,5 +3877,230 @@ namespace ACE.Server.Command.Handlers.Processors
 
         //    return level;
         //}
+
+        [CommandHandler("export-creature-tier-report", AccessLevel.Developer, CommandHandlerFlag.None, 0, "", "")]
+        public static void HandleExporCreatureTierReport(Session session, params string[] parameters)
+        {
+            CommandHandlerHelper.WriteOutputInfo(session, "Exporting creature tier discrepancies to reports/CreatureTierDiscrepancies.txt...");
+
+            var contentFolder = VerifyContentFolder(session, false);
+
+            var sep = Path.DirectorySeparatorChar;
+            var folder = new DirectoryInfo($"{contentFolder.FullName}{sep}reports{sep}");
+
+            if (!folder.Exists)
+                folder.Create();
+
+            var filename = $"{folder.FullName}{sep}CreatureTierDiscrepancies.txt";
+
+            var fileWriter = new StreamWriter(filename);
+
+            fileWriter.WriteLine("ClassId\tClassName\tLevel\tTier\tDeathTreasureId");
+
+            var WeenieTypes = DatabaseManager.World.GetAllWeenieTypes();
+            var treasureDeath = DatabaseManager.World.GetAllTreasureDeath();
+
+            foreach (var weenieTypeEntry in WeenieTypes)
+            {
+                if (weenieTypeEntry.Value != (int)WeenieType.Creature)
+                    continue;
+
+                var weenie = DatabaseManager.World.GetWeenie(weenieTypeEntry.Key);
+                var deathTreasure = weenie.GetProperty(PropertyDataId.DeathTreasureType) ?? 0;
+                var level = weenie.GetProperty(PropertyInt.Level) ?? 0;
+
+                if (level != 0 && deathTreasure != 0 && treasureDeath.ContainsKey(deathTreasure))
+                {
+                    var creatureLootTier = treasureDeath[deathTreasure].Tier;
+
+                    bool discrepant = false;
+                    switch (creatureLootTier)
+                    {
+                        case 1:
+                            if (level > 40)
+                                discrepant = true;
+                            break;
+                        case 2:
+                            if (level < 28 || level > 65)
+                                discrepant = true;
+                            break;
+                        case 3:
+                            if (level < 55 || level > 95)
+                                discrepant = true;
+                            break;
+                        case 4:
+                            if (level < 85 || level > 115)
+                                discrepant = true;
+                            break;
+                        case 5:
+                            if (level < 100 || level >= 210)
+                                discrepant = true;
+                            break;
+                        case 6:
+                            if (level < 120)
+                                discrepant = true;
+                            break;
+                    }
+
+                    if (discrepant)
+                    {
+                        fileWriter.WriteLine($"{weenie.ClassId}\t{weenie.ClassName}\t{level}\t{creatureLootTier}\t{deathTreasure}");
+                        fileWriter.Flush();
+                    }
+                }
+            }
+
+            fileWriter.Close();
+            CommandHandlerHelper.WriteOutputInfo(session, "Done.");
+        }
+
+        [CommandHandler("export-chest-tier-report", AccessLevel.Developer, CommandHandlerFlag.None, 0, "", "")]
+        public static void HandleExportChestTierReport(Session session, params string[] parameters)
+        {
+            CommandHandlerHelper.WriteOutputInfo(session, "Exporting chest tier discrepancies to reports/ChestTierDiscrepancies.txt...");
+
+            var contentFolder = VerifyContentFolder(session, false);
+
+            var sep = Path.DirectorySeparatorChar;
+            var folder = new DirectoryInfo($"{contentFolder.FullName}{sep}reports{sep}");
+
+            if (!folder.Exists)
+                folder.Create();
+
+            var filename = $"{folder.FullName}{sep}ChestTierDiscrepancies.txt";
+
+            var fileWriter = new StreamWriter(filename);
+
+            fileWriter.WriteLine("ClassId\tClassName\tTier\tHighestCreatureTier\tCount\tLandblock\tLocation");
+
+            var WeenieTypes = DatabaseManager.World.GetAllWeenieTypes();
+            var treasureDeath = DatabaseManager.World.GetAllTreasureDeath();
+
+            foreach (var weenieTypeEntry in WeenieTypes)
+            {
+                if (weenieTypeEntry.Value != (int)WeenieType.Chest && weenieTypeEntry.Value != (int)WeenieType.Container && weenieTypeEntry.Value != (int)WeenieType.Generic)
+                    continue;
+
+                var weenie = DatabaseManager.World.GetWeenie(weenieTypeEntry.Key);
+                if (weenie.WeeniePropertiesGenerator == null || weenie.WeeniePropertiesGenerator.Count == 0)
+                    continue;
+
+                var chestLootTier = 0;
+                foreach (var generatorEntry in weenie.WeeniePropertiesGenerator)
+                {
+                    if (((RegenLocationType)generatorEntry.WhereCreate).HasFlag(RegenLocationType.Treasure))
+                    {
+                        if (treasureDeath.ContainsKey(generatorEntry.WeenieClassId))
+                        {
+                            var generatorEntryLootTier = treasureDeath[generatorEntry.WeenieClassId].Tier;
+                            if (chestLootTier < generatorEntryLootTier)
+                                chestLootTier = generatorEntryLootTier;
+                        }
+                    }
+                }
+
+                if (chestLootTier == 0)
+                    continue;
+
+                var instances = DatabaseManager.World.GetLandblockInstancesByWcid(weenieTypeEntry.Key);
+
+                foreach(var instance in instances)
+                {
+                    var landblockInstances = DatabaseManager.World.GetCachedInstancesByLandblock((ushort)instance.Landblock.Value);
+
+                    Dictionary<int, int> creatureLootTiersCount = new Dictionary<int, int>();
+                    foreach (var landblockEntry in landblockInstances)
+                    {
+                        if(WeenieTypes.TryGetValue(landblockEntry.WeenieClassId, out var instanceWeenieType))
+                        {
+                            uint deathTreasure = 0;
+
+                            if (instanceWeenieType == (int)WeenieType.Generic)
+                            {
+                                var instanceWeenie = DatabaseManager.World.GetWeenie(landblockEntry.WeenieClassId);
+
+                                if (instanceWeenie.WeeniePropertiesGenerator == null || instanceWeenie.WeeniePropertiesGenerator.Count == 0)
+                                    continue;
+
+                                var highestLootTier = 0;
+                                uint highestLootTierDeathTreasure = 0;
+                                foreach (var generatorEntry in instanceWeenie.WeeniePropertiesGenerator)
+                                {
+                                    if (!((RegenLocationType)generatorEntry.WhereCreate).HasFlag(RegenLocationType.Treasure))
+                                    {
+                                        if (WeenieTypes.TryGetValue(generatorEntry.WeenieClassId, out var generatorEntryWeenieType) && generatorEntryWeenieType == (int)WeenieType.Creature)
+                                        {
+                                            var generatorEntryWeenie = DatabaseManager.World.GetWeenie(generatorEntry.WeenieClassId);
+                                            var generatorEntryDeathTreasure = generatorEntryWeenie.GetProperty(PropertyDataId.DeathTreasureType) ?? 0;
+
+                                            if (treasureDeath.ContainsKey(generatorEntryDeathTreasure))
+                                            {
+                                                var generatorEntryLootTier = treasureDeath[generatorEntryDeathTreasure].Tier;
+                                                if (highestLootTier < generatorEntryLootTier)
+                                                {
+                                                    highestLootTier = generatorEntryLootTier;
+                                                    highestLootTierDeathTreasure = generatorEntryDeathTreasure;
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+
+                                if (highestLootTierDeathTreasure == 0)
+                                    continue;
+
+                                deathTreasure = highestLootTierDeathTreasure;
+                            }
+                            else if (instanceWeenieType == (int)WeenieType.Creature)
+                            {
+                                var instanceWeenie = DatabaseManager.World.GetWeenie(landblockEntry.WeenieClassId);
+                                deathTreasure = instanceWeenie.GetProperty(PropertyDataId.DeathTreasureType) ?? 0;
+                            }
+
+                            if (deathTreasure != 0 && treasureDeath.ContainsKey(deathTreasure))
+                            {
+                                var creatureLootTier = treasureDeath[deathTreasure].Tier;
+                                if (creatureLootTiersCount.ContainsKey(creatureLootTier))
+                                    creatureLootTiersCount[creatureLootTier]++;
+                                else
+                                    creatureLootTiersCount.Add(creatureLootTier, 1);
+                            }
+                        }
+                    }
+
+                    var creatureCountThreshold = 5;
+                    var highestCreatureLootTier = 0;
+                    var highestCreatureLootTierCount = 0;
+                    while (creatureCountThreshold > 0)
+                    {
+                        foreach (var entry in creatureLootTiersCount)
+                        {
+                            if (entry.Value < creatureCountThreshold)
+                                continue;
+
+                            if (highestCreatureLootTier < entry.Key)
+                            {
+                                highestCreatureLootTier = entry.Key;
+                                highestCreatureLootTierCount = entry.Value;
+                            }
+                        }
+
+                        if (highestCreatureLootTier == 0)
+                            creatureCountThreshold--;
+                        else
+                            break;
+                    }
+
+                    if (chestLootTier > highestCreatureLootTier)
+                    {
+                        fileWriter.WriteLine($"{weenie.ClassId}\t{weenie.ClassName}\t{chestLootTier}\t{highestCreatureLootTier}\t{highestCreatureLootTierCount}\t0x{instance.ObjCellId:X8}\t@teleloc 0x{instance.ObjCellId:X8} [{instance.OriginX:F6} {instance.OriginY:F6} {instance.OriginZ:F6}] {instance.AnglesW:F6} {instance.AnglesX:F6} {instance.AnglesY:F6} {instance.AnglesZ:F6}");
+                        fileWriter.Flush();
+                    }
+                }
+            }
+
+            fileWriter.Close();
+            CommandHandlerHelper.WriteOutputInfo(session, "Done.");
+        }
     }
 }

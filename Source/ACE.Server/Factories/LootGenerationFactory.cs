@@ -169,24 +169,27 @@ namespace ACE.Server.Factories
                     return tweakedDeathTreasure;
                 }
 
-                // Temporary fix to mismatched high tier containers and generators in low level places, todo: fix it in the data.
-                switch (deathTreasureId)
+                if (Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.Infiltration)
                 {
-                    case 4: deathTreasureId = 6; break;
-                    case 16: deathTreasureId = 18; break;
-                    case 313: deathTreasureId = 453; break;
-                    case 457: deathTreasureId = 459; break;
-                    case 463: deathTreasureId = 465; break;
-                    case 15: deathTreasureId = 18; break;
-                    case 462: deathTreasureId = 465; break;
-                    case 460: deathTreasureId = 462; break;
+                    // Fix for mismatched high tier containers and generators in low level places, CustomDM has these fixed in the data files themselves.
+                    switch (deathTreasureId)
+                    {
+                        case 4: deathTreasureId = 6; break;
+                        case 16: deathTreasureId = 18; break;
+                        case 313: deathTreasureId = 453; break;
+                        case 457: deathTreasureId = 459; break;
+                        case 463: deathTreasureId = 465; break;
+                        case 15: deathTreasureId = 18; break;
+                        case 462: deathTreasureId = 465; break;
+                        case 460: deathTreasureId = 462; break;
 
-                    case 3: deathTreasureId = 4; break;
-                    case 13: deathTreasureId = 16; break;
-                    case 454: deathTreasureId = 457; break;
+                        case 3: deathTreasureId = 4; break;
+                        case 13: deathTreasureId = 16; break;
+                        case 454: deathTreasureId = 457; break;
 
-                    case 1: deathTreasureId = 3; break;
-                    case 456: deathTreasureId = 457; break;
+                        case 1: deathTreasureId = 3; break;
+                        case 456: deathTreasureId = 457; break;
+                    }
                 }
 
                 deathTreasure = DatabaseManager.World.GetCachedDeathTreasure(deathTreasureId);
