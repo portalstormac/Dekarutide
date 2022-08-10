@@ -3076,22 +3076,6 @@
     <tod_req>0</tod_req>
   </location>
   <location>
-    <id>197</id>
-    <latitude>4.2</latitude>
-    <longitude>17.3</longitude>
-    <name>Druge Cave</name>
-    <type>Dungeon</type>
-    <arrival_latitude>0</arrival_latitude>
-    <arrival_longitude>0</arrival_longitude>
-    <description>Great place for a small party to get exp and loot - merchant with everything (except trade notes &amp; spells) right on the surface. Outside Samsur - if memory serves.</description>
-    <date_added>1999-08-20T00:00:00.0000000-07:00</date_added>
-    <last_update>2005-02-16T17:14:19.0970000-08:00</last_update>
-    <dungeon_id>
-    </dungeon_id>
-    <retired>N</retired>
-    <tod_req>0</tod_req>
-  </location>
-  <location>
     <id>198</id>
     <latitude>52.1</latitude>
     <longitude>80.3</longitude>
@@ -8711,27 +8695,11 @@
     <id>553</id>
     <latitude>-12.4</latitude>
     <longitude>-73.7</longitude>
-    <name>Tumerok Fortress Portal (Overlord Quest)</name>
+    <name>Tumerok Fortress Portal</name>
     <type>Dungeon</type>
     <arrival_latitude>0</arrival_latitude>
     <arrival_longitude>0</arrival_longitude>
     <description>Home of the Tumerok Overlord and his uber chest.  High lockpick is almost essential here.  This dungeon portal is in the tower of the huge, heavily populated Tumerok Fortress.  Level 20+, tieable, but not summonable.  You can sneak around the back and tie to the portal without having to go in the fort.  You can then portal recall inside.  If you wish to save your tie, you can pick the entry door on the South side, the resistance is 650.  There is also a key for this door, and keys for all the other doors in the dungeon.  See the writeup at Maggie the Jackcats site for more details.  After running around the dungeon a bit, you come to an octagonal room with blue gemstones.  In the south wall near 2 blue gemstone pillars there is a secret passage to the final diff 700 locked door to the Overlords chamber.   The Overlord is guarded by Virindi Preceptors and a few Tumeroks.   He has a lightning Overlords quest sword that is no drop, and a no drop key to his chest.  &lt;I&gt; -- Doc Feelgood  -- Anon  -- Zimbalt/Hirachi -- Taarna Blood SC&lt;/i&gt;&lt;br&gt; He drops a key (1 week timer) for his chest which has 20-60 sing-quality items in it (good chance at something decent). Ive done this quest many times throughout the years, it does not require lockpick. There is a long quest for the keys, but they are not required either. The route is much longer without lockpick, but its doable. &lt;I&gt;-- Driden of Frostfell 11/5/2003&lt;/i&gt;&lt;br&gt;Come and see the happy Tumerok Champions, as they jump on your head from above. Come see the Augmented Tumeroks, and Ascendants, who are always delighted to show off their magic. Come and have your toes nibbled by half a dozen Wasteland Rats. Come and unlock those locked doors and the Overlords Chest.  Come and visit the imprisoned monsters and a bizarre floor full of mushrooms. Surrounded by about a dozen ever-friendly Virindi Preceptors is a Tumerok Overlord, who will be happy to slap you about a bit after youve been turned into a quivering wreck of weakness, frailty and slowness by his hooded companions.&lt;I&gt;-- Goldhart&lt;/i&gt;</description>
-    <date_added>2000-02-13T00:00:00.0000000-08:00</date_added>
-    <last_update>2005-02-16T17:14:19.0970000-08:00</last_update>
-    <dungeon_id>
-    </dungeon_id>
-    <retired>N</retired>
-    <tod_req>0</tod_req>
-  </location>
-  <location>
-    <id>554</id>
-    <latitude>-10.5</latitude>
-    <longitude>-68.8</longitude>
-    <name>Huge Tumerok Fort</name>
-    <type>Landmark</type>
-    <arrival_latitude>0</arrival_latitude>
-    <arrival_longitude>0</arrival_longitude>
-    <description>Its big, Jim!  Eight towers and over 30 tumeroks and drudges inside, about equal numbers guarding the walls on the outside.  At least one High Tumerok.  Approach from the east ridge line, west ridge side is full of shadows and gromnies.  Front Door is on the south, and very hard to pick. If youve got an army looking for something to do, bring it here. &lt;I&gt; -- Doc Feelgood&lt;/i&gt;&lt;BR&gt;Inside it is easy to get overpowered by the Tumerok Officers, Gladiators, and High Tumeroks.  There are also three Gold Wasps that do their best to get in your way.  Checkout the tower with the dungon portal, which has some spooky lights. &lt;I&gt; 4/7/2000 &lt;/i&gt;</description>
     <date_added>2000-02-13T00:00:00.0000000-08:00</date_added>
     <last_update>2005-02-16T17:14:19.0970000-08:00</last_update>
     <dungeon_id>
@@ -19211,22 +19179,6 @@
     <arrival_longitude>0</arrival_longitude>
     <description>very small cave, mosswart feeders and creepers will attack upon enter &lt;I&gt;	-- Black Hand 4/16/2001 &lt;/i&gt;</description>
     <date_added>2001-03-03T00:00:00.0000000-08:00</date_added>
-    <last_update>2005-02-16T17:14:19.0970000-08:00</last_update>
-    <dungeon_id>
-    </dungeon_id>
-    <retired>N</retired>
-    <tod_req>0</tod_req>
-  </location>
-  <location>
-    <id>1222</id>
-    <latitude>21.9</latitude>
-    <longitude>0.9</longitude>
-    <name>Drudge camp</name>
-    <type>Landmark</type>
-    <arrival_latitude>0</arrival_latitude>
-    <arrival_longitude>0</arrival_longitude>
-    <description>Small camp of drudges, one prowler and two skulkers. Battered remains of humans with mining tools scattered around. &lt;I&gt; -- Lothar&lt;/i&gt;</description>
-    <date_added>2001-03-04T00:00:00.0000000-08:00</date_added>
     <last_update>2005-02-16T17:14:19.0970000-08:00</last_update>
     <dungeon_id>
     </dungeon_id>
@@ -45960,22 +45912,6 @@ A small statue that looks just a little too life-like for comfort.</description>
     <tod_req>0</tod_req>
   </location>
   <location>
-    <id>2782</id>
-    <latitude>21.9</latitude>
-    <longitude>0.1</longitude>
-    <name>Drudge Camp</name>
-    <type>Landmark</type>
-    <arrival_latitude>0.000</arrival_latitude>
-    <arrival_longitude>0.000</arrival_longitude>
-    <description>A small drudge camp with a regular chest.</description>
-    <date_added>2004-03-21 00:00:00</date_added>
-    <last_update>0000-00-00 00:00:00</last_update>
-    <dungeon_id>
-    </dungeon_id>
-    <retired>N</retired>
-    <tod_req>0</tod_req>
-  </location>
-  <location>
     <id>2783</id>
     <latitude>27.5</latitude>
     <longitude>71</longitude>
@@ -46089,22 +46025,6 @@ Killed by a Red Rat.</description>
     <arrival_longitude>0.000</arrival_longitude>
     <description>A chess board where players can challenge each other to a match.</description>
     <date_added>2004-05-18 00:00:00</date_added>
-    <last_update>0000-00-00 00:00:00</last_update>
-    <dungeon_id>
-    </dungeon_id>
-    <retired>N</retired>
-    <tod_req>0</tod_req>
-  </location>
-  <location>
-    <id>2790</id>
-    <latitude>25.8</latitude>
-    <longitude>-46.9</longitude>
-    <name>Dires Great Lighthouse</name>
-    <type>Landmark</type>
-    <arrival_latitude>0.000</arrival_latitude>
-    <arrival_longitude>0.000</arrival_longitude>
-    <description>Updated during the Treaties in Stone event</description>
-    <date_added>2004-07-15 00:00:00</date_added>
     <last_update>0000-00-00 00:00:00</last_update>
     <dungeon_id>
     </dungeon_id>
