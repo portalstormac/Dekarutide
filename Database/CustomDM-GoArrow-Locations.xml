@@ -8453,13 +8453,13 @@
   </location>
   <location>
     <id>538</id>
-    <latitude>-9.2</latitude>
+    <latitude>-9.0</latitude>
     <longitude>-65.7</longitude>
-    <name>Dungeon/Fort</name>
+    <name>Tumerok Base</name>
     <type>Dungeon</type>
     <arrival_latitude>0</arrival_latitude>
     <arrival_longitude>0</arrival_longitude>
-    <description>Dungeon in a partial fort on the path between Fort Tet and the North Direlands entrance. This was a run-by so details are sketchy.  Outside is rich, there are Skeleton Lords, Tumerocs, Shadows and Iron Golems.  No details on portal or on inside.   &lt;I&gt; -- Doc Feelgood&lt;/i&gt;&lt;BR&gt;The name of this place is Tumerok Base &lt;I&gt;	-- Shoto Fle-Alch 2/10/00 &lt;/i&gt;&lt;BR&gt;This dungeon is full of tumeroks.  Mostly warriors, gladiators, and priests.  1 high tumerk and 1 high priest at the end.  This dungeon is a long windy one way type of deal.  You have to lockpick 5 or 6 doors.  At the very end of the dungeon are 2 chests which spawn crappy loot.  Dont come to this dungeon tumeroks are not worth it nor is the loot. &lt;I&gt;	-- Moe 2/10/00 &lt;/i&gt;</description>
+    <description>Dungeon in a partial fort on the path between Fort Teth and the North Direlands entrance. This was a run-by so details are sketchy.  Outside is rich, there are Skeleton Lords, Tumerocs, Shadows and Iron Golems.  No details on portal or on inside.   &lt;I&gt; -- Doc Feelgood&lt;/i&gt;&lt;BR&gt;The name of this place is Tumerok Base &lt;I&gt;	-- Shoto Fle-Alch 2/10/00 &lt;/i&gt;&lt;BR&gt;This dungeon is full of tumeroks.  Mostly warriors, gladiators, and priests.  1 high tumerk and 1 high priest at the end.  This dungeon is a long windy one way type of deal.  You have to lockpick 5 or 6 doors.  At the very end of the dungeon are 2 chests which spawn crappy loot.  Dont come to this dungeon tumeroks are not worth it nor is the loot. &lt;I&gt;	-- Moe 2/10/00 &lt;/i&gt;</description>
     <date_added>2000-02-09T00:00:00.0000000-08:00</date_added>
     <last_update>2005-02-16T17:14:19.0970000-08:00</last_update>
     <dungeon_id>
@@ -12524,7 +12524,7 @@
     <id>799</id>
     <latitude>34.5</latitude>
     <longitude>-49.8</longitude>
-    <name>Sm Fort</name>
+    <name>Small Fort</name>
     <type>Landmark</type>
     <arrival_latitude>0</arrival_latitude>
     <arrival_longitude>0</arrival_longitude>
