@@ -1478,19 +1478,19 @@ namespace ACE.Server.Command.Handlers
             var targetID = session.Player.CurrentAppraisalTarget;
             if (targetID == null)
             {
-                Console.WriteLine("ERROR: no appraisal target");
+                CommandHandlerHelper.WriteOutputInfo(session, "ERROR: no appraisal target");
                 return;
             }
             var targetGuid = new ObjectGuid(targetID.Value);
             var target = session.Player.CurrentLandblock?.GetObject(targetGuid);
             if (target == null)
             {
-                Console.WriteLine("Couldn't find " + targetGuid);
+                CommandHandlerHelper.WriteOutputInfo(session, "Couldn't find " + targetGuid);
                 return;
             }
 
             var visible = session.Player.IsDirectVisible(target);
-            Console.WriteLine("Visible: " + visible);
+            CommandHandlerHelper.WriteOutputInfo(session, "Visible: " + visible);
         }
 
         [CommandHandler("showstats", AccessLevel.Developer, CommandHandlerFlag.RequiresWorld, 0, "Shows a list of a creature's current attribute/skill levels", "showstats")]
