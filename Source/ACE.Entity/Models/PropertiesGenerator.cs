@@ -30,11 +30,6 @@ namespace ACE.Entity.Models
         public float? AnglesY { get; set; }
         public float? AnglesZ { get; set; }
 
-        /// <summary>
-        /// This is only used to tie this property back to a landblock instance when this was created by a landblock instance link
-        /// </summary>
-        public uint LandblockInstanceGuid = 0;
-
         public PropertiesGenerator Clone()
         {
             var result = new PropertiesGenerator

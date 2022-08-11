@@ -2954,10 +2954,6 @@ namespace ACE.Server.Command.Handlers
             session.Network.EnqueueSend(new GameMessageSystemChat($"Location: {wo.Location?.ToLOCStringAlt()}", ChatMessageType.Broadcast));
             session.Network.EnqueueSend(new GameMessageSystemChat($"Physics : {wo.PhysicsObj?.Position}", ChatMessageType.Broadcast));
             session.Network.EnqueueSend(new GameMessageSystemChat($"CurCell: 0x{wo.PhysicsObj?.CurCell?.ID:X8}", ChatMessageType.Broadcast));
-            if(wo.Guid.IsStatic())
-                session.Network.EnqueueSend(new GameMessageSystemChat($"LandblockInstanceGuid: 0x{wo.Guid.Full:X8}", ChatMessageType.Broadcast));
-            else if(wo.LandblockInstanceGuid != 0)
-                session.Network.EnqueueSend(new GameMessageSystemChat($"LandblockInstanceGuid: 0x{wo.LandblockInstanceGuid:X8}", ChatMessageType.Broadcast));
         }
 
         [CommandHandler("damagehistory", AccessLevel.Developer, CommandHandlerFlag.RequiresWorld)]
@@ -3103,8 +3099,12 @@ namespace ACE.Server.Command.Handlers
         {
             var wo = CommandHandlerHelper.GetLastAppraisedObject(session);
 
+            uint? staticGuid = null;
+            if (!wo.Guid.IsStatic() && wo.Generator != null)
+                staticGuid = wo.Generator.GetStaticGuid(wo.Guid.Full);
+
             if (wo != null)
-                session.Network.EnqueueSend(new GameMessageSystemChat($"GUID: {wo.Guid}\nWeenieClassId: {wo.WeenieClassId}\nWeenieClassName: {wo.WeenieClassName}", ChatMessageType.Broadcast));
+                session.Network.EnqueueSend(new GameMessageSystemChat($"GUID: {wo.Guid}{(staticGuid != null ? $"\nLandblockInstanceGUID: {staticGuid.Value.ToString("x8")}" : "")}\nWeenieClassId: {wo.WeenieClassId}\nWeenieClassName: {wo.WeenieClassName}", ChatMessageType.Broadcast));
         }
 
         public static WorldObject LastTestAim;

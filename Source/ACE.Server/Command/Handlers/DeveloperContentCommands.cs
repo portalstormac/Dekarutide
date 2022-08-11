@@ -1108,6 +1108,86 @@ namespace ACE.Server.Command.Handlers.Processors
 
         public static LandblockInstanceWriter LandblockInstanceWriter;
 
+        [CommandHandler("replaceinst", AccessLevel.Developer, CommandHandlerFlag.RequiresWorld, 1, "Replaces the last appraised object from the current landblock instances with a new wcid or classname", "<wcid or classname>")]
+        public static void HandleReplaceInst(Session session, params string[] parameters)
+        {
+            var obj = CommandHandlerHelper.GetLastAppraisedObject(session);
+
+            if (obj?.Location == null)
+            {
+                session.Network.EnqueueSend(new GameMessageSystemChat($"Invalid target.", ChatMessageType.Broadcast));
+                return;
+            }
+
+            var location = obj.Location;
+
+            // ensure landblock instance
+            uint objGuid = obj.Guid.Full;
+            if (!obj.Guid.IsStatic())
+            {
+                uint? staticGuid = null;
+                if (obj.Generator != null)
+                {
+                    // if generator child, try getting the "real" guid
+                    staticGuid = obj.Generator.GetStaticGuid(objGuid);
+                    if (staticGuid != null)
+                        objGuid = staticGuid.Value;
+                }
+
+                if (staticGuid == null)
+                {
+                    session.Network.EnqueueSend(new GameMessageSystemChat($"{obj.Name} ({obj.Guid}) is not landblock instance", ChatMessageType.Broadcast));
+                    return;
+                }
+            }
+
+            var landblock = (ushort)obj.Location.Landblock;
+            var instances = DatabaseManager.World.GetCachedInstancesByLandblock(landblock);
+
+            var instance = instances.FirstOrDefault(i => i.Guid == objGuid);
+
+            if (instance == null)
+            {
+                session.Network.EnqueueSend(new GameMessageSystemChat($"Couldn't find landblock_instance for {obj.WeenieClassId} - {obj.Name} (0x{objGuid:X8})", ChatMessageType.Broadcast));
+                return;
+            }
+
+            LandblockInstanceLink link = null;
+            if (instance.IsLinkChild)
+            {
+                foreach (var parent in instances.Where(i => i.LandblockInstanceLink.Count > 0))
+                {
+                    link = parent.LandblockInstanceLink.FirstOrDefault(i => i.ChildGuid == instance.Guid);
+
+                    if (link != null)
+                        break;
+                }
+
+                if (link == null)
+                {
+                    session.Network.EnqueueSend(new GameMessageSystemChat($"Couldn't find parent link for child {obj.WeenieClassId} - {obj.Name} (0x{objGuid:X8})", ChatMessageType.Broadcast));
+                    return;
+                }
+            }
+
+            Weenie weenie = null;
+
+            var WcidOrClassName = parameters[0];
+            if (uint.TryParse(WcidOrClassName, out var wcid))
+                weenie = DatabaseManager.World.GetWeenie(wcid);   // wcid
+            else
+                weenie = DatabaseManager.World.GetWeenie(WcidOrClassName);  // classname
+
+            if (weenie == null)
+            {
+                session.Network.EnqueueSend(new GameMessageSystemChat($"Couldn't find weenie {WcidOrClassName}", ChatMessageType.Broadcast));
+                return;
+            }
+
+            RemoveInstance(session);
+            CreateLandblockInstance(session, weenie, location, link != null ? link.ParentGuid : 0, objGuid);     
+        }
+
         [CommandHandler("createinst", AccessLevel.Developer, CommandHandlerFlag.RequiresWorld, 1, "Spawns a new wcid or classname as a landblock instance", "<wcid or classname>")]
         public static void HandleCreateInst(Session session, params string[] parameters)
         {
@@ -1117,7 +1197,7 @@ namespace ACE.Server.Command.Handlers.Processors
 
             Weenie weenie = null;
 
-            uint? parentGuid = null;
+            uint parentGuid = 0;
 
             var landblock = session.Player.CurrentLandblock.Id.Landblock;
 
@@ -1175,6 +1255,30 @@ namespace ACE.Server.Command.Handlers.Processors
                 return;
             }
 
+            uint startGuid = 0;
+            // manually specify a start guid?
+            if (parameters.Length == 2)
+                uint.TryParse(parameters[1].Replace("0x", ""), NumberStyles.HexNumber, CultureInfo.InvariantCulture, out startGuid);
+
+            CreateLandblockInstance(session, weenie, loc, parentGuid, startGuid);
+        }
+
+        public static void CreateLandblockInstance(Session session, Weenie weenie, Position loc, uint parentGuid = 0, uint nextStaticGuid = 0)
+        {
+            if (weenie == null)
+            {
+                session.Network.EnqueueSend(new GameMessageSystemChat($"Invalid weenie.", ChatMessageType.Broadcast));
+                return;
+            }
+
+            if (loc == null)
+            {
+                session.Network.EnqueueSend(new GameMessageSystemChat($"Invalid location.", ChatMessageType.Broadcast));
+                return;
+            }
+
+            var landblock = loc.LandblockId.Landblock;
+
             // clear any cached instances for this landblock
             DatabaseManager.World.ClearCachedInstancesByLandblock(landblock);
 
@@ -1184,7 +1288,7 @@ namespace ACE.Server.Command.Handlers.Processors
             WorldObject parentObj = null;
             LandblockInstance parentInstance = null;
 
-            if (parentGuid != null)
+            if (parentGuid != 0)
             {
                 parentInstance = instances.FirstOrDefault(i => i.Guid == parentGuid);
 
@@ -1194,7 +1298,7 @@ namespace ACE.Server.Command.Handlers.Processors
                     return;
                 }
 
-                parentObj = session.Player.CurrentLandblock.GetObject(parentGuid.Value);
+                parentObj = session.Player.CurrentLandblock.GetObject(parentGuid);
 
                 if (parentObj == null)
                 {
@@ -1203,34 +1307,31 @@ namespace ACE.Server.Command.Handlers.Processors
                 }
             }
 
-            var nextStaticGuid = GetNextStaticGuid(landblock, instances);
-
+            var firstStaticGuid = 0x70000000 | (uint)landblock << 12;
             var maxStaticGuid = firstStaticGuid | 0xFFF;
 
             // manually specify a start guid?
-            if (parameters.Length == 2)
+            if (nextStaticGuid > 0)
             {
-                if (uint.TryParse(parameters[1].Replace("0x", ""), NumberStyles.HexNumber, CultureInfo.InvariantCulture, out var startGuid))
+                if (nextStaticGuid <= 0xFFF)
+                    nextStaticGuid = firstStaticGuid | nextStaticGuid;
+
+                if (nextStaticGuid < firstStaticGuid || nextStaticGuid > maxStaticGuid)
                 {
-                    if (startGuid <= 0xFFF)
-                        startGuid = firstStaticGuid | startGuid;
+                    session.Network.EnqueueSend(new GameMessageSystemChat($"Landblock instance guid {nextStaticGuid:X8} must be between {firstStaticGuid:X8} and {maxStaticGuid:X8}", ChatMessageType.Broadcast));
+                    return;
+                }
 
-                    if (startGuid < firstStaticGuid || startGuid > maxStaticGuid)
-                    {
-                        session.Network.EnqueueSend(new GameMessageSystemChat($"Landblock instance guid {startGuid:X8} must be between {firstStaticGuid:X8} and {maxStaticGuid:X8}", ChatMessageType.Broadcast));
-                        return;
-                    }
+                var existing = instances.FirstOrDefault(i => i.Guid == nextStaticGuid);
 
-                    var existing = instances.FirstOrDefault(i => i.Guid == startGuid);
-
-                    if (existing != null)
-                    {
-                        session.Network.EnqueueSend(new GameMessageSystemChat($"Landblock instance guid {startGuid:X8} already exists", ChatMessageType.Broadcast));
-                        return;
-                    }
-                    nextStaticGuid = startGuid;
+                if (existing != null)
+                {
+                    session.Network.EnqueueSend(new GameMessageSystemChat($"Landblock instance guid {nextStaticGuid:X8} already exists", ChatMessageType.Broadcast));
+                    return;
                 }
             }
+            else
+                nextStaticGuid = GetNextStaticGuid(landblock, instances);
 
             if (nextStaticGuid > maxStaticGuid)
             {
@@ -1274,7 +1375,7 @@ namespace ACE.Server.Command.Handlers.Processors
             }
 
             // create new landblock instance
-            var instance = CreateLandblockInstance(wo, isLinkChild);
+            var instance = CreateLandblockInstanceObj(wo, isLinkChild);
 
             instances.Add(instance);
 
@@ -1282,7 +1383,7 @@ namespace ACE.Server.Command.Handlers.Processors
             {
                 var link = new LandblockInstanceLink();
 
-                link.ParentGuid = parentGuid.Value;
+                link.ParentGuid = parentGuid;
                 link.ChildGuid = wo.Guid.Full;
                 link.LastModified = DateTime.Now;
 
@@ -1355,7 +1456,7 @@ namespace ACE.Server.Command.Handlers.Processors
             DatabaseManager.World.ClearCachedInstancesByLandblock(landblock);
         }
 
-        public static LandblockInstance CreateLandblockInstance(WorldObject wo, bool isLinkChild = false)
+        public static LandblockInstance CreateLandblockInstanceObj(WorldObject wo, bool isLinkChild = false)
         {
             var instance = new LandblockInstance();
 
@@ -2647,12 +2748,16 @@ namespace ACE.Server.Command.Handlers.Processors
             uint objGuid = obj.Guid.Full;
             if (!obj.Guid.IsStatic())
             {
-                if (obj.LandblockInstanceGuid != 0)
+                uint? staticGuid = null;
+                if (obj.Generator != null)
                 {
-                    // We're originated from a landblock instance link
-                    objGuid = obj.LandblockInstanceGuid;
+                    // if generator child, try getting the "real" guid
+                    staticGuid = obj.Generator.GetStaticGuid(objGuid);
+                    if (staticGuid != null)
+                        objGuid = staticGuid.Value;
                 }
-                else
+
+                if(staticGuid == null)
                 {
                     session.Network.EnqueueSend(new GameMessageSystemChat($"{obj.Name} ({obj.Guid}) is not landblock instance", ChatMessageType.Broadcast));
                     return;
@@ -2866,12 +2971,16 @@ namespace ACE.Server.Command.Handlers.Processors
             uint objGuid = obj.Guid.Full;
             if (!obj.Guid.IsStatic())
             {
-                if (obj.LandblockInstanceGuid != 0)
+                uint? staticGuid = null;
+                if (obj.Generator != null)
                 {
-                    // We're originated from a landblock instance link
-                    objGuid = obj.LandblockInstanceGuid;
+                    // if generator child, try getting the "real" guid
+                    staticGuid = obj.Generator.GetStaticGuid(objGuid);
+                    if (staticGuid != null)
+                        objGuid = staticGuid.Value;
                 }
-                else
+
+                if (staticGuid == null)
                 {
                     session.Network.EnqueueSend(new GameMessageSystemChat($"{obj.Name} ({obj.Guid}) is not landblock instance", ChatMessageType.Broadcast));
                     return;
