@@ -1119,8 +1119,6 @@ namespace ACE.Server.Command.Handlers.Processors
                 return;
             }
 
-            var location = obj.Location;
-
             // ensure landblock instance
             uint objGuid = obj.Guid.Full;
             if (!obj.Guid.IsStatic())
@@ -1151,6 +1149,8 @@ namespace ACE.Server.Command.Handlers.Processors
                 session.Network.EnqueueSend(new GameMessageSystemChat($"Couldn't find landblock_instance for {obj.WeenieClassId} - {obj.Name} (0x{objGuid:X8})", ChatMessageType.Broadcast));
                 return;
             }
+
+            var location = new Position(instance.ObjCellId, instance.OriginX, instance.OriginY, instance.OriginZ, instance.AnglesX, instance.AnglesY, instance.AnglesZ, instance.AnglesW);
 
             LandblockInstanceLink link = null;
             if (instance.IsLinkChild)
