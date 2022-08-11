@@ -3382,12 +3382,13 @@ namespace ACE.Server.Command.Handlers
         }
 
         /// <summary>
-        /// Shows the DeathTreasure tier for the last appraised monster
+        /// Shows the DeathTreasure tier for the last appraised monster, container or generator
         /// </summary>
-        [CommandHandler("showtier", AccessLevel.Developer, CommandHandlerFlag.RequiresWorld, "Shows the DeathTreasure tier for the last appraised monster")]
+        [CommandHandler("showtier", AccessLevel.Developer, CommandHandlerFlag.RequiresWorld, "Shows the DeathTreasure tier for the last appraised monster, container or generator")]
         public static void HandleShowTier(Session session, params string[] parameters)
         {
-            var creature = CommandHandlerHelper.GetLastAppraisedObject(session) as Creature;
+            var obj = CommandHandlerHelper.GetLastAppraisedObject(session);
+            var creature = obj as Creature;
 
             if (creature != null)
             {
@@ -3395,23 +3396,18 @@ namespace ACE.Server.Command.Handlers
 
                 CommandHandlerHelper.WriteOutputInfo(session, $"{creature.Name} ({creature.Guid}) {msg}");
             }
-            else
+            else if(obj != null && obj.GeneratorProfiles != null)
             {
-                var chest = CommandHandlerHelper.GetLastAppraisedObject(session) as Chest;
-
-                if (chest != null)
+                int counter = 1;
+                foreach (var generator in obj.GeneratorProfiles)
                 {
-                    int counter = 1;
-                    foreach (var generator in chest.GeneratorProfiles)
+                    if (generator.RegenLocationType.HasFlag(RegenLocationType.Treasure))
                     {
-                        if (generator.RegenLocationType.HasFlag(RegenLocationType.Treasure))
-                        {
-                            var treasure = LootGenerationFactory.GetTweakedDeathTreasureProfile(generator.Biota.WeenieClassId, chest);
+                        var treasure = LootGenerationFactory.GetTweakedDeathTreasureProfile(generator.Biota.WeenieClassId, obj);
 
-                            var msg = treasure != null ? $"Generator {counter} - DeathTreasure - Tier: {treasure.Tier} QualityMod: {treasure.LootQualityMod}" : "doesn't have a valid DeathTreasureType";
-                            counter++;
-                            CommandHandlerHelper.WriteOutputInfo(session, $"{chest.Name} ({chest.Guid}) {msg}");
-                        }
+                        var msg = treasure != null ? $"Generator {counter} - DeathTreasure - Tier: {treasure.Tier} QualityMod: {treasure.LootQualityMod}" : "doesn't have a valid DeathTreasureType";
+                        counter++;
+                        CommandHandlerHelper.WriteOutputInfo(session, $"{obj.Name} ({obj.Guid}) {msg}");
                     }
                 }
             }
