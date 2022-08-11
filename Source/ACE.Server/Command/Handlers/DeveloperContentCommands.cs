@@ -2644,10 +2644,19 @@ namespace ACE.Server.Command.Handlers.Processors
             if (obj == null) return;
 
             // ensure landblock instance
+            uint objGuid = obj.Guid.Full;
             if (!obj.Guid.IsStatic())
             {
-                session.Network.EnqueueSend(new GameMessageSystemChat($"{obj.Name} ({obj.Guid}) is not landblock instance", ChatMessageType.Broadcast));
-                return;
+                if (obj.LandblockInstanceGuid != 0)
+                {
+                    // We're originated from a landblock instance link
+                    objGuid = obj.LandblockInstanceGuid;
+                }
+                else
+                {
+                    session.Network.EnqueueSend(new GameMessageSystemChat($"{obj.Name} ({obj.Guid}) is not landblock instance", ChatMessageType.Broadcast));
+                    return;
+                }
             }
 
             if (obj.PhysicsObj == null)
@@ -2690,13 +2699,13 @@ namespace ACE.Server.Command.Handlers.Processors
             var nudge = dir * amount;
 
             // get landblock for static guid
-            var landblock_id = (ushort)(obj.Guid.Full >> 12);
+            var landblock_id = (ushort)(objGuid >> 12);
 
             // get instances for landblock
             var instances = DatabaseManager.World.GetCachedInstancesByLandblock(landblock_id);
 
             // find instance
-            var instance = instances.FirstOrDefault(i => i.Guid == obj.Guid.Full);
+            var instance = instances.FirstOrDefault(i => i.Guid == objGuid);
 
             if (instance == null)
             {
@@ -2854,10 +2863,19 @@ namespace ACE.Server.Command.Handlers.Processors
             if (obj == null) return;
 
             // ensure landblock instance
+            uint objGuid = obj.Guid.Full;
             if (!obj.Guid.IsStatic())
             {
-                session.Network.EnqueueSend(new GameMessageSystemChat($"{obj.Name} ({obj.Guid}) is not landblock instance", ChatMessageType.Broadcast));
-                return;
+                if (obj.LandblockInstanceGuid != 0)
+                {
+                    // We're originated from a landblock instance link
+                    objGuid = obj.LandblockInstanceGuid;
+                }
+                else
+                {
+                    session.Network.EnqueueSend(new GameMessageSystemChat($"{obj.Name} ({obj.Guid}) is not landblock instance", ChatMessageType.Broadcast));
+                    return;
+                }
             }
 
             if (obj.PhysicsObj == null)
@@ -2906,13 +2924,13 @@ namespace ACE.Server.Command.Handlers.Processors
             }
 
             // get landblock for static guid
-            var landblock_id = (ushort)(obj.Guid.Full >> 12);
+            var landblock_id = (ushort)(objGuid >> 12);
 
             // get instances for landblock
             var instances = DatabaseManager.World.GetCachedInstancesByLandblock(landblock_id);
 
             // find instance
-            var instance = instances.FirstOrDefault(i => i.Guid == obj.Guid.Full);
+            var instance = instances.FirstOrDefault(i => i.Guid == objGuid);
 
             if (instance == null)
             {

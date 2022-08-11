@@ -269,6 +269,8 @@ namespace ACE.Server.Entity
                 if (Biota.StackSize.HasValue && Biota.StackSize > 0)
                     wo.SetStackSize(Biota.StackSize);
 
+                wo.LandblockInstanceGuid = Biota.LandblockInstanceGuid;
+
                 objects.Add(wo);
             }
 
