@@ -32,7 +32,8 @@ namespace ACE.Server.Network.Enum
         ClientOutOfDate,
         ForcedLogOffRequested,
         CharacterSaveFailed,
-        BiotaSaveFailed
+        BiotaSaveFailed,
+        MovementEnforcementFailure
     }
     public static class SessionTerminationReasonHelper
     {
@@ -62,7 +63,8 @@ namespace ACE.Server.Network.Enum
             "Client is not up to date",
             "Forced log off requested by Admin",
             "Character Save Failed",
-            "Biota Save Failed"
+            "Biota Save Failed",
+            "Forced logoff by the player movement enforcement system"
         };
         public static string GetDescription(this SessionTerminationReason reason)
         {

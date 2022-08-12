@@ -150,8 +150,20 @@ namespace ACE.Server.WorldObjects
                     LogOut();
             }
 
-            if (PropertyManager.GetBool("enforce_player_movement").Item && !Teleporting)
+            bool wasAlreadyEnforcing = EnforceMovement;
+            EnforceMovement = PropertyManager.GetBool("enforce_player_movement").Item;
+            if (EnforceMovement && !Teleporting)
             {
+                if (!wasAlreadyEnforcing)
+                {
+                    Location = PhysicsObj.Position.ACEPosition();
+                    SnapPos = Location;
+                    PrevMovementUpdateMaxSpeed = 0.0f;
+                    LastPlayerInitiatedActionTime = DateTime.UtcNow;
+                    LastPlayerMovementCheckTime = DateTime.UtcNow;
+                    HasPerformedActionsSinceLastMovementUpdate = false;
+                }
+
                 if ((DateTime.UtcNow - LastPlayerMovementCheckTime).TotalSeconds >= 5 && !HasAnyMovement())
                 {
                     LastPlayerMovementCheckTime = DateTime.UtcNow;
@@ -170,7 +182,9 @@ namespace ACE.Server.WorldObjects
         /// <summary>
         /// Flag indicates if player is doing full physics simulation
         /// </summary>
-        public bool FastTick => IsPKType;
+        public bool FastTick => IsPKType || EnforceMovement;
+
+        public bool EnforceMovement { get; set; } = false;
 
         /// <summary>
         /// For advanced spellcasting / players glitching around during powersliding,
@@ -489,7 +503,7 @@ namespace ACE.Server.WorldObjects
 
                             PhysicsObj.set_request_pos(newPosition.Pos, newPosition.Rotation, curCell, Location.LandblockId.Raw);
                             if (FastTick)
-                                success = PhysicsObj.update_object_server_new();
+                                success = PhysicsObj.update_object_server_new(!EnforceMovement) ;
                             else
                                 success = PhysicsObj.update_object_server();
 
@@ -518,7 +532,7 @@ namespace ACE.Server.WorldObjects
                     else
                         PhysicsObj.Position.Frame.Orientation = newPosition.Rotation;
 
-                    if (PropertyManager.GetBool("enforce_player_movement").Item && !Teleporting && GodState == null)
+                    if (EnforceMovement && !Teleporting && GodState == null)
                     {
                         if ((DateTime.UtcNow - MovementEnforcementTimer).TotalSeconds > 60)
                             MovementEnforcementTimer = DateTime.UtcNow;
@@ -557,6 +571,7 @@ namespace ACE.Server.WorldObjects
                             }
                             else
                             {
+                                // This is no longer used because EnforceMovement also forces FastTick but leaving it here for now.
                                 currentMaxSpeed = (5.5f * GetRunRate() * deltaTime * (1.0f + velocity / 5.0f)) + 2.0f;
 
                                 if (HasPerformedActionsSinceLastMovementUpdate)
@@ -599,7 +614,8 @@ namespace ACE.Server.WorldObjects
                                 else
                                 {
                                     // Kick players when they go over 10 enforcements in a minute.
-                                    Session.Terminate(SessionTerminationReason.ClientOutOfDate, new GameMessageBootAccount(" because the server and the client do not agree on your current location."));
+                                    Session.Terminate(SessionTerminationReason.MovementEnforcementFailure, new GameMessageBootAccount(" because there is a divergence between your server and client locations"));
+                                    log.Warn($"{Name} - INVALID MOVEMENT DETECTED - Speed: {dist.ToString("0.00")}/{currentMaxSpeed.ToString("0.00")} PrevMaxSpeed: {loggingPrevMaxMovementSpeed.ToString("0.00")}({loggingInertia}) FastTick: {FastTick} TimeSpam: {deltaTime.ToString("0.00")} Velocity: {velocity.ToString("0.00")} timeSinceLastAction: {timeSinceLastAction.ToString("0.00")} isMovingOrAnimating: {isMovingOrAnimating} actionsSinceLastMovementUpdate: {loggingHasPerformedActionsSinceLastMovementUpdate}");
                                     return false;
                                 }
                             }
