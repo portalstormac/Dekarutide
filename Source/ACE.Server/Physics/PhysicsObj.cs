@@ -4366,8 +4366,12 @@ namespace ACE.Server.Physics
                     var valid = false;
                     float dist = 0;
 
+                    bool needCollisions = false;
                     if (deltaTime <= PhysicsGlobals.MinQuantum && transit == null)
+                    {
+                        needCollisions = true;
                         transit = transition(Position, RequestPos, false);
+                    }
 
                     if (transit != null)
                     {
@@ -4380,8 +4384,9 @@ namespace ACE.Server.Physics
                     var player = WeenieObj.WorldObject as Player;
                     if (valid || forcePos || player?.GodState != null)
                     {
-                        if (transit != null)
+                        if (transit != null && needCollisions)
                         {
+                            // Process remaining collisions that were not processed in UpdateObjectInternal() above.
                             var prevContact = (TransientState & TransientStateFlags.Contact) != 0;
 
                             foreach (var collideObject in transit.CollisionInfo.CollideObject)
