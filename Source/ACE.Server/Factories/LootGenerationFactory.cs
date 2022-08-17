@@ -218,9 +218,9 @@ namespace ACE.Server.Factories
                         // Add some scrolls to chest loot.
                         var treasureRoll = new TreasureRoll(TreasureItemType_Orig.Scroll);
                         Chest chest = tweakedFor as Chest;
-                        int numScrolls = 1;
+                        int numScrolls = 0;
                         if (ThreadSafeRandom.Next(1, 10) > 8)
-                            numScrolls = 2;
+                            numScrolls = 1;
                         for (var i = 0; i < numScrolls; i++)
                         {
                             treasureRoll.Wcid = ScrollWcids.Roll();
