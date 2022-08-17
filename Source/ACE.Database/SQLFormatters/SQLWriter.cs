@@ -241,14 +241,20 @@ namespace ACE.Database.SQLFormatters
                     }
                     else*/ if (TreasureDeath != null && TreasureDeath.ContainsKey(value))
                     {
-                        return $"Loot Tier: {TreasureDeath[value].Tier}";
+                        if(Enum.IsDefined((TreasureDeathDesc)value))
+                            return $"{(TreasureDeathDesc)value} - Loot Tier: {TreasureDeath[value].Tier}";
+                        else
+                            return $"Loot Tier: {TreasureDeath[value].Tier}";
                     }
                     break;
                 case PropertyDataId.DeathTreasureType:
                     string treasureD = "";
                     if (TreasureDeath != null && TreasureDeath.ContainsKey(value))
                     {
-                        return $"Loot Tier: {TreasureDeath[value].Tier}";
+                        if (Enum.IsDefined((TreasureDeathDesc)value))
+                            return $"{(TreasureDeathDesc)value} - Loot Tier: {TreasureDeath[value].Tier}";
+                        else
+                            return $"Loot Tier: {TreasureDeath[value].Tier}";
                     }
                     else if (TreasureWielded != null && TreasureWielded.ContainsKey(value))
                     {
@@ -314,7 +320,7 @@ namespace ACE.Database.SQLFormatters
             {
                 if (TreasureDeath != null && TreasureDeath.ContainsKey(deathTreasureType.Value))
                 {
-                    label = $"Random Loot: Tier {TreasureDeath[deathTreasureType.Value].Tier} - DeathTreasureType: {deathTreasureType}";
+                    label = $"Random Loot: Tier {TreasureDeath[deathTreasureType.Value].Tier} - DeathTreasureType: {deathTreasureType}({(TreasureDeathDesc)deathTreasureType})";
                 }
                 else if (TreasureWielded != null && TreasureWielded.ContainsKey(wieldedTreasureType.Value))
                 {

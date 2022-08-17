@@ -4229,5 +4229,67 @@ namespace ACE.Server.Command.Handlers.Processors
             fileWriter.Close();
             CommandHandlerHelper.WriteOutputInfo(session, "Done.");
         }
+
+        private enum HeritageProfileDesc
+        {
+            A = 1,
+            G = 2,
+            S = 3,
+            A75G25 = 4,
+            A75S25 = 5,
+            G75A25 = 6,
+            G75S25 = 7,
+            S75A25 = 8,
+            S75G25 = 9,
+            A50G50 = 10,
+            A50S50 = 11,
+            G50S50 = 12,
+            A80G10S10 = 13,
+            A10G80S10 = 14,
+            A10G10S80 = 15,
+            A50G25S25 = 16,
+            A25G50S25 = 17,
+            A25G25S50 = 18,
+            A34G33S33 = 19,
+            V = 20,
+            A25G25S25V25 = 21,
+        }
+
+        [CommandHandler("export-treasuredeath-profiles", AccessLevel.Developer, CommandHandlerFlag.None, 0, "", "")]
+        public static void HandleExportDeathTreasureProfiles(Session session, params string[] parameters)
+        {
+            CommandHandlerHelper.WriteOutputInfo(session, "Exporting deathTreasure profiles to reports/TreasureDeath.txt...");
+
+            var contentFolder = VerifyContentFolder(session, false);
+
+            var sep = Path.DirectorySeparatorChar;
+            var folder = new DirectoryInfo($"{contentFolder.FullName}{sep}reports{sep}");
+
+            if (!folder.Exists)
+                folder.Create();
+
+            var filename = $"{folder.FullName}{sep}TreasureDeath.txt";
+
+            var fileWriter = new StreamWriter(filename);
+
+            fileWriter.WriteLine($"TreasureType\tTreasureTypeDesc\tTier\tLootQualityMod\tHeritageChance\tHeritageChanceDesc\t" +
+                $"ItemChance\tItemMinAmount\tItemMaxAmount\tItemTreasureTypeSelectionChances\t" +
+                $"MagicItemChance\tMagicItemMinAmount\tMagicItemMaxAmount\tMagicItemTreasureTypeSelectionChances\t" +
+                $"MundaneItemChance\tMundaneItemMinAmount\tMundaneItemMaxAmount\tMundaneItemTypeSelectionChances");
+
+            var treasureDeaths = DatabaseManager.World.GetAllTreasureDeath();
+            foreach (var entryPair in treasureDeaths)
+            {
+                var entry = entryPair.Value;
+                fileWriter.WriteLine($"{entry.TreasureType}\t{(TreasureDeathDesc)entry.TreasureType}\t{entry.Tier}\t{entry.LootQualityMod}\t{entry.UnknownChances}\t{(HeritageProfileDesc)entry.UnknownChances}\t" +
+                    $"{entry.ItemChance}\t{entry.ItemMinAmount}\t{entry.ItemMaxAmount}\t{entry.ItemTreasureTypeSelectionChances}\t" +
+                    $"{entry.MagicItemChance}\t{entry.MagicItemMinAmount}\t{entry.MagicItemMaxAmount}\t{entry.MagicItemTreasureTypeSelectionChances}\t" +
+                    $"{entry.MundaneItemChance}\t{entry.MundaneItemMinAmount}\t{entry.MundaneItemMaxAmount}\t{entry.MundaneItemTypeSelectionChances}");
+                fileWriter.Flush();
+    }
+
+            fileWriter.Close();
+            CommandHandlerHelper.WriteOutputInfo(session, "Done.");
+        }
     }
 }

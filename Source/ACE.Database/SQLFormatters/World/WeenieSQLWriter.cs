@@ -786,7 +786,7 @@ namespace ACE.Database.SQLFormatters.World
                     var weenie = DatabaseManager.World.GetCachedWeenie(input[i].WeenieClassId);
                     var deathTreasureType = ACE.Entity.Models.WeenieExtensions.GetProperty(weenie, PropertyDataId.DeathTreasureType) ?? 0;
                     if (deathTreasureType != 0 && TreasureDeath.TryGetValue(deathTreasureType, out var treasureDeath))
-                        label += $" - {GetValueForTreasureData(treasureDeath.TreasureType)}";
+                        label += $" - {(TreasureDeathDesc)treasureDeath.TreasureType} - {GetValueForTreasureData(treasureDeath.TreasureType)}";
                 }
 
                 return  $"{weenieClassID}, " +

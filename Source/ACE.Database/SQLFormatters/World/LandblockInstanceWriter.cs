@@ -67,7 +67,7 @@ namespace ACE.Database.SQLFormatters.World
                     var weenie = DatabaseManager.World.GetCachedWeenie(value.WeenieClassId);
                     var deathTreasureType = weenie.GetProperty(PropertyDataId.DeathTreasureType) ?? 0;
                     if (deathTreasureType != 0 && TreasureDeath.TryGetValue(deathTreasureType, out var treasureDeath))
-                        label += $" - {GetValueForTreasureData(treasureDeath.TreasureType)}";
+                        label += $" - {(TreasureDeathDesc)treasureDeath.TreasureType} - {GetValueForTreasureData(treasureDeath.TreasureType)}";
                 }
 
                 if (type == (int)WeenieType.Chest || type == (int)WeenieType.Container || type == (int)WeenieType.Door)
@@ -275,7 +275,7 @@ namespace ACE.Database.SQLFormatters.World
                         var weenie = DatabaseManager.World.GetCachedWeenie(wcid);
                         var deathTreasureType = weenie.GetProperty(PropertyDataId.DeathTreasureType) ?? 0;
                         if (deathTreasureType != 0 && TreasureDeath.TryGetValue(deathTreasureType, out var treasureDeath))
-                            label += $" - {GetValueForTreasureData(treasureDeath.TreasureType)}";
+                            label += $" {(TreasureDeathDesc)treasureDeath.TreasureType} - {GetValueForTreasureData(treasureDeath.TreasureType)}";
                     }
 
                     var type = 0;
