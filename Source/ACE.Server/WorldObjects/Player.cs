@@ -1118,17 +1118,27 @@ namespace ACE.Server.WorldObjects
             }
 
             // send CO network messages for admin objects
-            if (Adminvision && oldState != Adminvision)
+            if (oldState != Adminvision)
             {
                 var adminObjs = PhysicsObj.ObjMaint.GetKnownObjectsValuesWhere(o => o.WeenieObj.WorldObject != null && o.WeenieObj.WorldObject.Visibility);
                 PhysicsObj.enqueue_objs(adminObjs);
 
                 var nodrawObjs = PhysicsObj.ObjMaint.GetKnownObjectsValuesWhere(o => o.WeenieObj.WorldObject != null && ((o.WeenieObj.WorldObject.NoDraw ?? false) || o.WeenieObj.WorldObject.UiHidden));
 
+                if (Adminvision)
+                {
+                    PhysicsObj.enqueue_objs(adminObjs);
                 foreach (var wo in nodrawObjs)
                     Session.Network.EnqueueSend(new GameMessageUpdateObject(wo.WeenieObj.WorldObject, Adminvision, Adminvision ? true : false));
+                }
+                else
+                {
+                    foreach (var wo in adminObjs)
+                        RemoveTrackedObject(wo.WeenieObj.WorldObject, false);
 
-                // sending DO network messages for /adminvision off here doesn't work in client unfortunately?
+                    foreach (var wo in nodrawObjs)
+                        RemoveTrackedObject(wo.WeenieObj.WorldObject, false);
+                }
             }
 
             string state = Adminvision ? "enabled" : "disabled";
