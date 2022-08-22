@@ -120,11 +120,29 @@ namespace ACE.Server.WorldObjects
         {
             if (Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.CustomDM)
             {
-                bool newtSetting = !GetCharacterOptions2(CharacterOptions2.NotUsed1);
-                SetCharacterOptions2(CharacterOptions2.NotUsed1, newtSetting);
+                bool newSetting = !GetCharacterOptions2(CharacterOptions2.NotUsed1);
+                SetCharacterOptions2(CharacterOptions2.NotUsed1, newSetting);
 
-                return newtSetting;
+                CachedAttemptToTaunt = newSetting;
+                return newSetting;
             }
+
+            CachedAttemptToTaunt = false;
+            return false;
+        }
+
+        public bool ToggleSneakSetting()
+        {
+            if (Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.CustomDM)
+            {
+                bool newSetting = !GetCharacterOptions2(CharacterOptions2.NotUsed2);
+                SetCharacterOptions2(CharacterOptions2.NotUsed2, newSetting);
+
+                CachedAttemptToSneak = newSetting;
+                return newSetting;
+            }
+
+            CachedAttemptToSneak = false;
             return false;
         }
 

@@ -226,7 +226,11 @@ namespace ACE.Server.WorldObjects
             LastUseTime = 0.0f;
 
             if (success)
+            {
+                if (item is PressurePlate pressurePlate)
+                    pressurePlate.NextActivationIsFromUse = true;
                 item.OnActivate(this);
+            }
 
             // manually managed
             if (LastUseTime == float.MinValue)

@@ -166,19 +166,25 @@ namespace ACE.Server.WorldObjects
                 player.Session.Network.EnqueueSend(new GameMessageSystemChat($"{Name} accepted. Click on the quill icon in the lower right corner to open your contract tab to view your active contracts.", ChatMessageType.Broadcast));
             }
 
-            if (TacticAndTechniqueId > 0)
+            if (Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.CustomDM)
             {
-                switch((TacticAndTechniqueType)TacticAndTechniqueId)
+                if (TacticAndTechniqueId > 0)
                 {
-                    case TacticAndTechniqueType.Taunt:
-                        if (Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.CustomDM)
-                        {
+                    switch ((TacticAndTechniqueType)TacticAndTechniqueId)
+                    {
+                        case TacticAndTechniqueType.Taunt:
                             if (player.ToggleTauntSetting())
                                 player.Session.Network.EnqueueSend(new GameMessageSystemChat($"You will now start attempting to taunt opponents into attacking you.", ChatMessageType.Broadcast));
                             else
                                 player.Session.Network.EnqueueSend(new GameMessageSystemChat($"You will no longer attempt to taunt opponents.", ChatMessageType.Broadcast));
-                        }
-                        break;
+                            break;
+                        case TacticAndTechniqueType.Sneak:
+                            if (player.ToggleSneakSetting())
+                                player.Session.Network.EnqueueSend(new GameMessageSystemChat($"You will now start attempting to sneak when walking.", ChatMessageType.Broadcast));
+                            else
+                                player.Session.Network.EnqueueSend(new GameMessageSystemChat($"You will no longer attempt to sneak when walking.", ChatMessageType.Broadcast));
+                            break;
+                    }
                 }
             }
 

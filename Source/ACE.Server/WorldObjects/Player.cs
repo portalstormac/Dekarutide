@@ -84,6 +84,43 @@ namespace ACE.Server.WorldObjects
         public int MovementEnforcementCounter;
         public double MovementEnforcementTimer;
 
+        private bool? CachedAttemptToTaunt = null;
+        public bool IsAttemptingToTaunt
+        {
+            get
+            {
+                if (!CachedAttemptToTaunt.HasValue)
+                    CachedAttemptToTaunt = GetCharacterOption(CharacterOption.AttemptToTaunt);
+
+                return CachedAttemptToTaunt ?? false;
+            }
+        }
+
+        private bool? CachedAttemptToSneak = null;
+        public bool IsAttemptingToSneak
+        {
+            get
+            {
+                if (!CachedAttemptToSneak.HasValue)
+                {
+                    CachedAttemptToSneak = GetCharacterOption(CharacterOption.AttemptToSneak);
+
+                    if (CachedAttemptToSneak ?? false)
+                    {
+                        var sneakingSkill = GetCreatureSkill(Skill.Sneaking);
+                        if (sneakingSkill.AdvancementClass < SkillAdvancementClass.Trained)
+                        {
+                            // Might as well turn it off since we can't use it.
+                            CachedAttemptToSneak = false;
+                            SetCharacterOptions2(CharacterOptions2.NotUsed2, false);
+                        }
+                    }
+                }
+
+                return CachedAttemptToSneak ?? false;
+            }
+        }
+
         public ConfirmationManager ConfirmationManager;
 
         public SquelchManager SquelchManager;
@@ -1121,15 +1158,13 @@ namespace ACE.Server.WorldObjects
             if (oldState != Adminvision)
             {
                 var adminObjs = PhysicsObj.ObjMaint.GetKnownObjectsValuesWhere(o => o.WeenieObj.WorldObject != null && o.WeenieObj.WorldObject.Visibility);
-                PhysicsObj.enqueue_objs(adminObjs);
-
                 var nodrawObjs = PhysicsObj.ObjMaint.GetKnownObjectsValuesWhere(o => o.WeenieObj.WorldObject != null && ((o.WeenieObj.WorldObject.NoDraw ?? false) || o.WeenieObj.WorldObject.UiHidden));
 
                 if (Adminvision)
                 {
                     PhysicsObj.enqueue_objs(adminObjs);
-                foreach (var wo in nodrawObjs)
-                    Session.Network.EnqueueSend(new GameMessageUpdateObject(wo.WeenieObj.WorldObject, Adminvision, Adminvision ? true : false));
+                    foreach (var wo in nodrawObjs)
+                        Session.Network.EnqueueSend(new GameMessageUpdateObject(wo.WeenieObj.WorldObject, Adminvision, Adminvision ? true : false));
                 }
                 else
                 {
@@ -1143,11 +1178,6 @@ namespace ACE.Server.WorldObjects
 
             string state = Adminvision ? "enabled" : "disabled";
             Session.Network.EnqueueSend(new GameMessageSystemChat($"Admin Vision is {state}.", ChatMessageType.Broadcast));
-
-            if (oldState != Adminvision && !Adminvision)
-            {
-                Session.Network.EnqueueSend(new GameMessageSystemChat("Note that you will need to log out and back in before the visible items become invisible again.", ChatMessageType.Broadcast));
-            }
         }
 
         public void SendMessage(string msg, ChatMessageType type = ChatMessageType.Broadcast, WorldObject source = null)

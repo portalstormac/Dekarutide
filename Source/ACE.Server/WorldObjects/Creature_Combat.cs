@@ -694,6 +694,13 @@ namespace ACE.Server.WorldObjects
             var shield = GetEquippedShield();
             if (shield == null) return 1.0f;
 
+            var player = this as Player;
+            if (Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.CustomDM)
+            {
+                if (player != null && GetCreatureSkill(Skill.Shield).AdvancementClass < SkillAdvancementClass.Trained)
+                    return 0.0f;
+            }
+
             // phantom weapons ignore all armor and shields
             if (weapon != null && weapon.HasImbuedEffect(ImbuedEffectType.IgnoreAllArmor))
                 return 1.0f;
@@ -751,19 +758,7 @@ namespace ACE.Server.WorldObjects
 
             var effectiveLevel = effectiveSL * effectiveRL;
 
-            if (Common.ConfigManager.Config.Server.WorldRuleset != Common.Ruleset.Infiltration)
-            {
-                // SL cap:
-                // Trained / untrained: 1/2 shield skill
-                // Spec: shield skill
-                // SL cap is applied *after* item enchantments
-                var shieldSkill = GetCreatureSkill(Skill.Shield);
-                var shieldCap = shieldSkill.Current;
-                if (shieldSkill.AdvancementClass != SkillAdvancementClass.Specialized)
-                    shieldCap = (uint)Math.Round(shieldCap / 2.0f);
-
-                effectiveLevel = Math.Min(effectiveLevel, shieldCap);
-            }
+            effectiveLevel = CapShield(effectiveLevel);
 
             var ignoreShieldMod = attacker.GetIgnoreShieldMod(weapon);
             //Console.WriteLine($"IgnoreShieldMod: {ignoreShieldMod}");
@@ -775,6 +770,7 @@ namespace ACE.Server.WorldObjects
             //Console.WriteLine("ShieldMod: " + shieldMod);
             return shieldMod;
         }
+
         public static double GetThrownWeaponMaxVelocity(WorldObject throwed)
         {
             Creature thrower = throwed.Wielder as Creature;

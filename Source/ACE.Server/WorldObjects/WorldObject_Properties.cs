@@ -977,6 +977,12 @@ namespace ACE.Server.WorldObjects
             set { if (!value.HasValue) RemoveProperty(PropertyInt.Value); else SetProperty(PropertyInt.Value, value.Value); }
         }
 
+        public int? OriginalValue
+        {
+            get => GetProperty(PropertyInt.OriginalValue);
+            set { if (!value.HasValue) RemoveProperty(PropertyInt.OriginalValue); else SetProperty(PropertyInt.OriginalValue, value.Value); }
+        }
+
         /// <summary>
         /// Flag indicates if an equipped item w/ built-in spells is currently activated, and mana is burning on item
         /// </summary>
@@ -3093,6 +3099,18 @@ namespace ACE.Server.WorldObjects
         {
             get => GetProperty(PropertyFloat.RotationSpeed);
             set { if (!value.HasValue) RemoveProperty(PropertyFloat.RotationSpeed); else SetProperty(PropertyFloat.RotationSpeed, value.Value); }
+        }
+
+        public int? ResistAwareness
+        {
+            get => GetProperty(PropertyInt.ResistAwareness);
+            set { if (!value.HasValue) RemoveProperty(PropertyInt.ResistAwareness); else SetProperty(PropertyInt.ResistAwareness, value.Value); }
+        }
+
+        public int? Tier
+        {
+            get => GetProperty(PropertyInt.Tier);
+            set { if (!value.HasValue) RemoveProperty(PropertyInt.Tier); else SetProperty(PropertyInt.Tier, value.Value); }
         }
 
         public bool HasMissileFlightPlacement => CSetup.HasMissileFlightPlacement;

@@ -97,6 +97,9 @@ namespace ACE.Server.WorldObjects
         /// </summary>
         public virtual void Heartbeat(double currentUnixTime)
         {
+            if (ResistAwareness.HasValue)
+                AwarenessHeartbeat(currentUnixTime);
+
             if (EnchantmentManager.HasEnchantments)
                 EnchantmentManager.HeartBeat(CachedHeartbeatInterval);
 

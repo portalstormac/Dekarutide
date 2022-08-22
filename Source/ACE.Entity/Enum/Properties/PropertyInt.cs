@@ -643,6 +643,8 @@ namespace ACE.Entity.Enum.Properties
         LeyLineLastDecayTime                     = 10004,
         RecentMoneyIncome                        = 10005,
         RecentMoneyOutflow                       = 10006,
+        Tier                                     = 10007,
+        ResistAwareness                          = 10008,
     }
 
     public static class PropertyIntExtensions

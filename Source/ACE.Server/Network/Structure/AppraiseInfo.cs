@@ -48,6 +48,8 @@ namespace ACE.Server.Network.Structure
 
         public ArmorLevel ArmorLevels;
 
+        public bool IsArmorCapped = false;
+
         // This helps ensure the item will identify properly. Some "items" are technically "Creatures".
         private bool NPCLooksLikeObject;
 
@@ -124,7 +126,23 @@ namespace ACE.Server.Network.Structure
             if (wo.WeaponMissileDefense.HasValue && wo.WeaponMissileDefense.Value > 0 && wo.WeaponMissileDefense.Value < 1 && ((wo.GetProperty(PropertyInt.ImbueStackingBits) ?? 0) & 1) != 0)
                 PropertiesFloat[PropertyFloat.WeaponMissileDefense] += 1;
 
-            if (wo is Door || wo is Chest)
+            if (wo is PressurePlate)
+            {
+                if (PropertiesInt.ContainsKey(PropertyInt.ResistLockpick))
+                    PropertiesInt.Remove(PropertyInt.ResistLockpick);
+
+                if (PropertiesInt.ContainsKey(PropertyInt.Value))
+                    PropertiesInt.Remove(PropertyInt.Value);
+
+                if (PropertiesInt.ContainsKey(PropertyInt.EncumbranceVal))
+                    PropertiesInt.Remove(PropertyInt.EncumbranceVal);
+
+                if (wo.Active)
+                    PropertiesString.Add(PropertyString.ShortDesc, "Armed");
+                else
+                    PropertiesString.Add(PropertyString.ShortDesc, "Disarmed");
+            }
+            else if (wo is Door || wo is Chest)
             {
                 // If wo is not locked, do not send ResistLockpick value. If ResistLockpick is sent for unlocked objects, id panel shows bonus to Lockpick skill
                 if (!wo.IsLocked && PropertiesInt.ContainsKey(PropertyInt.ResistLockpick))
@@ -330,6 +348,9 @@ namespace ACE.Server.Network.Structure
                 //PropertiesInt.Clear();
                 //PropertiesInt64.Clear();
                 //PropertiesString.Clear();
+
+                if (PropertiesInt.ContainsKey(PropertyInt.Value))
+                    PropertiesInt.Remove(PropertyInt.Value);
             }
 
             BuildFlags();
@@ -393,7 +414,28 @@ namespace ACE.Server.Network.Structure
             if (wo == null) return;
 
             if (PropertiesInt.ContainsKey(PropertyInt.ArmorLevel))
+            {
                 PropertiesInt[PropertyInt.ArmorLevel] += wo.EnchantmentManager.GetArmorMod();
+
+                if (Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.CustomDM)
+                {
+                    var wielder = wo.Wielder as Player;
+                    if (wielder != null)
+                    {
+                        int armor;
+                        if (wo.IsShield)
+                            armor = (int)wielder.CapShield(PropertiesInt[PropertyInt.ArmorLevel]);
+                        else
+                            armor = (int)wielder.CapArmor(PropertiesInt[PropertyInt.ArmorLevel]);
+
+                        if (armor != PropertiesInt[PropertyInt.ArmorLevel])
+                        {
+                            PropertiesInt[PropertyInt.ArmorLevel] = armor;
+                            IsArmorCapped = true;
+                        }
+                    }
+                }
+            }
 
             if (wo.ItemSkillLimit != null)
                 PropertiesInt[PropertyInt.AppraisalItemSkill] = (int)wo.ItemSkillLimit;
@@ -545,7 +587,7 @@ namespace ACE.Server.Network.Structure
                 return;
 
             ArmorProfile = new ArmorProfile(wo);
-            ArmorHighlight = ArmorMaskHelper.GetHighlightMask(wo);
+            ArmorHighlight = ArmorMaskHelper.GetHighlightMask(wo, IsArmorCapped);
             ArmorColor = ArmorMaskHelper.GetColorMask(wo);
 
             AddEnchantments(wo);

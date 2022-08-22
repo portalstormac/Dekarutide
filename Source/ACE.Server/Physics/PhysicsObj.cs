@@ -2394,6 +2394,12 @@ namespace ACE.Server.Physics
             {
                 var newlyVisible = handle_visible_cells();
                 enqueue_objs(newlyVisible);
+
+                foreach(var entry in newlyVisible)
+                {
+                    if(entry.WeenieObj.WorldObject.ResistAwareness.HasValue)
+                        entry.WeenieObj.WorldObject.CheckAwareness();
+                }
             }
             else
             {

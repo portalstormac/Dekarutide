@@ -173,7 +173,7 @@
                     "weenieId": "627",
                     "name": "Alder Talisman",
                     "stacksize": "3"
-                },                
+                },
                 {
                     "weenieId": "763",
                     "name": "Verdigris",
@@ -218,12 +218,12 @@
                     "weenieId": "753",
                     "name": "Brimstone",
                     "stacksize": "10"
-                },                
+                },
                 {
                     "weenieId": "783",
                     "name": "Powdered Amber",
                     "stacksize": "10"
-                },                
+                },
                 {
                     "weenieId": "778",
                     "name": "Saffron",
@@ -459,7 +459,7 @@
         {
             "id": "34",
             "name": "War Magic",
-            "gear": [                
+            "gear": [
                 {
                     "weenieId": "741",
                     "name": "Birch Talisman",
@@ -469,7 +469,7 @@
                     "weenieId": "790",
                     "name": "Powdered Onyx",
                     "stacksize": "10"
-                },                
+                },
                 {
                     "weenieId": "764",
                     "name": "Vitriol",
@@ -512,7 +512,7 @@
                     "weenieId": "772",
                     "name": "Hawthorn",
                     "stacksize": "10"
-                },                
+                },
                 {
                     "weenieId": "691",
                     "name": "Lead Scarab",
@@ -943,6 +943,61 @@
                 {
                     "weenieId": "93",
                     "name": "Round Shield",
+                    "stacksize": "1"
+                }
+            ]
+        },
+        {
+            "id": "55",
+            "name": "Appraise Missile Item",
+            "gear": [
+                {
+                    "weenieId": "50077",
+                    "name": "Magnifying Glass",
+                    "stacksize": "1"
+                }
+            ]
+        },
+        {
+            "id": "56",
+            "name": "Appraise Melee Item",
+            "gear": [
+                {
+                    "weenieId": "50077",
+                    "name": "Magnifying Glass",
+                    "stacksize": "1"
+                }
+            ]
+        },
+        {
+            "id": "57",
+            "name": "Appraise Armor",
+            "gear": [
+                {
+                    "weenieId": "50077",
+                    "name": "Magnifying Glass",
+                    "stacksize": "1"
+                }
+            ]
+        },
+        {
+            "id": "58",
+            "name": "Appraise Caster Item",
+            "gear": [
+                {
+                    "weenieId": "50077",
+                    "name": "Magnifying Glass",
+                    "stacksize": "1"
+                }
+            ]
+        },
+        {
+            "id": "60",
+            "name": "Sneaking",
+            "gear": [
+                {
+                    "weenieId": "50078",
+                    "name": "Combat Tactic - Sneaking",
                     "stacksize": "1"
                 }
             ]

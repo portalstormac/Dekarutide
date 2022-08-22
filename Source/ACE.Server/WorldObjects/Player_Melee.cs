@@ -257,6 +257,7 @@ namespace ACE.Server.WorldObjects
             //log.Info($"{Name}.Attack({target.Name}, {attackSequence})");
 
             HasPerformedActionsSinceLastMovementUpdate = true;
+            EndSneaking(null, true);
 
             if (AttackSequence != attackSequence)
                 return;

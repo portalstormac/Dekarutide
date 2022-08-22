@@ -702,6 +702,8 @@ namespace ACE.Server.WorldObjects
         {
             //Console.WriteLine("DoCastSpell");
 
+            EndSneaking(null, true);
+
             if (!MagicState.IsCasting)
                 return;
 

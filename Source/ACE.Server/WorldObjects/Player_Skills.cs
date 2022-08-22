@@ -971,7 +971,7 @@ namespace ACE.Server.WorldObjects
         }
         static Player()
         {
-            if (Common.ConfigManager.Config.Server.WorldRuleset <= Common.Ruleset.Infiltration)
+            if (Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.Infiltration)
             {
                 AlwaysTrained.Remove(Skill.ArcaneLore);
 
@@ -1000,18 +1000,39 @@ namespace ACE.Server.WorldObjects
                 PlayerSkills.Add(Skill.UnarmedCombat);
                 PlayerSkills.Add(Skill.Salvaging);
             }
-
-            if (Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.CustomDM)
+            else if (Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.CustomDM)
             {
+                AlwaysTrained.Remove(Skill.ArcaneLore);
                 AlwaysTrained.Remove(Skill.Salvaging);
+
+                PlayerSkills.Remove(Skill.TwoHandedCombat);
+                PlayerSkills.Remove(Skill.HeavyWeapons);
+                PlayerSkills.Remove(Skill.LightWeapons);
+                PlayerSkills.Remove(Skill.FinesseWeapons);
+                PlayerSkills.Remove(Skill.MissileWeapons);
+                PlayerSkills.Remove(Skill.Recklessness);
+                PlayerSkills.Remove(Skill.SneakAttack);
+                PlayerSkills.Remove(Skill.DirtyFighting);
+                PlayerSkills.Remove(Skill.VoidMagic);
+                PlayerSkills.Remove(Skill.Summoning);
+
+                PlayerSkills.Add(Skill.Axe);
+                PlayerSkills.Add(Skill.Bow);
+                PlayerSkills.Add(Skill.Crossbow);
+                PlayerSkills.Add(Skill.Dagger);
+                PlayerSkills.Add(Skill.Mace);
+                PlayerSkills.Add(Skill.Spear);
+                PlayerSkills.Add(Skill.Staff);
+                PlayerSkills.Add(Skill.Sword);
+                PlayerSkills.Add(Skill.ThrownWeapon);
+                PlayerSkills.Add(Skill.UnarmedCombat);
+                PlayerSkills.Add(Skill.Salvaging);
 
                 PlayerSkills.Remove(Skill.ItemEnchantment);
                 PlayerSkills.Remove(Skill.CreatureEnchantment);
                 PlayerSkills.Remove(Skill.Crossbow);
                 PlayerSkills.Remove(Skill.Mace);
                 PlayerSkills.Remove(Skill.Staff);
-
-                PlayerSkills.Add(Skill.Shield);
             }
         }
 

@@ -1603,48 +1603,71 @@ namespace ACE.Server.WorldObjects
                 return false;
             }
 
-            // Unwield wand/missile launcher/two-handed if dual wielding
-            if (wieldedLocation == EquipMask.Shield && !item.IsShield)
+            if (wieldedLocation == EquipMask.Shield)
             {
-                if (Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.Infiltration)
+                if (item.IsShield)
                 {
-                    Session.Network.EnqueueSend(new GameEventInventoryServerSaveFailed(Session, item.Guid.Full, wieldError));
-                    return false; // No dual wielding allowed in this ruleset.
-                }
-
-                var mainWeapon = GetEquippedMeleeWeapon(true);
-
-                if (mainWeapon != null && !mainWeapon.IsTwoHanded)
-                    mainWeapon = null;
-
-                mainWeapon = mainWeapon ?? GetEquippedMissileWeapon() ?? GetEquippedWand();
-
-                // special case: instead of sending the typical DequipItem -> GetAndWieldItem here,
-                // the client just sends GetAndWieldItem, and the server is responsible for detecting if DequipItem is needed
-
-                if (mainWeapon != null)
-                {
-                    // this wasn't a thing in retail, and can bug out the client during laggy conditions
-
-                    // if main-hand slot is filled with anything other than a 1-handed melee weapon, send error
-                    Session.Network.EnqueueSend(new GameEventInventoryServerSaveFailed(Session, item.Guid.Full, WeenieError.ConflictingInventoryLocation));
-                    return false;
-
-                    /*if (CombatMode != CombatMode.NonCombat)
+                    if (Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.CustomDM)
                     {
-                        HandleActionChangeCombatMode(CombatMode.Melee, true, () =>
+                        if (GetCreatureSkill(Skill.Shield).AdvancementClass < SkillAdvancementClass.Trained)
                         {
-                            if (!DoHandleActionGetAndWieldItem_DequipItemToInventory(mainWeapon, item))
-                                return;
-
-                            DoHandleActionGetAndWieldItem(item, itemRootOwner, wasEquipped, wieldedLocation);
-                        });
-                        return true;
+                            Session.Network.EnqueueSend(new GameEventInventoryServerSaveFailed(Session, item.Guid.Full));
+                            Session.Network.EnqueueSend(new GameEventCommunicationTransientString(Session, $"You are not trained in using shields!"));
+                            return false;
+                        }
                     }
-                    else if (!DoHandleActionGetAndWieldItem_DequipItemToInventory(mainWeapon, item))
+                }
+                else // Unwield wand/missile launcher/two-handed if dual wielding
+                {                  
+                    if (Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.Infiltration)
                     {
+                        Session.Network.EnqueueSend(new GameEventInventoryServerSaveFailed(Session, item.Guid.Full));
+                        return false; // No dual wielding allowed in this ruleset.
+                    }
+                    else if (Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.CustomDM)
+                    {
+                        if (GetCreatureSkill(Skill.DualWield).AdvancementClass < SkillAdvancementClass.Trained)
+                        {
+                            Session.Network.EnqueueSend(new GameEventInventoryServerSaveFailed(Session, item.Guid.Full));
+                            Session.Network.EnqueueSend(new GameEventCommunicationTransientString(Session, $"You are not trained in dual wielding weapons!"));
+                            return false;
+                        }
+                    }
+
+                    var mainWeapon = GetEquippedMeleeWeapon(true);
+
+                    if (mainWeapon != null && !mainWeapon.IsTwoHanded)
+                        mainWeapon = null;
+
+                    mainWeapon = mainWeapon ?? GetEquippedMissileWeapon() ?? GetEquippedWand();
+
+                    // special case: instead of sending the typical DequipItem -> GetAndWieldItem here,
+                    // the client just sends GetAndWieldItem, and the server is responsible for detecting if DequipItem is needed
+
+                    if (mainWeapon != null)
+                    {
+                        // this wasn't a thing in retail, and can bug out the client during laggy conditions
+
+                        // if main-hand slot is filled with anything other than a 1-handed melee weapon, send error
+                        Session.Network.EnqueueSend(new GameEventInventoryServerSaveFailed(Session, item.Guid.Full, WeenieError.ConflictingInventoryLocation));
                         return false;
-                    }*/
+
+                        /*if (CombatMode != CombatMode.NonCombat)
+                        {
+                            HandleActionChangeCombatMode(CombatMode.Melee, true, () =>
+                            {
+                                if (!DoHandleActionGetAndWieldItem_DequipItemToInventory(mainWeapon, item))
+                                    return;
+
+                                DoHandleActionGetAndWieldItem(item, itemRootOwner, wasEquipped, wieldedLocation);
+                            });
+                            return true;
+                        }
+                        else if (!DoHandleActionGetAndWieldItem_DequipItemToInventory(mainWeapon, item))
+                        {
+                            return false;
+                        }*/
+                    }
                 }
             }
 

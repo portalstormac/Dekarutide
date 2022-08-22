@@ -7,6 +7,7 @@ namespace ACE.Entity.Enum
         Reckless,
         Defensive,
         Opportunist,
-        Riposte
+        Riposte,
+        Sneak
     }
 }

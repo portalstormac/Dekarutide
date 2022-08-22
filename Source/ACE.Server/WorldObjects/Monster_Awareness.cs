@@ -143,7 +143,7 @@ namespace ACE.Server.WorldObjects
             var manaCost = 2; // Taunting uses mana!
 
             Player target = AttackTarget as Player;
-            if (target != null && target.GetCharacterOption(CharacterOption.AttemptToTaunt) && IsDirectVisible(target))
+            if (target != null && target.IsAttemptingToTaunt && IsDirectVisible(target))
             {
                 // Current target is already trying to taunt and is visible, so he has priority over everyone else and we also skip the activation chance step.
 
@@ -191,7 +191,7 @@ namespace ACE.Server.WorldObjects
                 target = targetDistance.Target as Player;
                 if (target == AttackTarget)
                     continue;
-                else if (target != null && target.GetCharacterOption(CharacterOption.AttemptToTaunt))
+                else if (target != null && target.IsAttemptingToTaunt)
                 {
                     if (target.Mana.Current < manaCost)
                         continue;
@@ -375,7 +375,12 @@ namespace ACE.Server.WorldObjects
                 /*if (Location.SquaredDistanceTo(creature.Location) > chaseDistSq)
                     continue;*/
 
-                if (PhysicsObj.get_distance_sq_to_object(creature.PhysicsObj, true) > chaseDistSq)
+                var distSq = PhysicsObj.get_distance_sq_to_object(creature.PhysicsObj, true);
+
+                if (creature is Player player && player.TestSneaking(creature, distSq, $"{creature.Name} sees you, you are no longer sneaking!"))
+                    continue;
+
+                if (distSq > chaseDistSq)
                     continue;
 
                 // if this monster belongs to a faction,
@@ -475,7 +480,8 @@ namespace ACE.Server.WorldObjects
 
             foreach (var creature in PhysicsObj.ObjMaint.GetVisibleTargetsValuesOfTypeCreature())
             {
-                if (creature is Player player && (!player.Attackable || player.Teleporting || (player.Hidden ?? false)))
+                var player = creature as Player;
+                if (player != null && (!player.Attackable || player.Teleporting || (player.Hidden ?? false)))
                     continue;
 
                 if (Tolerance.HasFlag(Tolerance.Monster) && (creature is Player || creature is CombatPet))
@@ -483,6 +489,9 @@ namespace ACE.Server.WorldObjects
 
                 //var distSq = Location.SquaredDistanceTo(creature.Location);
                 var distSq = PhysicsObj.get_distance_sq_to_object(creature.PhysicsObj, true);
+                if (player != null && player.TestSneaking(creature, distSq, $"{creature.Name} sees you, you are no longer sneaking!"))
+                    continue;
+
                 if (distSq < closestDistSq)
                 {
                     closestDistSq = (float)distSq;

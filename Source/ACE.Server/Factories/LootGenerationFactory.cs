@@ -1172,6 +1172,12 @@ namespace ACE.Server.Factories
 
             MutateValue_Spells(wo);
 
+            if (Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.CustomDM)
+            {
+                wo.OriginalValue = wo.Value;
+                wo.Value = (int)ThreadSafeRandom.Next(wo.Value.Value * 0.7f, wo.Value.Value * 0.9f);
+            }
+
             /*Console.WriteLine($"Mutating value for {wo.Name} ({weenieValue:N0} -> {wo.Value:N0})");
 
             // compare with previous function
@@ -1493,6 +1499,7 @@ namespace ACE.Server.Factories
             if (treasureRoll.ItemType != TreasureItemType_Orig.Scroll)
             {
                 wo = WorldObjectFactory.CreateNewWorldObject((uint)treasureRoll.Wcid);
+                wo.Tier = treasureDeath.Tier;
 
                 if (wo == null)
                 {

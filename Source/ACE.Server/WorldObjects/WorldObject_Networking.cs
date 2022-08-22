@@ -1021,7 +1021,7 @@ namespace ACE.Server.WorldObjects
 
             foreach (var player in PhysicsObj.ObjMaint.GetKnownPlayersValuesAsPlayer())
             {
-                if (Visibility && !player.Adminvision)
+                if (Visibility && !player.Adminvision && !player.IsAware(this))
                     continue;
 
                 if (excludeSelf && this == player)
@@ -1327,7 +1327,7 @@ namespace ACE.Server.WorldObjects
                 if (isDungeon && Location.Landblock != player.Location.Landblock)
                     continue;
 
-                if (Visibility && !player.Adminvision)
+                if (Visibility && !player.Adminvision && !player.IsAware(this))
                     continue;
 
                 //var dist = Vector3.Distance(Location.ToGlobal(), player.Location.ToGlobal());
@@ -1366,7 +1366,7 @@ namespace ACE.Server.WorldObjects
                 if (isDungeon && Location.Landblock != player.Location.Landblock)
                     continue;
 
-                if (Visibility && !player.Adminvision)
+                if (Visibility && !player.Adminvision && !player.IsAware(this))
                     continue;
 
                 //var dist = Vector3.Distance(Location.ToGlobal(), player.Location.ToGlobal());
@@ -1404,7 +1404,7 @@ namespace ACE.Server.WorldObjects
             var nearbyPlayers = PhysicsObj.ObjMaint.GetKnownPlayersValuesAsPlayer();
             foreach (var player in nearbyPlayers)
             {
-                if (Visibility && !player.Adminvision)
+                if (Visibility && !player.Adminvision && !player.IsAware(this))
                     continue;
 
                 player.Session.Network.EnqueueSend(msgs);
@@ -1425,7 +1425,7 @@ namespace ACE.Server.WorldObjects
             var nearbyPlayers = PhysicsObj.ObjMaint.GetKnownPlayersValuesAsPlayer();
             foreach (var player in nearbyPlayers.Except(excludePlayers))
             {
-                if (Visibility && !player.Adminvision)
+                if (Visibility && !player.Adminvision && !player.IsAware(this))
                     continue;
 
                 player.Session.Network.EnqueueSend(msgs);

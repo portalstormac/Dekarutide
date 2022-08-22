@@ -674,6 +674,7 @@ namespace ACE.Server.WorldObjects
                                 }
                             }
 
+                            UpdateSneakingState();
                             CheckMonsters();
                         }
                     }

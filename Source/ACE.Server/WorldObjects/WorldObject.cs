@@ -266,6 +266,9 @@ namespace ACE.Server.WorldObjects
 
             if (MotionTableId != 0)
                 CurrentMotionState = new Motion(MotionStance.Invalid);
+
+            AwareList = null;
+            NextAwarenessCheck = 0;
         }
 
         /// <summary>

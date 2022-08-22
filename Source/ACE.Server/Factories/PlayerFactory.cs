@@ -170,7 +170,7 @@ namespace ACE.Server.Factories
                 }
                 if (Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.CustomDM)
                 {
-                    if (characterCreateInfo.SkillAdvancementClasses.Count != 49) // Not really 49 but shield skill is id 48 so we get a few empty slots. The client doesn't seem to mind at all.
+                    if (characterCreateInfo.SkillAdvancementClasses.Count != (int)Skill.Sneaking + 1)
                         return CreateResult.ClientServerSkillsMismatch;
                 }
                 else
@@ -224,10 +224,11 @@ namespace ACE.Server.Factories
                 }
 
                 var isDualWieldTrainedOrSpecialized = false;
-                if (Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.EoR)
-                {
+                if (Common.ConfigManager.Config.Server.WorldRuleset != Common.Ruleset.Infiltration)
                     isDualWieldTrainedOrSpecialized = player.Skills.TryGetValue(Skill.DualWield, out var dualWield) && dualWield.AdvancementClass > SkillAdvancementClass.Untrained;
 
+                if (Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.EoR)
+                {
                     // Set Heritage based Melee and Ranged Masteries
                     GetMasteries(player.HeritageGroup, out WeaponType meleeMastery, out WeaponType rangedMastery);
 

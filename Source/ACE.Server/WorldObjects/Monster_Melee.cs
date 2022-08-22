@@ -112,7 +112,16 @@ namespace ACE.Server.WorldObjects
                             if (damageEvent.ShieldMod != 1.0f)
                             {
                                 var shieldSkill = targetPlayer.GetCreatureSkill(Skill.Shield);
-                                Proficiency.OnSuccessUse(targetPlayer, shieldSkill, shieldSkill.Current); // ?
+                                Proficiency.OnSuccessUse(targetPlayer, shieldSkill, damageEvent.EffectiveAttackSkill);
+                            }
+
+                            if (Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.CustomDM)
+                            {
+                                if (damageEvent.Armor != null && damageEvent.Armor.Count > 0)
+                                {
+                                    var armorSkill = targetPlayer.GetCreatureSkill(Skill.Armor);
+                                    Proficiency.OnSuccessUse(targetPlayer, armorSkill, damageEvent.EffectiveAttackSkill);
+                                }
                             }
 
                             // handle Dirty Fighting
@@ -432,7 +441,7 @@ namespace ACE.Server.WorldObjects
             var effectiveAL = 0.0f;
 
             foreach (var armor in armors)
-                effectiveAL += GetArmorMod(armor, damageType, ignoreMagicArmor);
+                effectiveAL += defender.GetArmorMod(armor, damageType, ignoreMagicArmor);
 
             // life spells
             // additive: armor/imperil
@@ -486,6 +495,52 @@ namespace ACE.Server.WorldObjects
                 return 0;
         }
 
+        public float CapShield(float armor)
+        {
+            if (Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.Infiltration)
+                return armor;
+
+            var player = this as Player;
+            if (player != null) // Creatures always have full armor level.
+            {
+                // SL cap:
+                // Trained / untrained: 1/2 shield skill
+                // Spec: shield skill
+                // SL cap is applied *after* item enchantments
+                var shieldSkill = GetCreatureSkill(Skill.Shield);
+                var shieldCap = shieldSkill.Current;
+                if (shieldSkill.AdvancementClass != SkillAdvancementClass.Specialized)
+                    shieldCap = (uint)Math.Round(shieldCap / 2.0f);
+
+                return Math.Min(armor, shieldCap);
+            }
+            else
+                return armor;
+        }
+
+        public float CapArmor(float armor)
+        {
+            if (Common.ConfigManager.Config.Server.WorldRuleset != Common.Ruleset.CustomDM)
+                return armor;
+
+            var player = this as Player;
+            if (player != null) // Creatures always have full armor level.
+            {
+                // AL  cap:
+                // Trained / untrained: 80% armor skill
+                // Spec: armor skill
+                // AL cap is applied *after* item enchantments
+                var armorSkill = GetCreatureSkill(Skill.Armor);
+                var armorCap = armorSkill.Current;
+                if (armorSkill.AdvancementClass != SkillAdvancementClass.Specialized)
+                    armorCap = (uint)Math.Round(armorCap * 0.8f);
+
+                return Math.Min(armor, armorCap);
+            }
+            else
+                return armor;
+        }
+
         /// <summary>
         /// Returns the effective AL for 1 piece of armor/clothing
         /// </summary>
@@ -525,13 +580,13 @@ namespace ACE.Server.WorldObjects
 
             // TODO: could brittlemail / lures send a piece of armor or clothing's AL into the negatives?
             //if (effectiveAL < 0 && effectiveRL != 0)
-                //effectiveRL = 1.0f / effectiveRL;
+            //effectiveRL = 1.0f / effectiveRL;
 
             /*Console.WriteLine("Effective AL: " + effectiveAL);
             Console.WriteLine("Effective RL: " + effectiveRL);
             Console.WriteLine();*/
 
-            return effectiveAL * effectiveRL;
+            return CapArmor(effectiveAL * effectiveRL);
         }
 
         /// <summary>

@@ -157,6 +157,13 @@ namespace ACE.Server.WorldObjects
 
             numRecentAttacksReceived = 0;
             attacksReceivedPerSecond = 0.0f;
+
+            if(!Tier.HasValue && DeathTreasureType.HasValue)
+            {
+                var treasure = DeathTreasure;
+                if(treasure != null)
+                    Tier = DeathTreasure.Tier;
+            }
         }
 
         public override void BeforeEnterWorld()
