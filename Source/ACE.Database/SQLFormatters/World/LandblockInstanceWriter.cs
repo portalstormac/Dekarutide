@@ -4,24 +4,95 @@ using System.IO;
 using System.Linq;
 
 using ACE.Database.Models.World;
+using ACE.Entity;
 using ACE.Entity.Enum;
 using ACE.Entity.Enum.Properties;
 using ACE.Entity.Models;
+using log4net;
+using static System.Collections.Specialized.BitVector32;
 
 namespace ACE.Database.SQLFormatters.World
 {
     public class LandblockInstanceWriter : SQLWriter
     {
+        private static readonly ILog log = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+
         /// <summary>
         /// Default is formed from: (input.ObjCellId >> 16).ToString("X4")
         /// </summary>
-        public string GetDefaultFileName(LandblockInstance input)
+        public static string GetDefaultFileName(LandblockInstance input)
         {
-            string fileName = (input.ObjCellId >> 16).ToString("X4");
+            var landblock = input.ObjCellId >> 16;
+            return GetDefaultFileName(landblock);
+        }
+
+        public static string GetDefaultFileName(uint landblockId)
+        {
+            var name = GetNameFromPortalDestination(landblockId);
+
+            string fileName;
+            if (name != "")
+                fileName = $"{landblockId.ToString("X4")} - {name}";
+            else
+                fileName = landblockId.ToString("X4");
             fileName = IllegalInFileName.Replace(fileName, "_");
             fileName += ".sql";
-
             return fileName;
+        }
+
+        public static string GetNameFromPortalDestination(uint landblock)
+        {
+            using (var ctx = new WorldDbContext())
+            {
+                var query = from weenie in ctx.Weenie
+                            join wdest in ctx.WeeniePropertiesPosition on weenie.ClassId equals wdest.ObjectId
+                            join wname in ctx.WeeniePropertiesString on weenie.ClassId equals wname.ObjectId
+                            where weenie.Type == (int)WeenieType.Portal && wdest.PositionType == (int)PositionType.Destination && wname.Type == (int)PropertyString.Name
+                            select new
+                            {
+                                Weenie = weenie,
+                                Dest = wdest,
+                                Name = wname
+                            };
+
+                var results = query.ToList();
+
+                var resultsTest = results.Where(i => i.Dest.ObjCellId >> 16 == landblock).ToList();
+
+                var name = results.Where(i => i.Dest.ObjCellId >> 16 == landblock && i.Name != null && !i.Name.Value.Contains("Surface")).Select(i => i.Name.Value).FirstOrDefault();
+
+                if (name == null)
+                {
+                    var resultsAlternative = results.Where(i => i.Dest.ObjCellId >> 16 == landblock).ToList();
+                    foreach (var entry in resultsAlternative)
+                    {
+                        var portalInstances = DatabaseManager.World.GetLandblockInstancesByWcid(entry.Weenie.ClassId);
+                        foreach (var instance in portalInstances)
+                        {
+                            var dungeonLandblock = instance.ObjCellId >> 16;
+                            name = results.Where(i => i.Dest.ObjCellId >> 16 == dungeonLandblock && i.Name != null && !i.Name.Value.Contains("Surface")).Select(i => i.Name.Value).FirstOrDefault();
+                            if (name != null)
+                            {
+                                name = $"Surface around {name}";
+                                break;
+                            }
+                        }
+
+                        if (name != null)
+                            break;
+                    }
+
+                    if (name == null)
+                        return "";
+                }
+
+                if(name.StartsWith("Portal to "))
+                    name = name.Replace("Portal to ", "");
+                else if (name.EndsWith(" Portal"))
+                    name = name.Replace(" Portal", "");
+
+                return name;
+            }
         }
 
         public void CreateSQLDELETEStatement(IList<LandblockInstance> input, StreamWriter writer)
@@ -44,14 +115,22 @@ namespace ACE.Database.SQLFormatters.World
                 writer.WriteLine("INSERT INTO `landblock_instance` (`guid`, `weenie_Class_Id`, `obj_Cell_Id`, `origin_X`, `origin_Y`, `origin_Z`, `angles_W`, `angles_X`, `angles_Y`, `angles_Z`, `is_Link_Child`, `last_Modified`)");
 
                 string label = null;
+                string weenieName = null;
+                string className = null;
                 var level = 0;
                 var type = 0;
 
                 if (WeenieNames != null)
-                    WeenieNames.TryGetValue(value.WeenieClassId, out label);
+                    WeenieNames.TryGetValue(value.WeenieClassId, out weenieName);
 
-                if (WeenieClassNames != null && WeenieClassNames.TryGetValue(value.WeenieClassId, out var className))
-                    label += $"({value.WeenieClassId}/{className})";
+                if (WeenieClassNames != null)
+                    WeenieClassNames.TryGetValue(value.WeenieClassId, out className);
+
+                if(weenieName != null && className != null)
+                    label += weenieName + $"({value.WeenieClassId}/{className})";
+                else if (weenieName != null)
+                    label = weenieName + $" ({value.WeenieClassId})";
+                var parentWeenieName = label;
 
                 if (WeenieLevels != null)
                     WeenieLevels.TryGetValue(value.WeenieClassId, out level);
@@ -62,166 +141,219 @@ namespace ACE.Database.SQLFormatters.World
                 if (level > 0)
                     label += $" - Level: {level}";
 
-                if (TreasureDeath != null)
+                var weenie = DatabaseManager.World.GetCachedWeenie(value.WeenieClassId);
+
+                if(weenie == null)
                 {
-                    var weenie = DatabaseManager.World.GetCachedWeenie(value.WeenieClassId);
-                    var deathTreasureType = weenie.GetProperty(PropertyDataId.DeathTreasureType) ?? 0;
-                    if (deathTreasureType != 0 && TreasureDeath.TryGetValue(deathTreasureType, out var treasureDeath))
-                        label += $" - {(TreasureDeathDesc)treasureDeath.TreasureType} - {GetValueForTreasureData(treasureDeath.TreasureType)}";
+                    var landblockId = value.ObjCellId >> 16;
+                    log.Warn($"[LANDBLOCKINSTANCEWRITER] Landblock {landblockId:X4}: LandblockInstance has entry to unknown weeniedClassId: {value.WeenieClassId}");
                 }
-
-                if (type == (int)WeenieType.Chest || type == (int)WeenieType.Container || type == (int)WeenieType.Door)
+                else
                 {
-                    var weenie = DatabaseManager.World.GetCachedWeenie(value.WeenieClassId);
-                    var locked = weenie.GetProperty(PropertyBool.DefaultLocked) ?? false;
-                    var resistLockpick = weenie.GetProperty(PropertyInt.ResistLockpick) ?? 0;
-                    var key = weenie.GetProperty(PropertyString.LockCode) ?? "";
-
-                    if (locked)
-                        label += $" - Locked({resistLockpick}{(key.Length > 0 ? $"/{key})" : ")")}";
-
-                    var content = "";
                     if (TreasureDeath != null)
                     {
-                        if (weenie.PropertiesGenerator != null)
-                        {
-                            bool isFirst = true;
-                            foreach (var entry in weenie.PropertiesGenerator)
-                            {
-                                if (!isFirst)
-                                    content += " / ";
-                                isFirst = false;
+                        var deathTreasureType = weenie.GetProperty(PropertyDataId.DeathTreasureType) ?? 0;
+                        if (deathTreasureType != 0 && TreasureDeath.TryGetValue(deathTreasureType, out var treasureDeath))
+                            label += $" - {(TreasureDeathDesc)treasureDeath.TreasureType} - {GetValueForTreasureData(treasureDeath.TreasureType)}";
 
-                                if (entry.WhereCreate.HasFlag(RegenLocationType.Treasure))
-                                    content += GetValueForTreasureData(entry.WeenieClassId);
-                                else
-                                {
-                                    if (WeenieNames != null)
-                                    {
-                                        WeenieNames.TryGetValue(entry.WeenieClassId, out var entryWeenieName);
-                                        if (WeenieClassNames != null && WeenieClassNames.TryGetValue(entry.WeenieClassId, out var entryClassName))
-                                            content += $"{entryWeenieName}({entry.WeenieClassId}/{entryClassName})";
-                                        else
-                                            content += $"{entryWeenieName}({entry.WeenieClassId})";
-                                    }
-                                    else
-                                        content += entry.WeenieClassId;
-                                }
-                            }
-                        }
-
-                        if (weenie.PropertiesCreateList != null)
-                        {
-                            bool isFirst = true;
-                            foreach (var entry in weenie.PropertiesCreateList)
-                            {
-                                if (entry.WeenieClassId == 0)
-                                    continue;
-
-                                if (!isFirst)
-                                    content += " / ";
-                                isFirst = false;
-
-                                if (WeenieNames != null)
-                                {
-                                    WeenieNames.TryGetValue(entry.WeenieClassId, out var entryWeenieName);
-                                    if (WeenieClassNames != null && WeenieClassNames.TryGetValue(entry.WeenieClassId, out var entryClassName))
-                                        content += $"{entryWeenieName}({entry.WeenieClassId}/{entryClassName})";
-                                    else
-                                        content += $"{entryWeenieName}({entry.WeenieClassId})";
-
-                                    if (WeenieLevels != null)
-                                    {
-                                        WeenieLevels.TryGetValue(entry.WeenieClassId, out var generatedLevel);
-                                        if (generatedLevel > 0)
-                                            content += $" - Level: {generatedLevel}";
-                                    }
-                                }
-                                else
-                                    content += entry.WeenieClassId;
-                            }
-                        }
                     }
 
-                    if (content.Length > 0)
-                        label += $" - Content - {content}";
-                }
-                else// if (type == (int)WeenieType.Generic)
-                {
-                    var weenie = DatabaseManager.World.GetCachedWeenie(value.WeenieClassId);
-
-                    var generated = "";
-                    if (TreasureDeath != null)
+                    if (type == (int)WeenieType.Chest || type == (int)WeenieType.Container || type == (int)WeenieType.Door)
                     {
-                        if (weenie.PropertiesGenerator != null)
+                        var locked = weenie.GetProperty(PropertyBool.DefaultLocked) ?? false;
+                        var resistLockpick = weenie.GetProperty(PropertyInt.ResistLockpick) ?? 0;
+                        var key = weenie.GetProperty(PropertyString.LockCode) ?? "";
+
+                        if (locked)
+                            label += $" - Locked({resistLockpick}{(key.Length > 0 ? $"/{key})" : ")")}";
+
+                        var content = "";
+                        if (TreasureDeath != null)
                         {
-                            bool isFirst = true;
-                            foreach (var entry in weenie.PropertiesGenerator)
+                            if (weenie.PropertiesGenerator != null)
                             {
-                                if (!isFirst)
-                                    generated += " / ";
-                                isFirst = false;
-
-                                if (entry.WhereCreate.HasFlag(RegenLocationType.Treasure))
-                                    generated += GetValueForTreasureData(entry.WeenieClassId);
-                                else
+                                bool isFirst = true;
+                                foreach (var entry in weenie.PropertiesGenerator)
                                 {
-                                    if (WeenieNames != null)
-                                    {
-                                        WeenieNames.TryGetValue(entry.WeenieClassId, out var entryWeenieName);
-                                        if (WeenieClassNames != null && WeenieClassNames.TryGetValue(entry.WeenieClassId, out var entryClassName))
-                                            generated += $"{entryWeenieName}({entry.WeenieClassId}/{entryClassName})";
-                                        else
-                                            generated += $"{entryWeenieName}({entry.WeenieClassId})";
+                                    if (!isFirst)
+                                        content += " / ";
+                                    isFirst = false;
 
-                                        if (WeenieLevels != null)
+                                    var entryWeenie = DatabaseManager.World.GetCachedWeenie(entry.WeenieClassId);
+                                    if (entry.WhereCreate.HasFlag(RegenLocationType.Treasure))
+                                        content += GetValueForTreasureData(entry.WeenieClassId);
+                                    else
+                                    {
+                                        if (entryWeenie != null)
                                         {
-                                            WeenieLevels.TryGetValue(entry.WeenieClassId, out var generatedLevel);
-                                            if (generatedLevel > 0)
-                                                generated += $" - Level: {generatedLevel}";
+                                            if (WeenieNames != null)
+                                            {
+                                                string entryWeenieName = null;
+                                                WeenieNames.TryGetValue(entry.WeenieClassId, out entryWeenieName);
+
+                                                if (WeenieClassNames != null && WeenieClassNames.TryGetValue(entry.WeenieClassId, out var entryClassName))
+                                                    content += $"{entryWeenieName}({entry.WeenieClassId}/{entryClassName})";
+                                                else
+                                                    content += $"{entryWeenieName}({entry.WeenieClassId})";
+                                            }
+                                            else
+                                                content += $"({entry.WeenieClassId})";
+                                        }
+                                        else
+                                        {
+                                            content += $"({entry.WeenieClassId})";
+                                            
+                                            var landblockId = value.ObjCellId >> 16;
+                                            log.Warn($"[LANDBLOCKINSTANCEWRITER] Landblock {landblockId}:{parentWeenieName}: Generator has entry to unknown weeniedClassId: {entry.WeenieClassId}");
                                         }
                                     }
-                                    else
-                                        generated += entry.WeenieClassId;
                                 }
                             }
-                        }
 
-                        if (weenie.PropertiesCreateList != null)
-                        {
-                            bool isFirst = true;
-                            foreach (var entry in weenie.PropertiesCreateList)
+                            if (weenie.PropertiesCreateList != null)
                             {
-                                if (entry.WeenieClassId == 0)
-                                    continue;
-
-                                if (!isFirst)
-                                    generated += " / ";
-                                isFirst = false;
-
-                                if (WeenieNames != null)
+                                bool isFirst = true;
+                                foreach (var entry in weenie.PropertiesCreateList)
                                 {
-                                    WeenieNames.TryGetValue(entry.WeenieClassId, out var entryWeenieName);
-                                    if (WeenieClassNames != null && WeenieClassNames.TryGetValue(entry.WeenieClassId, out var entryClassName))
-                                        generated += $"{entryWeenieName}({entry.WeenieClassId}/{entryClassName})";
-                                    else
-                                        generated += $"{entryWeenieName}({entry.WeenieClassId})";
+                                    if (entry.WeenieClassId == 0)
+                                        continue;
 
-                                    if (WeenieLevels != null)
+                                    if (!isFirst)
+                                        content += " / ";
+                                    isFirst = false;
+
+                                    var entryWeenie = DatabaseManager.World.GetCachedWeenie(entry.WeenieClassId);
+                                    if (entryWeenie != null)
                                     {
-                                        WeenieLevels.TryGetValue(entry.WeenieClassId, out var generatedLevel);
-                                        if (generatedLevel > 0)
-                                            generated += $" - Level: {generatedLevel}";
+                                        if (WeenieNames != null)
+                                        {
+                                            WeenieNames.TryGetValue(entry.WeenieClassId, out var entryWeenieName);
+                                            if (WeenieClassNames != null && WeenieClassNames.TryGetValue(entry.WeenieClassId, out var entryClassName))
+                                                content += $"{entryWeenieName}({entry.WeenieClassId}/{entryClassName})";
+                                            else
+                                                content += $"{entryWeenieName}({entry.WeenieClassId})";
+
+                                            if (WeenieLevels != null)
+                                            {
+                                                WeenieLevels.TryGetValue(entry.WeenieClassId, out var generatedLevel);
+                                                if (generatedLevel > 0)
+                                                    content += $" - Level: {generatedLevel}";
+                                            }
+                                        }
+                                        else
+                                            content += $"({entry.WeenieClassId})";
+                                    }
+                                    else
+                                    {
+                                        content += $"({entry.WeenieClassId})";
+
+                                        var landblockId = value.ObjCellId >> 16;
+                                        log.Warn($"[LANDBLOCKINSTANCEWRITER] Landblock {landblockId}:{parentWeenieName}: CreateList has entry to unknown weeniedClassId: {entry.WeenieClassId}");
                                     }
                                 }
-                                else
-                                    generated += entry.WeenieClassId;
                             }
                         }
-                    }
 
-                    if (generated.Length > 0)
-                        label += $" - Generates - {generated}";
+                        if (content.Length > 0)
+                            label += $" - Content - {content}";
+                    }
+                    else// if (type == (int)WeenieType.Generic)
+                    {
+                        var generated = "";
+                        if (TreasureDeath != null)
+                        {
+                            if (weenie.PropertiesGenerator != null)
+                            {
+                                bool isFirst = true;
+                                foreach (var entry in weenie.PropertiesGenerator)
+                                {
+                                    if (!isFirst)
+                                        generated += " / ";
+                                    isFirst = false;
+
+                                    var entryWeenie = DatabaseManager.World.GetCachedWeenie(entry.WeenieClassId);
+                                    if (entry.WhereCreate.HasFlag(RegenLocationType.Treasure))
+                                        generated += GetValueForTreasureData(entry.WeenieClassId);
+                                    else
+                                    {
+                                        if (entryWeenie != null)
+                                        {
+                                            if (WeenieNames != null)
+                                            {
+                                                WeenieNames.TryGetValue(entry.WeenieClassId, out var entryWeenieName);
+                                                if (WeenieClassNames != null && WeenieClassNames.TryGetValue(entry.WeenieClassId, out var entryClassName))
+                                                    generated += $"{entryWeenieName}({entry.WeenieClassId}/{entryClassName})";
+                                                else
+                                                    generated += $"{entryWeenieName}({entry.WeenieClassId})";
+
+                                                if (WeenieLevels != null)
+                                                {
+                                                    WeenieLevels.TryGetValue(entry.WeenieClassId, out var generatedLevel);
+                                                    if (generatedLevel > 0)
+                                                        generated += $" - Level: {generatedLevel}";
+                                                }
+                                            }
+                                            else
+                                                generated += $"({entry.WeenieClassId})";
+                                        }
+                                        else
+                                        {
+                                            generated += $"({entry.WeenieClassId})";
+
+                                            var landblockId = value.ObjCellId >> 16;
+                                            log.Warn($"[LANDBLOCKINSTANCEWRITER] Landblock {landblockId}:{parentWeenieName}: Generator has entry to unknown weeniedClassId: {entry.WeenieClassId}");
+                                        }
+                                    }
+                                }
+                            }
+
+                            if (weenie.PropertiesCreateList != null)
+                            {
+                                bool isFirst = true;
+                                foreach (var entry in weenie.PropertiesCreateList)
+                                {
+                                    if (entry.WeenieClassId == 0)
+                                        continue;
+
+                                    if (!isFirst)
+                                        generated += " / ";
+                                    isFirst = false;
+
+                                    var entryWeenie = DatabaseManager.World.GetCachedWeenie(entry.WeenieClassId);
+                                    if (entryWeenie != null)
+                                    {
+                                        if (WeenieNames != null)
+                                        {
+                                            WeenieNames.TryGetValue(entry.WeenieClassId, out var entryWeenieName);
+                                            if (WeenieClassNames != null && WeenieClassNames.TryGetValue(entry.WeenieClassId, out var entryClassName))
+                                                generated += $"{entryWeenieName}({entry.WeenieClassId}/{entryClassName})";
+                                            else
+                                                generated += $"{entryWeenieName}({entry.WeenieClassId})";
+
+                                            if (WeenieLevels != null)
+                                            {
+                                                WeenieLevels.TryGetValue(entry.WeenieClassId, out var generatedLevel);
+                                                if (generatedLevel > 0)
+                                                    generated += $" - Level: {generatedLevel}";
+                                            }
+                                        }
+                                        else
+                                            generated += entry.WeenieClassId;
+                                    }
+                                    else
+                                    {
+                                        generated += $"({entry.WeenieClassId})";
+
+                                        var landblockId = value.ObjCellId >> 16;
+                                        log.Warn($"[LANDBLOCKINSTANCEWRITER] Landblock {landblockId}:{parentWeenieName}: CreateList has entry to unknown weeniedClassId: {entry.WeenieClassId}");
+                                    }
+                                }
+                            }
+
+                            if (generated.Length > 0)
+                                label += $" - Generates - {generated}";
+                        }
+                    }
                 }
 
                 var output = "VALUES (" +

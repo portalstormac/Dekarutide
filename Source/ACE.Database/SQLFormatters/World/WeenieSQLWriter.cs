@@ -7,11 +7,14 @@ using System.Linq;
 using ACE.Database.Models.World;
 using ACE.Entity.Enum;
 using ACE.Entity.Enum.Properties;
+using log4net;
 
 namespace ACE.Database.SQLFormatters.World
 {
     public class WeenieSQLWriter : SQLWriter
     {
+        private static readonly ILog log = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+
         /// <summary>
         /// Default is formed from: input.ClassId.ToString("00000") + " " + name
         /// </summary>
@@ -784,9 +787,27 @@ namespace ACE.Database.SQLFormatters.World
                 else if (TreasureDeath != null)
                 {
                     var weenie = DatabaseManager.World.GetCachedWeenie(input[i].WeenieClassId);
-                    var deathTreasureType = ACE.Entity.Models.WeenieExtensions.GetProperty(weenie, PropertyDataId.DeathTreasureType) ?? 0;
-                    if (deathTreasureType != 0 && TreasureDeath.TryGetValue(deathTreasureType, out var treasureDeath))
-                        label += $" - {(TreasureDeathDesc)treasureDeath.TreasureType} - {GetValueForTreasureData(treasureDeath.TreasureType)}";
+                    if (weenie != null)
+                    {
+                        var deathTreasureType = ACE.Entity.Models.WeenieExtensions.GetProperty(weenie, PropertyDataId.DeathTreasureType) ?? 0;
+                        if (deathTreasureType != 0 && TreasureDeath.TryGetValue(deathTreasureType, out var treasureDeath))
+                            label += $" - {(TreasureDeathDesc)treasureDeath.TreasureType} - {GetValueForTreasureData(treasureDeath.TreasureType)}";
+                    }
+                    else
+                    {
+                        string parentWeenieName = null;
+
+                        if (WeenieNames != null)
+                            WeenieNames.TryGetValue(weenieClassID, out parentWeenieName);
+
+                        var parentLabel = "";
+                        if (WeenieClassNames != null && WeenieClassNames.TryGetValue(weenieClassID, out var parentClassName))
+                            parentLabel += parentWeenieName + $"({weenieClassID}/{parentClassName})";
+                        else
+                            parentLabel = parentWeenieName + $" ({weenieClassID})";
+
+                        log.Warn($"[SQLWRITER] {parentLabel}: Generator has entry to unknown weeniedClassId: {input[i].WeenieClassId}");
+                    }
                 }
 
                 return  $"{weenieClassID}, " +
