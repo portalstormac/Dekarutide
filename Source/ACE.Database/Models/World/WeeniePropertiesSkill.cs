@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
 #nullable disable
@@ -16,6 +16,7 @@ namespace ACE.Database.Models.World
         public uint InitLevel { get; set; }
         public uint ResistanceAtLastCheck { get; set; }
         public double LastUsedTime { get; set; }
+        public ushort SecondaryTo { get; set; }
 
         public virtual Weenie Object { get; set; }
     }

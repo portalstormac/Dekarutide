@@ -68,6 +68,12 @@ namespace ACE.Server.WorldObjects
 
         private bool SpendSkillXp(CreatureSkill creatureSkill, uint amount, bool sendNetworkUpdate = true)
         {
+            if(creatureSkill.IsSecondary)
+            {
+                Session.Network.EnqueueSend(new GameMessageSystemChat($"You cannot raise {creatureSkill.Skill.ToSentence()} directly as it's set as a secondary skill of {creatureSkill.SecondaryTo.ToSentence()}.", ChatMessageType.Advancement));
+                return false;
+            }
+
             var skillXPTable = GetSkillXPTable(creatureSkill.AdvancementClass);
             if (skillXPTable == null)
             {
@@ -177,15 +183,22 @@ namespace ACE.Server.WorldObjects
 
             creatureSkill.AdvancementClass = SkillAdvancementClass.Trained;
             creatureSkill.Ranks = 0;
-            creatureSkill.InitLevel = 0;
 
-            if (applyCreationBonusXP)
+            if (Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.CustomDM)
             {
-                creatureSkill.ExperienceSpent = 526;
-                creatureSkill.Ranks = 5;
+                creatureSkill.InitLevel = 5;
             }
             else
-                creatureSkill.ExperienceSpent = 0;
+            {
+                creatureSkill.InitLevel = 0;
+                if (applyCreationBonusXP)
+                {
+                    creatureSkill.ExperienceSpent = 526;
+                    creatureSkill.Ranks = 5;
+                }
+                else
+                    creatureSkill.ExperienceSpent = 0;
+            }
 
             AvailableSkillCredits -= creditsSpent;
 
@@ -262,7 +275,10 @@ namespace ACE.Server.WorldObjects
             else
             {
                 // refund xp and skill credits
-                RefundXP(creatureSkill.ExperienceSpent);
+                if (!creatureSkill.IsSecondary)
+                    RefundXP(creatureSkill.ExperienceSpent);
+                else
+                    creatureSkill.SecondaryTo = Skill.None;
 
                 // temple untraining 'always trained' skills:
                 // cannot be untrained, but skill XP can be recovered
@@ -335,6 +351,9 @@ namespace ACE.Server.WorldObjects
             var playerSkill = GetCreatureSkill(skill);
 
             if (playerSkill.AdvancementClass < SkillAdvancementClass.Trained || playerSkill.IsMaxRank)
+                return;
+
+            if (playerSkill.IsSecondary)
                 return;
 
             amount = Math.Min(amount, playerSkill.ExperienceLeft);

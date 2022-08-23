@@ -283,7 +283,7 @@ namespace ACE.Database.SQLFormatters.Shard
 
         public void CreateSQLINSERTStatement(uint id, IList<BiotaPropertiesSkill> input, StreamWriter writer)
         {
-            writer.WriteLine("INSERT INTO `biota_properties_skill` (`object_Id`, `type`, `level_From_P_P`, `s_a_c`, `p_p`, `init_Level`, `resistance_At_Last_Check`, `last_Used_Time`)");
+            writer.WriteLine("INSERT INTO `biota_properties_skill` (`object_Id`, `type`, `level_From_P_P`, `s_a_c`, `p_p`, `init_Level`, `resistance_At_Last_Check`, `last_Used_Time`, `secondary_To`)");
 
             var lineGenerator = new Func<int, string>(i =>
                 $"{id}, " +
@@ -294,6 +294,7 @@ namespace ACE.Database.SQLFormatters.Shard
                 $"{input[i].InitLevel.ToString().PadLeft(3)}, " +
                 $"{input[i].ResistanceAtLastCheck.ToString().PadLeft(3)}, " +
                 $"{input[i].LastUsedTime}) " +
+                $"{input[i].SecondaryTo}) " +
                 // ReSharper disable once PossibleNullReferenceException
                 $"/* {Enum.GetName(typeof(Skill), input[i].Type).PadRight(19)} {((SkillAdvancementClass)input[i].SAC).ToString()} */");
 

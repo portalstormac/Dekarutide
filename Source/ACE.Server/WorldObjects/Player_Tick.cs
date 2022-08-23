@@ -540,7 +540,7 @@ namespace ACE.Server.WorldObjects
                                 // The client does not seem to send any packets when walk/run is toggled by hitting shift, so unless the player does something else(like turning) we won't find about it.
                                 // To reduce the delay we check the distance the player requested on this packet and toggle walk/run ourselves, this still has a delay compared to the client.
                                 var minterp = PhysicsObj.get_minterp();
-                                if (!IsJumping && !IsFirstAutoPosPacketSinceMoveToState && (minterp.RawState.ForwardCommand != (uint)MotionCommand.Ready || minterp.RawState.SideStepCommand != (uint)MotionCommand.Invalid))
+                                if (!IsJumping && !PhysicsObj.TransientState.HasFlag(TransientStateFlags.Sliding) && !IsFirstAutoPosPacketSinceMoveToState && (minterp.RawState.ForwardCommand != (uint)MotionCommand.Ready || minterp.RawState.SideStepCommand != (uint)MotionCommand.Invalid))
                                 {
                                     var isRunning = CheckIsRunning();
                                     var isForward = minterp.RawState.ForwardCommand != (uint)MotionCommand.WalkBackwards;
@@ -565,7 +565,7 @@ namespace ACE.Server.WorldObjects
                                         walkRate = -0.65f * 0.65f;
                                     }
 
-                                    if(isSideStepping)
+                                    if (isSideStepping)
                                     {
                                         if (hasForwardOrBackwardsMovement)
                                         {
@@ -575,7 +575,7 @@ namespace ACE.Server.WorldObjects
                                         else
                                         {
                                             var multiplier = 1.0f;
-                                            if(minterp.RawState.SideStepCommand == (uint)MotionCommand.SideStepLeft)
+                                            if (minterp.RawState.SideStepCommand == (uint)MotionCommand.SideStepLeft)
                                                 multiplier = -1.0f;
 
                                             runRate = multiplier * 0.65f * myRunRate * 0.65f;
@@ -613,7 +613,7 @@ namespace ACE.Server.WorldObjects
                                         CurrentMoveToState.RawMotionState.CurrentHoldKey = HoldKey.Invalid;
                                         CurrentMoveToState.RawMotionState.Flags &= ~RawMotionFlags.CurrentHoldKey;
 
-                                        if(isSideStepping && (hasForwardOrBackwardsMovement && !isForward))
+                                        if (isSideStepping && (hasForwardOrBackwardsMovement && !isForward))
                                             CurrentMoveToState.RawMotionState.Flags &= ~RawMotionFlags.SideStepCommand;
 
                                         //Session.Network.EnqueueSend(new GameMessageSystemChat($"{realDist.ToString("0.00")} {testRunDist.ToString("0.00")} {testWalkDist.ToString("0.00")}", ChatMessageType.Broadcast));

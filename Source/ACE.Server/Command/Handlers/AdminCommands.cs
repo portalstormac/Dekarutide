@@ -4783,5 +4783,47 @@ namespace ACE.Server.Command.Handlers
 
             AuthenticationHandler.RemoveIpFromVpnBlockList(parameters[0]);
         }
+
+        [CommandHandler("setsecondaryskill", AccessLevel.Admin, CommandHandlerFlag.RequiresWorld, 2, "Sets a skill as a secondary skill of another skill.", "<secondaryId> <primaryId or 0>")]
+        public static void HandleSetSecondarySkill(Session session, params string[] parameters)
+        {
+            if (ushort.TryParse(parameters[0], out ushort secondarySkillId) && ushort.TryParse(parameters[1], out ushort primarySkillId))
+            {
+                var player = session.Player;
+
+                CreatureSkill primarySkill = null;
+                if (primarySkillId != 0)
+                    primarySkill = player.GetCreatureSkill((Skill)primarySkillId, false);
+                var secondarySkill = player.GetCreatureSkill((Skill)secondarySkillId, false);
+
+                if(primarySkill != null && secondarySkill != null)
+                {
+                    if (secondarySkill.AdvancementClass < SkillAdvancementClass.Trained)
+                    {
+                        CommandHandlerHelper.WriteOutputInfo(session, $"{secondarySkill.Skill.ToSentence()} can't be set as secondary as it's not trained.", ChatMessageType.WorldBroadcast);
+                        return;
+                    }
+                    else if (secondarySkill.Ranks != 0)
+                    {
+                        CommandHandlerHelper.WriteOutputInfo(session, $"{secondarySkill.Skill.ToSentence()} can't be set as secondary as experience has been spent on it.", ChatMessageType.WorldBroadcast);
+                        return;
+                    }
+                    else
+                    {
+                        secondarySkill.SecondaryTo = primarySkill.Skill;
+                        CommandHandlerHelper.WriteOutputInfo(session, $"{secondarySkill.Skill.ToSentence()} is now set as secondary of {primarySkill.Skill.ToSentence()}.", ChatMessageType.WorldBroadcast);
+                    }
+                }
+                else if(secondarySkill != null && primarySkillId == 0)
+                {
+                    secondarySkill.SecondaryTo = Skill.None;
+                    CommandHandlerHelper.WriteOutputInfo(session, $"{secondarySkill.Skill.ToSentence()} is set as primary.", ChatMessageType.WorldBroadcast);
+                }
+                else
+                    CommandHandlerHelper.WriteOutputInfo(session, "Invalid skill IDs.", ChatMessageType.WorldBroadcast);
+            }
+            else
+                CommandHandlerHelper.WriteOutputInfo(session, "Invalid skill IDs.", ChatMessageType.WorldBroadcast);
+        }
     }
 }

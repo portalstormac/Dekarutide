@@ -338,7 +338,7 @@ namespace ACE.Database.SQLFormatters.World
 
         public void CreateSQLINSERTStatement(uint weenieClassID, IList<WeeniePropertiesSkill> input, StreamWriter writer)
         {
-            writer.WriteLine("INSERT INTO `weenie_properties_skill` (`object_Id`, `type`, `level_From_P_P`, `s_a_c`, `p_p`, `init_Level`, `resistance_At_Last_Check`, `last_Used_Time`)");
+            writer.WriteLine("INSERT INTO `weenie_properties_skill` (`object_Id`, `type`, `level_From_P_P`, `s_a_c`, `p_p`, `init_Level`, `resistance_At_Last_Check`, `last_Used_Time`, `secondary_To`)");
 
             var lineGenerator = new Func<int, string>(i =>
                 $"{weenieClassID}, " +
@@ -349,6 +349,7 @@ namespace ACE.Database.SQLFormatters.World
                 $"{input[i].InitLevel.ToString().PadLeft(3)}, " +
                 $"{input[i].ResistanceAtLastCheck}, " +
                 $"{input[i].LastUsedTime}) " +
+                $"{input[i].SecondaryTo}) " +
                 // ReSharper disable once PossibleNullReferenceException
                 $"/* {Enum.GetName(typeof(Skill), input[i].Type).PadRight(19)} {((SkillAdvancementClass)input[i].SAC).ToString()} */");
 

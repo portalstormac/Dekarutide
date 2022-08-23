@@ -1095,6 +1095,10 @@ namespace ACE.Database.Models.Shard
                     .HasColumnName("s_a_c")
                     .HasComment("skill state");
 
+                entity.Property(e => e.SecondaryTo)
+                    .HasColumnName("secondary_To")
+                    .HasComment("Id of the skill this is a secondary skill of");
+
                 entity.HasOne(d => d.Object)
                     .WithMany(p => p.BiotaPropertiesSkill)
                     .HasForeignKey(d => d.ObjectId)

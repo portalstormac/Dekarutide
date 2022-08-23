@@ -2256,6 +2256,10 @@ namespace ACE.Database.Models.World
                     .HasColumnName("type")
                     .HasComment("Type of Property the value applies to (PropertySkill.????)");
 
+                entity.Property(e => e.SecondaryTo)
+                    .HasColumnName("secondary_To")
+                    .HasComment("Id of the skill this is a secondary skill of");
+
                 entity.HasOne(d => d.Object)
                     .WithMany(p => p.WeeniePropertiesSkill)
                     .HasForeignKey(d => d.ObjectId)

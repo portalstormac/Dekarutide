@@ -377,6 +377,7 @@ namespace ACE.Database.Adapter
                         InitLevel = record.InitLevel,
                         ResistanceAtLastCheck = record.ResistanceAtLastCheck,
                         LastUsedTime = record.LastUsedTime,
+                        SecondaryTo = (Skill)record.SecondaryTo,
                     };
 
                     result.PropertiesSkill[(Skill)record.Type] = newEntity;
@@ -811,6 +812,7 @@ namespace ACE.Database.Adapter
                         InitLevel = kvp.Value.InitLevel,
                         ResistanceAtLastCheck = kvp.Value.ResistanceAtLastCheck,
                         LastUsedTime = kvp.Value.LastUsedTime,
+                        SecondaryTo = (ushort)kvp.Value.SecondaryTo,
                     };
 
                     result.BiotaPropertiesSkill.Add(entity);
