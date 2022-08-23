@@ -465,8 +465,6 @@ namespace ACE.Server.WorldObjects
             return isRunning;
         }
 
-        bool secondTime = false;
-
         /// <summary>
         /// Used by physics engine to actually update a player position
         /// Automatically notifies clients of updated position
