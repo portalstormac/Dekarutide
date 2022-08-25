@@ -122,9 +122,8 @@ namespace ACE.Server.WorldObjects.Entity
                 {
                     foreach (var entry in creature.Skills)
                     {
-                        var skill = entry.Value;
-                        if (skill.IsSecondary && skill.SecondaryTo == Skill)
-                            skill.UpdateSecondarySkill(value);
+                        if (entry.Value.SecondaryTo == Skill)
+                            entry.Value.UpdateSecondarySkill(value);
                     }
                 }
             }
@@ -261,9 +260,9 @@ namespace ACE.Server.WorldObjects.Entity
                 else
                     ExperienceSpent = 0;
 
+                // Delay sending theses message for one tick so they appear after the original skill message.
                 if (SecondaryTo != 0)
                 {
-                    // Delay sending theses message for one tick so they appear after the original skill message.
                     var sendMessageChain = new ActionChain();
                     sendMessageChain.AddDelayForOneTick();
 
@@ -271,6 +270,19 @@ namespace ACE.Server.WorldObjects.Entity
                     {
                         player.Session.Network.EnqueueSend(new GameMessagePrivateUpdateSkill(player, this));
                         player.Session.Network.EnqueueSend(new GameMessageSystemChat($"Your base {Skill.ToSentence()} secondary skill is now {Base}!", ChatMessageType.Advancement));
+                    });
+
+                    sendMessageChain.EnqueueChain();
+                }
+                else
+                {
+                    var sendMessageChain = new ActionChain();
+                    sendMessageChain.AddDelayForOneTick();
+
+                    sendMessageChain.AddAction(player, () =>
+                    {
+                        player.Session.Network.EnqueueSend(new GameMessagePrivateUpdateSkill(player, this));
+                        player.Session.Network.EnqueueSend(new GameMessageSystemChat($"Your base {Skill.ToSentence()} skill is now {Base}!", ChatMessageType.Advancement));
                     });
 
                     sendMessageChain.EnqueueChain();

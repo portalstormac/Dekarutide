@@ -70,8 +70,8 @@ namespace ACE.Server.WorldObjects
         {
             if(creatureSkill.IsSecondary)
             {
-                Session.Network.EnqueueSend(new GameMessageSystemChat($"You cannot raise {creatureSkill.Skill.ToSentence()} directly as it's set as a secondary skill of {creatureSkill.SecondaryTo.ToSentence()}.", ChatMessageType.Advancement));
-                return false;
+                Session.Network.EnqueueSend(new GameMessageSystemChat($"You cannot raise your {creatureSkill.Skill.ToSentence()} skill directly as it's set as a secondary skill of your {creatureSkill.SecondaryTo.ToSentence()} skill.", ChatMessageType.Advancement));
+                return true;
             }
 
             var skillXPTable = GetSkillXPTable(creatureSkill.AdvancementClass);
