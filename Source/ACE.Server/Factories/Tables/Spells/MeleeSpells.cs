@@ -45,7 +45,7 @@ namespace ACE.Server.Factories.Tables
                 {
                     ( SpellId.DefenderSelf1,     0.25f ),
                     //( SpellId.BloodDrinkerSelf1, 1.00f ),
-                    ( SpellId.SwiftKillerSelf1,  0.30f ),
+                    //( SpellId.SwiftKillerSelf1,  0.30f ),
                     ( SpellId.HeartSeekerSelf1,  0.25f ),
                 };
             }

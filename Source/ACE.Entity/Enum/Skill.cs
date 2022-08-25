@@ -170,9 +170,9 @@ namespace ACE.Entity.Enum
                 ValidSkills.Add(Skill.UnarmedCombat);
                 ValidSkills.Add(Skill.Salvaging);
 
-                ValidSkills.Add(Skill.Spellcraft);
+                //ValidSkills.Add(Skill.Spellcraft);
                 ValidSkills.Add(Skill.Awareness);
-                ValidSkills.Add(Skill.ArmsAndArmorRepair);
+                //ValidSkills.Add(Skill.ArmsAndArmorRepair);
                 ValidSkills.Add(Skill.AppraiseMissileItem);
                 ValidSkills.Add(Skill.AppraiseMeleeItem);
                 ValidSkills.Add(Skill.AppraiseArmor);
