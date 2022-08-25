@@ -217,7 +217,7 @@ namespace ACE.Server.WorldObjects
                     sendRestMessageChain.AddDelayForOneTick();
                     sendRestMessageChain.AddAction(this, () =>
                     {
-                        playerDamager.Session.Network.EnqueueSend(new GameEventKillerNotification(playerDamager.Session, $"You've earned {(long)Math.Round(totalXP)} experience! T: {(typeCampBonus * 100).ToString("0")}% A: {(areaCampBonus * 100).ToString("0")}% R: {(restCampBonus * 100).ToString("0")}%"));
+                        playerDamager.Session.Network.EnqueueSend(new GameEventKillerNotification(playerDamager.Session, $"You've earned {((long)Math.Round(totalXP)):N0} experience! T: {(typeCampBonus * 100).ToString("0")}% A: {(areaCampBonus * 100).ToString("0")}% R: {(restCampBonus * 100).ToString("0")}%"));
                     });
 
                     sendRestMessageChain.EnqueueChain();
