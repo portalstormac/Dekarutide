@@ -1695,7 +1695,7 @@ namespace ACE.Server.Command.Handlers.Processors
             if (!folder.Exists)
                 folder.Create();
 
-            var sqlFilename = $"{folder.FullName}{sep}{landblock:X4}.sql";
+            var sqlFilename = $"{folder.FullName}{sep}{LandblockInstanceWriter.GetDefaultFileName(landblock)}";
 
             if (instances.Count > 0)
             {
@@ -2773,7 +2773,7 @@ namespace ACE.Server.Command.Handlers.Processors
             if (!di.Exists)
                 di.Create();
 
-            var sql_filename = $"{landblockId:X4}.sql";
+            var sql_filename = LandblockInstanceWriter.GetDefaultFileName(landblockId);
 
             try
             {
@@ -2787,8 +2787,6 @@ namespace ACE.Server.Command.Handlers.Processors
                     LandblockInstanceWriter.TreasureDeath = DatabaseManager.World.GetAllTreasureDeath();
                     LandblockInstanceWriter.TreasureWielded = DatabaseManager.World.GetAllTreasureWielded();
                 }
-
-                sql_filename = LandblockInstanceWriter.GetDefaultFileName(landblockId);
 
                 var sqlFile = new StreamWriter(sql_folder + sql_filename);
 
