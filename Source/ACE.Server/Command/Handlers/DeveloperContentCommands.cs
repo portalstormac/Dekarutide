@@ -1948,10 +1948,76 @@ namespace ACE.Server.Command.Handlers.Processors
             foreach (var entry in encounters)
             {
                 Weenie weenie = DatabaseManager.World.GetWeenie(entry.WeenieClassId);
-                session.Network.EnqueueSend(new GameMessageSystemChat($"{counter}: {weenie.ClassId}({weenie.WeeniePropertiesString.FirstOrDefault(i => i.Type == (int)PropertyString.Name)?.Value}) - cellX: {entry.CellX} - cellY: {entry.CellY}", ChatMessageType.Broadcast));
+                session.Network.EnqueueSend(new GameMessageSystemChat($"{counter}: {weenie.WeeniePropertiesString.FirstOrDefault(i => i.Type == (int)PropertyString.Name)?.Value}({weenie.ClassId}/{weenie.ClassName}) - cellX: {entry.CellX} - cellY: {entry.CellY}", ChatMessageType.Broadcast));
                 counter++;
             }
             session.Network.EnqueueSend(new GameMessageSystemChat($"---", ChatMessageType.Broadcast));
+        }
+
+        //[CommandHandler("fixEnc", AccessLevel.Developer, CommandHandlerFlag.RequiresWorld, "")]
+        //public static void HandleFixEnc(Session session, params string[] parameters)
+        //{
+        //    int counter = 0;
+        //    for (int x = 0xCF; x < 0xE3; x++)
+        //    {
+        //        for (int y = 0x4C; y < 0x63; y++)
+        //        {
+        //            ushort landblock = (ushort)(x << 8 | y);
+        //            ReplaceEncounterByLandblock(session, 23178, 23185, landblock); // Fix desert spawners around Shoushi
+        //            counter++;
+        //        }
+        //    }
+        //    session.Network.EnqueueSend(new GameMessageSystemChat($"Fixed {counter} landblocks.", ChatMessageType.Broadcast));
+        //}
+
+        public static void ReplaceEncounterByLandblock(Session session, uint source, uint target, ushort landblock)
+        {
+            Weenie weenieSource = null;
+            Weenie weenieTarget = null;
+
+            weenieSource = DatabaseManager.World.GetWeenie(source);
+            weenieTarget = DatabaseManager.World.GetWeenie(target);
+
+            if (weenieSource == null)
+            {
+                session.Network.EnqueueSend(new GameMessageSystemChat($"Couldn't find weenie {source}", ChatMessageType.Broadcast));
+                return;
+            }
+
+            if (weenieTarget == null)
+            {
+                session.Network.EnqueueSend(new GameMessageSystemChat($"Couldn't find weenie {target}", ChatMessageType.Broadcast));
+                return;
+            }
+
+            var pos = session.Player.Location;
+
+            if ((pos.Cell & 0xFFFF) >= 0x100)
+            {
+                session.Network.EnqueueSend(new GameMessageSystemChat("You must be outdoors to replace an encounter!", ChatMessageType.Broadcast));
+                return;
+            }
+
+            // clear any cached encounters for this landblock so we get the unmodified entries
+            DatabaseManager.World.ClearCachedEncountersByLandblock(landblock);
+
+            // get existing encounters for this landblock
+            var encounters = DatabaseManager.World.GetCachedEncountersByLandblock(landblock, out _);
+
+            foreach (var entry in encounters)
+            {
+                if (entry.WeenieClassId == weenieSource.ClassId)
+                {
+                    entry.WeenieClassId = weenieTarget.ClassId;
+                    entry.LastModified = DateTime.Now;
+                }
+            }
+
+            session.Network.EnqueueSend(new GameMessageSystemChat($"Replacing entries of encounter {weenieSource.ClassId}({weenieSource.WeeniePropertiesString.FirstOrDefault(i => i.Type == (int)PropertyString.Name)?.Value}) for {weenieTarget.ClassId}({weenieTarget.WeeniePropertiesString.FirstOrDefault(i => i.Type == (int)PropertyString.Name)?.Value}) @ landblock 0x{pos.Landblock:X4}", ChatMessageType.Broadcast));
+
+            SyncEncounters(session, landblock, encounters);
+            DeveloperCommands.HandleReloadLandblocks(session);
+
         }
 
         [CommandHandler("replaceenc", AccessLevel.Developer, CommandHandlerFlag.RequiresWorld, 2, "Replaces a wcid or classname in the current outdoor landblock encounters for another", "<wcid or classname> <wcid or classname>")]
@@ -2584,6 +2650,18 @@ namespace ACE.Server.Command.Handlers.Processors
                 case FileType.Weenie:
                     ExportSQLWeenie(session, param);
                     break;
+            }
+        }
+
+
+        [CommandHandler("export-sql-landblocks", AccessLevel.Developer, CommandHandlerFlag.None, 0, "Exports all landblocks from database to SQL file", "")]
+        public static void HandleExportSqLandblocksl(Session session, params string[] parameters)
+        {
+            for (ushort landblockId = 0x0000; landblockId < 0xFFFF; landblockId++)
+            {
+                var instances = DatabaseManager.World.GetCachedInstancesByLandblock(landblockId);
+                if(instances != null && instances.Count > 0)
+                    ExportSQLLandblock(session, landblockId.ToString("x4"));
             }
         }
 

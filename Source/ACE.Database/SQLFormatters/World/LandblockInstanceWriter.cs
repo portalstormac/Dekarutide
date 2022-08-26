@@ -40,37 +40,49 @@ namespace ACE.Database.SQLFormatters.World
             return fileName;
         }
 
+        private class NameResults
+        {
+            public Models.World.Weenie Weenie{ get; set; }
+            public WeeniePropertiesPosition Dest { get; set; }
+            public WeeniePropertiesString Name { get; set; }
+        }
+
+        private static List<NameResults> Results = null;
+
         public static string GetNameFromPortalDestination(uint landblock)
         {
             using (var ctx = new WorldDbContext())
             {
-                var query = from weenie in ctx.Weenie
-                            join wdest in ctx.WeeniePropertiesPosition on weenie.ClassId equals wdest.ObjectId
-                            join wname in ctx.WeeniePropertiesString on weenie.ClassId equals wname.ObjectId
-                            where weenie.Type == (int)WeenieType.Portal && wdest.PositionType == (int)PositionType.Destination && wname.Type == (int)PropertyString.Name
-                            select new
-                            {
-                                Weenie = weenie,
-                                Dest = wdest,
-                                Name = wname
-                            };
+                if (Results == null)
+                {
+                    var query = from weenie in ctx.Weenie
+                                join wdest in ctx.WeeniePropertiesPosition on weenie.ClassId equals wdest.ObjectId
+                                join wname in ctx.WeeniePropertiesString on weenie.ClassId equals wname.ObjectId
+                                where weenie.Type == (int)WeenieType.Portal && wdest.PositionType == (int)PositionType.Destination && wname.Type == (int)PropertyString.Name
+                                select new NameResults
+                                {
+                                    Weenie = weenie,
+                                    Dest = wdest,
+                                    Name = wname
+                                };
 
-                var results = query.ToList();
+                    Results = query.ToList();
+                }
 
-                var resultsTest = results.Where(i => i.Dest.ObjCellId >> 16 == landblock).ToList();
+                var resultsTest = Results.Where(i => i.Dest.ObjCellId >> 16 == landblock).ToList();
 
-                var name = results.Where(i => i.Dest.ObjCellId >> 16 == landblock && i.Name != null && !i.Name.Value.Contains("Surface")).Select(i => i.Name.Value).FirstOrDefault();
+                var name = Results.Where(i => i.Dest.ObjCellId >> 16 == landblock && i.Name != null && !i.Name.Value.Contains("Surface") && !i.Name.Value.Contains("Gateway") && !i.Name.Value.Contains("Exit")).Select(i => i.Name.Value).FirstOrDefault();
 
                 if (name == null)
                 {
-                    var resultsAlternative = results.Where(i => i.Dest.ObjCellId >> 16 == landblock).ToList();
+                    var resultsAlternative = Results.Where(i => i.Dest.ObjCellId >> 16 == landblock).ToList();
                     foreach (var entry in resultsAlternative)
                     {
                         var portalInstances = DatabaseManager.World.GetLandblockInstancesByWcid(entry.Weenie.ClassId);
                         foreach (var instance in portalInstances)
                         {
                             var dungeonLandblock = instance.ObjCellId >> 16;
-                            name = results.Where(i => i.Dest.ObjCellId >> 16 == dungeonLandblock && i.Name != null && !i.Name.Value.Contains("Surface")).Select(i => i.Name.Value).FirstOrDefault();
+                            name = Results.Where(i => i.Dest.ObjCellId >> 16 == dungeonLandblock && i.Name != null && !i.Name.Value.Contains("Surface") && !i.Name.Value.Contains("Gateway") && !i.Name.Value.StartsWith("Exit")).Select(i => i.Name.Value).FirstOrDefault();
                             if (name != null)
                             {
                                 name = $"Surface around {name}";
@@ -86,10 +98,14 @@ namespace ACE.Database.SQLFormatters.World
                         return "";
                 }
 
-                if(name.StartsWith("Portal to "))
+                if (name.StartsWith("Portal to "))
                     name = name.Replace("Portal to ", "");
                 else if (name.EndsWith(" Portal"))
                     name = name.Replace(" Portal", "");
+                else if (name.StartsWith("Way Back to "))
+                    name = name.Replace("Way Back to ", "");
+                else if (name.EndsWith(" Exit"))
+                    name = name.Replace(" Exit", "");
 
                 return name;
             }
