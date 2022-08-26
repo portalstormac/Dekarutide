@@ -362,7 +362,7 @@ namespace ACE.Server.WorldObjects
             }
 
             var runSkill = GetCreatureSkill(Skill.Run).Current;
-            var runRate = MovementSystem.GetRunRate(burden, (int)runSkill, 1.0f);
+            var runRate = MovementSystem.GetRunRate(burden, (int)runSkill, ACE.Common.ConfigManager.Config.Server.WorldRuleset == ACE.Common.Ruleset.CustomDM ? 1.5f : 1.0f);
 
             return (float)runRate;
         }

@@ -129,7 +129,7 @@ namespace ACE.Server.Physics.Common
                 runSkill = creature.GetCreatureSkill(Skill.Run).Current;
 
             //rate = (float)MovementSystem.GetRunRate(0.0f, 300, 1.0f);
-            rate = (float)MovementSystem.GetRunRate(0.0f, (int)runSkill, 1.0f);
+            rate = (float)MovementSystem.GetRunRate(0.0f, (int)runSkill, ACE.Common.ConfigManager.Config.Server.WorldRuleset == ACE.Common.Ruleset.CustomDM ? 1.5f : 1.0f);
             //Console.WriteLine($"{WorldObject.Name} ({WorldObject.Guid}) - WeenieObject.InqRunRate: runSkill = {runSkill}, rate = {rate}");
             return true;
         }
