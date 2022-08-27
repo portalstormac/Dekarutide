@@ -110,53 +110,6 @@ namespace ACE.Server.WorldObjects
             base.OnAttackReceived(attacker, attackType, critical, avoided);
         }
 
-        /// <summary>
-        /// Returns the highest melee skill for the player
-        /// (light / heavy / finesse)
-        /// </summary>
-        public Skill GetHighestMeleeSkill()
-        {
-            Entity.CreatureSkill maxMelee;
-            if (ConfigManager.Config.Server.WorldRuleset == Ruleset.EoR)
-            {
-                var light = GetCreatureSkill(Skill.LightWeapons);
-                var heavy = GetCreatureSkill(Skill.HeavyWeapons);
-                var finesse = GetCreatureSkill(Skill.FinesseWeapons);
-
-                maxMelee = light;
-                if (heavy.Current > maxMelee.Current)
-                    maxMelee = heavy;
-                if (finesse.Current > maxMelee.Current)
-                    maxMelee = finesse;
-            }
-            else
-            {
-                var axe = GetCreatureSkill(Skill.Axe);
-                var dagger = GetCreatureSkill(Skill.Dagger);
-                var mace = GetCreatureSkill(Skill.Mace);
-                var spear = GetCreatureSkill(Skill.Spear);
-                var staff = GetCreatureSkill(Skill.Staff);
-                var sword = GetCreatureSkill(Skill.Sword);
-                var unarmed = GetCreatureSkill(Skill.UnarmedCombat);
-
-                maxMelee = axe;
-                if (dagger.Current > maxMelee.Current)
-                    maxMelee = dagger;
-                if (mace.Current > maxMelee.Current)
-                    maxMelee = mace;
-                if (spear.Current > maxMelee.Current)
-                    maxMelee = spear;
-                if (staff.Current > maxMelee.Current)
-                    maxMelee = staff;
-                if (sword.Current > maxMelee.Current)
-                    maxMelee = sword;
-                if (unarmed.Current > maxMelee.Current)
-                    maxMelee = unarmed;
-            }
-
-            return maxMelee.Skill;
-        }
-
         public override CombatType GetCombatType()
         {
             // this is an unsafe function, move away from this

@@ -1039,7 +1039,7 @@ namespace ACE.Server.WorldObjects
         {
             if (ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.CustomDM)
             {
-                switch(skill)
+                switch (skill)
                 {
                     case Skill.Mace: return Skill.Axe;
                     case Skill.Staff: return Skill.Spear;
@@ -1049,16 +1049,18 @@ namespace ACE.Server.WorldObjects
             }
             else if (ConfigManager.Config.Server.WorldRuleset <= Common.Ruleset.Infiltration)
                 return skill;
-
-            if (this is Player player)
+            else
             {
-                if (SkillExtensions.RetiredMelee.Contains(skill))
-                    return player.GetHighestMeleeSkill();
-                if (SkillExtensions.RetiredMissile.Contains(skill))
-                    return Skill.MissileWeapons;
-            }
+                if (this is Player player)
+                {
+                    if (SkillExtensions.RetiredMelee.Contains(skill))
+                        return player.GetHighestMeleeSkill();
+                    if (SkillExtensions.RetiredMissile.Contains(skill))
+                        return Skill.MissileWeapons;
+                }
 
-            return skill;
+                return skill;
+            }
         }
 
         public void GetCurrentMotionState(out MotionStance currentStance, out MotionCommand currentMotion)
