@@ -19,5 +19,25 @@ namespace ACE.Database.Models.World
         public ushort SecondaryTo { get; set; }
 
         public virtual Weenie Object { get; set; }
+
+        public WeeniePropertiesSkill() { }
+
+        /// <summary>
+        /// Copy constructor
+        /// </summary>
+        public WeeniePropertiesSkill(WeeniePropertiesSkill other)
+        {
+            Id = other.Id;
+            ObjectId = other.ObjectId;
+            Type = other.Type;
+            LevelFromPP = other.LevelFromPP;
+            SAC = other.SAC;
+            PP = other.PP;
+            InitLevel = other.InitLevel;
+            ResistanceAtLastCheck = other.ResistanceAtLastCheck;
+            LastUsedTime = other.LastUsedTime;
+            SecondaryTo = other.SecondaryTo;
+            Object = other.Object;
+        }
     }
 }

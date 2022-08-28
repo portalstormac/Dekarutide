@@ -1,14 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.IO;
-using System.Linq;
-using System.Numerics;
-using System.Text.RegularExpressions;
-
-using Microsoft.EntityFrameworkCore;
-using Newtonsoft.Json;
-
 using ACE.Adapter.GDLE;
 using ACE.Adapter.Lifestoned;
 using ACE.Common.Extensions;
@@ -20,14 +9,21 @@ using ACE.Entity.Enum;
 using ACE.Entity.Enum.Properties;
 using ACE.Server.Entity;
 using ACE.Server.Factories;
+using ACE.Server.Factories.Tables;
 using ACE.Server.Managers;
 using ACE.Server.Network;
 using ACE.Server.Network.GameMessages.Messages;
 using ACE.Server.Physics.Extensions;
 using ACE.Server.WorldObjects;
-using ACE.Server.Factories.Tables;
-using MySqlX.XDevAPI.Common;
-using log4net;
+using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
+using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.IO;
+using System.Linq;
+using System.Numerics;
+using System.Text.RegularExpressions;
 
 namespace ACE.Server.Command.Handlers.Processors
 {
@@ -2653,7 +2649,6 @@ namespace ACE.Server.Command.Handlers.Processors
             }
         }
 
-
         [CommandHandler("export-sql-landblocks", AccessLevel.Developer, CommandHandlerFlag.None, 0, "Exports all landblocks from database to SQL file", "")]
         public static void HandleExportSqLandblocksl(Session session, params string[] parameters)
         {
@@ -4672,14 +4667,116 @@ namespace ACE.Server.Command.Handlers.Processors
 
         //        var weenie = DatabaseManager.World.GetWeenie(weenieTypeEntry.Key);
 
-        //        var creature = WorldObjectFactory.CreateNewWorldObject(weenie.ClassId) as Creature;
-        //        var highestMeleeSkill = creature.GetHighestMeleeSkill();
-        //        var highestMissileSkill = creature.GetHighestMissileSkill();
-        //        var newSkills = new HashSet<WeeniePropertiesSkill>();
-        //        bool addedMeleeSkill = false;
-        //        bool addedMissileSkill = false;
-        //        WeeniePropertiesSkill highestExistingMeleeSkill = new WeeniePropertiesSkill();
-        //        WeeniePropertiesSkill highestExistingMissileSkill = new WeeniePropertiesSkill();
+        //        if (weenie.WeeniePropertiesSkill == null || weenie.WeeniePropertiesSkill.Count == 0)
+        //            continue;
+
+        //        WeeniePropertiesSkill highestExistingMeleeSkill = null;
+        //        WeeniePropertiesSkill highestExistingMissileSkill = null;
+        //        foreach (var skill in weenie.WeeniePropertiesSkill)
+        //        {
+        //            switch ((Skill)skill.Type)
+        //            {
+        //                case Skill.Axe:
+        //                case Skill.Dagger:
+        //                case Skill.Mace:
+        //                case Skill.Spear:
+        //                case Skill.Staff:
+        //                case Skill.Sword:
+        //                case Skill.UnarmedCombat:
+        //                    skill.LastUsedTime = 0;
+        //                    if (highestExistingMeleeSkill == null || skill.InitLevel > highestExistingMeleeSkill.InitLevel)
+        //                            highestExistingMeleeSkill = new WeeniePropertiesSkill(skill);
+        //                    break;
+        //                case Skill.Bow:
+        //                case Skill.Crossbow:
+        //                case Skill.ThrownWeapon:
+        //                    skill.LastUsedTime = 0;
+        //                    if (highestExistingMissileSkill == null || skill.InitLevel > highestExistingMissileSkill.InitLevel)
+        //                        highestExistingMissileSkill = new WeeniePropertiesSkill(skill);
+        //                    break;
+        //                default:
+        //                    skill.LastUsedTime = 0;
+        //                    break;
+        //            }
+        //        }
+
+        //        if (highestExistingMeleeSkill == null && highestExistingMissileSkill == null)
+        //            continue;
+
+        //        if (highestExistingMeleeSkill == null)
+        //        {
+        //            highestExistingMeleeSkill = new WeeniePropertiesSkill();
+        //            highestExistingMeleeSkill.SAC = (uint)SkillAdvancementClass.Trained;
+        //        }
+
+        //        if (highestExistingMissileSkill == null)
+        //        {
+        //            highestExistingMissileSkill = new WeeniePropertiesSkill();
+        //            highestExistingMissileSkill.SAC = (uint)SkillAdvancementClass.Trained;
+        //        }
+
+        //        // Add all combat skills so we pick the best one correctly
+        //        if (weenie.WeeniePropertiesSkill.FirstOrDefault(x => x.Type == (ushort)Skill.Axe) == null)
+        //        {
+        //            var newSkill = new WeeniePropertiesSkill(highestExistingMeleeSkill);
+        //            newSkill.Type = (ushort)Skill.Axe;
+        //            weenie.WeeniePropertiesSkill.Add(newSkill);
+        //        }
+        //        if (weenie.WeeniePropertiesSkill.FirstOrDefault(x => x.Type == (ushort)Skill.Dagger) == null)
+        //        {
+        //            var newSkill = new WeeniePropertiesSkill(highestExistingMeleeSkill);
+        //            newSkill.Type = (ushort)Skill.Dagger;
+        //            weenie.WeeniePropertiesSkill.Add(newSkill);
+        //        }
+        //        if (weenie.WeeniePropertiesSkill.FirstOrDefault(x => x.Type == (ushort)Skill.Mace) == null)
+        //        {
+        //            var newSkill = new WeeniePropertiesSkill(highestExistingMeleeSkill);
+        //            newSkill.Type = (ushort)Skill.Mace;
+        //            weenie.WeeniePropertiesSkill.Add(newSkill);
+        //        }
+        //        if (weenie.WeeniePropertiesSkill.FirstOrDefault(x => x.Type == (ushort)Skill.Spear) == null)
+        //        {
+        //            var newSkill = new WeeniePropertiesSkill(highestExistingMeleeSkill);
+        //            newSkill.Type = (ushort)Skill.Spear;
+        //            weenie.WeeniePropertiesSkill.Add(newSkill);
+        //        }
+        //        if (weenie.WeeniePropertiesSkill.FirstOrDefault(x => x.Type == (ushort)Skill.Staff) == null)
+        //        {
+        //            var newSkill = new WeeniePropertiesSkill(highestExistingMeleeSkill);
+        //            newSkill.Type = (ushort)Skill.Staff;
+        //            weenie.WeeniePropertiesSkill.Add(newSkill);
+        //        }
+        //        if (weenie.WeeniePropertiesSkill.FirstOrDefault(x => x.Type == (ushort)Skill.Sword) == null)
+        //        {
+        //            var newSkill = new WeeniePropertiesSkill(highestExistingMeleeSkill);
+        //            newSkill.Type = (ushort)Skill.Sword;
+        //            weenie.WeeniePropertiesSkill.Add(newSkill);
+        //        }
+        //        if (weenie.WeeniePropertiesSkill.FirstOrDefault(x => x.Type == (ushort)Skill.UnarmedCombat) == null)
+        //        {
+        //            var newSkill = new WeeniePropertiesSkill(highestExistingMeleeSkill);
+        //            newSkill.Type = (ushort)Skill.UnarmedCombat;
+        //            weenie.WeeniePropertiesSkill.Add(newSkill);
+        //        }
+        //        if (weenie.WeeniePropertiesSkill.FirstOrDefault(x => x.Type == (ushort)Skill.Bow) == null)
+        //        {
+        //            var newSkill = new WeeniePropertiesSkill(highestExistingMissileSkill);
+        //            newSkill.Type = (ushort)Skill.Bow;
+        //            weenie.WeeniePropertiesSkill.Add(newSkill);
+        //        }
+        //        if (weenie.WeeniePropertiesSkill.FirstOrDefault(x => x.Type == (ushort)Skill.Crossbow) == null)
+        //        {
+        //            var newSkill = new WeeniePropertiesSkill(highestExistingMissileSkill);
+        //            newSkill.Type = (ushort)Skill.Crossbow;
+        //            weenie.WeeniePropertiesSkill.Add(newSkill);
+        //        }
+        //        if (weenie.WeeniePropertiesSkill.FirstOrDefault(x => x.Type == (ushort)Skill.ThrownWeapon) == null)
+        //        {
+        //            var newSkill = new WeeniePropertiesSkill(highestExistingMissileSkill);
+        //            newSkill.Type = (ushort)Skill.ThrownWeapon;
+        //            weenie.WeeniePropertiesSkill.Add(newSkill);
+        //        }
+
         //        foreach (var skill in weenie.WeeniePropertiesSkill)
         //        {
         //            switch ((Skill)skill.Type)
@@ -4688,10 +4785,37 @@ namespace ACE.Server.Command.Handlers.Processors
         //                case Skill.Dagger:
         //                case Skill.Spear:
         //                case Skill.Sword:
+        //                case Skill.Staff:
+        //                case Skill.Mace:
+        //                case Skill.UnarmedCombat:
+        //                    skill.InitLevel = highestExistingMeleeSkill.InitLevel;
+        //                    break;
+        //                case Skill.Bow:
+        //                case Skill.ThrownWeapon:
+        //                case Skill.Crossbow:
+        //                    skill.InitLevel = highestExistingMissileSkill.InitLevel;
+        //                    break;
+        //            }
+        //        }
+
+        //        var creature = WorldObjectFactory.CreateNewWorldObject(WeenieConverter.ConvertToEntityWeenie(weenie)) as Creature;
+        //        var highestMeleeSkill = creature.GetHighestMeleeSkill();
+        //        var highestMissileSkill = creature.GetHighestMissileSkill();
+        //        creature.Destroy();
+
+        //        var newSkills = new HashSet<WeeniePropertiesSkill>();
+        //        foreach (var skill in weenie.WeeniePropertiesSkill)
+        //        {
+        //            switch ((Skill)skill.Type)
+        //            {
+        //                case Skill.Axe:
+        //                case Skill.Dagger:
+        //                case Skill.Spear:
+        //                case Skill.Sword:
+        //                case Skill.UnarmedCombat:
         //                    if ((Skill)skill.Type == highestMeleeSkill)
         //                    {
         //                        newSkills.Add(skill);
-        //                        addedMeleeSkill = true;
         //                        if (skill.InitLevel > highestExistingMeleeSkill.InitLevel)
         //                            highestExistingMeleeSkill = skill;
         //                    }
@@ -4701,7 +4825,6 @@ namespace ACE.Server.Command.Handlers.Processors
         //                    {
         //                        skill.Type = (ushort)Skill.Spear;
         //                        newSkills.Add(skill);
-        //                        addedMeleeSkill = true;
         //                        if (skill.InitLevel > highestExistingMeleeSkill.InitLevel)
         //                            highestExistingMeleeSkill = skill;
         //                    }
@@ -4711,22 +4834,15 @@ namespace ACE.Server.Command.Handlers.Processors
         //                    {
         //                        skill.Type = (ushort)Skill.Axe;
         //                        newSkills.Add(skill);
-        //                        addedMeleeSkill = true;
         //                        if (skill.InitLevel > highestExistingMeleeSkill.InitLevel)
         //                            highestExistingMeleeSkill = skill;
         //                    }
-        //                    break;
-        //                case Skill.UnarmedCombat:
-        //                    // Let's not add Unarmed Combat for now, we will add it below if it's appropriate, many creatures have only unarmed but since it's formula has changed we need to make sure that's the best skill, it usually isn't.
-        //                    if (skill.InitLevel > highestExistingMeleeSkill.InitLevel)
-        //                        highestExistingMeleeSkill = skill;
         //                    break;
         //                case Skill.Bow:
         //                case Skill.ThrownWeapon:
         //                    if ((Skill)skill.Type == highestMissileSkill)
         //                    {
         //                        newSkills.Add(skill);
-        //                        addedMissileSkill = true;
         //                        if (skill.InitLevel > highestExistingMissileSkill.InitLevel)
         //                            highestExistingMissileSkill = skill;
         //                    }
@@ -4736,69 +4852,12 @@ namespace ACE.Server.Command.Handlers.Processors
         //                    {
         //                        skill.Type = (ushort)Skill.Bow;
         //                        newSkills.Add(skill);
-        //                        addedMissileSkill = true;
         //                        if (skill.InitLevel > highestExistingMissileSkill.InitLevel)
         //                            highestExistingMissileSkill = skill;
         //                    }
         //                    break;
         //                default:
         //                    newSkills.Add(skill);
-        //                    break;
-        //            }
-        //        }
-        //        creature.Destroy();
-
-        //        // Sometimes the highest skill is not even trained! Let's fix that.
-        //        if(!addedMeleeSkill)
-        //        {
-        //            bool added = false;
-        //            foreach (var skill in weenie.WeeniePropertiesSkill)
-        //            {
-        //                switch ((Skill)skill.Type)
-        //                {
-        //                    case Skill.Axe:
-        //                    case Skill.Dagger:
-        //                    case Skill.Mace:
-        //                    case Skill.Spear:
-        //                    case Skill.Staff:
-        //                    case Skill.Sword:
-        //                    case Skill.UnarmedCombat:
-        //                        if(highestExistingMeleeSkill.Type != (ushort)Skill.UnarmedCombat)
-        //                            skill.Type = (ushort)highestMeleeSkill;
-        //                        else
-        //                        {
-        //                            if (weenie.GetProperty(PropertyAttribute.Strength).InitLevel >= weenie.GetProperty(PropertyAttribute.Quickness).InitLevel)
-        //                                skill.Type = (ushort)Skill.Sword;
-        //                            else
-        //                                skill.Type = (ushort)Skill.Dagger;
-        //                        }
-        //                        skill.InitLevel = highestExistingMeleeSkill.InitLevel;
-        //                        newSkills.Add(skill);
-        //                        added = true;
-        //                        break;
-        //                }
-        //                if (added)
-        //                    break;
-        //            }
-        //        }
-
-        //        if (!addedMissileSkill)
-        //        {
-        //            bool added = false;
-        //            foreach (var skill in newSkills)
-        //            {
-        //                switch ((Skill)skill.Type)
-        //                {
-        //                    case Skill.Bow:
-        //                    case Skill.Crossbow:
-        //                    case Skill.ThrownWeapon:
-        //                        skill.Type = (ushort)highestMissileSkill;
-        //                        skill.InitLevel = highestExistingMissileSkill.InitLevel;
-        //                        newSkills.Add(skill);
-        //                        added = true;
-        //                        break;
-        //                }
-        //                if (added)
         //                    break;
         //            }
         //        }
