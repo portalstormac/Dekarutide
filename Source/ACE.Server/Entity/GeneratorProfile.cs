@@ -343,6 +343,8 @@ namespace ACE.Server.Entity
                     obj.Location = new ACE.Entity.Position(Generator.Location.Cell, Generator.Location.PositionX + Biota.OriginX ?? 0, Generator.Location.PositionY + Biota.OriginY ?? 0, Generator.Location.PositionZ + Biota.OriginZ ?? 0, Biota.AnglesX ?? 0, Biota.AnglesY ?? 0, Biota.AnglesZ ?? 0, Biota.AnglesW ?? 0);
             }
 
+            obj.Location.PositionZ += 0.05f;
+
             if (!VerifyLandblock(obj) || !VerifyWalkableSlope(obj))
                 return false;
 
@@ -422,6 +424,11 @@ namespace ACE.Server.Entity
 
             obj.Location = new ACE.Entity.Position(Generator.Location);
 
+            obj.Location.PositionZ += 0.05f;
+
+            if (!VerifyLandblock(obj) || !VerifyWalkableSlope(obj))
+                return false;
+
             return obj.EnterWorld();
         }
 
@@ -470,7 +477,6 @@ namespace ACE.Server.Entity
 
             if (deathTreasure != null)
             {
-                // TODO: get randomly generated death treasure from LootGenerationFactory
                 //log.Debug($"{_generator.Name}.TreasureGenerator(): found death treasure {Biota.WeenieClassId}");
                 var generatedLoot = LootGenerationFactory.CreateRandomLootObjects(deathTreasure);
 

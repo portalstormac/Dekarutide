@@ -196,7 +196,7 @@ namespace ACE.Server.Factories
                 if (deathTreasure == null)
                     return deathTreasure;
 
-                if (tweakedFor is Chest)
+                if (tweakedFor is Container)
                 {
                     // Some overrides to make chests more interesting, ideally this should be done in the data but as a quick tweak this will do.
                     tweakedDeathTreasure = new Database.Models.World.TreasureDeath(deathTreasure);
@@ -232,6 +232,17 @@ namespace ACE.Server.Factories
                             }
                         }
                     }
+
+                    return tweakedDeathTreasure;
+                }
+                else if (tweakedFor is GenericObject generic && generic.GeneratorProfiles != null) // Ground item spawners
+                {
+                    tweakedDeathTreasure = new Database.Models.World.TreasureDeath(deathTreasure);
+                    if (tweakedDeathTreasure.LootQualityMod < 0.2f)
+                        tweakedDeathTreasure.LootQualityMod = 0.2f;
+
+                    if(tweakedDeathTreasure.ItemChance != 0 || tweakedDeathTreasure.MagicItemChance != 0)
+                        tweakedDeathTreasure.MundaneItemChance = 0; // If we can spawn something besides mundanes suppress mundane items.
 
                     return tweakedDeathTreasure;
                 }
@@ -444,7 +455,7 @@ namespace ACE.Server.Factories
                                 loot.Add(lootWorldObject);
                         }
                     }
-                    else
+                    else if (profile.ItemChance > 0)
                     {
                         itemChance = ThreadSafeRandom.NextInterval(profile.LootQualityMod);
                         if (itemChance < profile.ItemChance / 100.0)
@@ -484,11 +495,12 @@ namespace ACE.Server.Factories
                                 loot.Add(lootWorldObject);
                         }
                     }
-                    else
+                    else if (profile.MagicItemChance > 0)
                     {
                         itemChance = ThreadSafeRandom.NextInterval(profile.LootQualityMod);
                         if (itemChance < profile.MagicItemChance / 100.0)
                         {
+                            // If we roll this bracket we are guaranteed at least MagicItemMinAmount of items, with an extra roll for each additional item under MagicItemMaxAmount.
                             for (var i = 0; i < profile.MagicItemMinAmount; i++)
                             {
                                 lootWorldObject = CreateRandomLootObjects_New(profile, TreasureItemCategory.MagicItem);
@@ -531,7 +543,7 @@ namespace ACE.Server.Factories
                         if (lootWorldObject != null)
                             loot.Add(lootWorldObject);
                     }
-                    else
+                    else if(profile.MundaneItemChance > 0)
                     {
                         itemChance = ThreadSafeRandom.NextInterval(profile.LootQualityMod);
                         if (itemChance < profile.MundaneItemChance / 100.0)

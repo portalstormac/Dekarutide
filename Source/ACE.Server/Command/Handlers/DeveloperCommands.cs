@@ -3396,8 +3396,7 @@ namespace ACE.Server.Command.Handlers
 
             if (creature != null)
             {
-                var desc = (TreasureDeathDesc)creature.DeathTreasure.TreasureType;
-                var msg = creature.DeathTreasure != null ? $"DeathTreasure {desc} - Tier: {creature.DeathTreasure.Tier} QualityMod: {creature.DeathTreasure.LootQualityMod}" : "doesn't have PropertyDataId.DeathTreasureType";
+                var msg = creature.DeathTreasure != null ? $"DeathTreasure {(TreasureDeathDesc)creature.DeathTreasure.TreasureType}({creature.DeathTreasure.TreasureType}) - Tier: {creature.DeathTreasure.Tier} QualityMod: {creature.DeathTreasure.LootQualityMod}" : "doesn't have PropertyDataId.DeathTreasureType";
 
                 CommandHandlerHelper.WriteOutputInfo(session, $"{creature.Name} ({creature.Guid}) {msg}");
             }
@@ -3410,8 +3409,7 @@ namespace ACE.Server.Command.Handlers
                     {
                         var treasure = LootGenerationFactory.GetTweakedDeathTreasureProfile(generator.Biota.WeenieClassId, obj);
 
-                        var desc = (TreasureDeathDesc)creature.DeathTreasure.TreasureType;
-                        var msg = treasure != null ? $"Generator {counter} - DeathTreasure {desc} - Tier: {treasure.Tier} QualityMod: {treasure.LootQualityMod}" : "doesn't have a valid DeathTreasureType";
+                        var msg = treasure != null ? $"Generator {counter} - DeathTreasure {(TreasureDeathDesc)treasure.TreasureType}({treasure.TreasureType}) - Tier: {treasure.Tier} QualityMod: {treasure.LootQualityMod}" : "doesn't have a valid DeathTreasureType";
                         counter++;
                         CommandHandlerHelper.WriteOutputInfo(session, $"{obj.Name} ({obj.Guid}) {msg}");
                     }
