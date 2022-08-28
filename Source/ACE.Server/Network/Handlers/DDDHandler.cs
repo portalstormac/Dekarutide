@@ -1,17 +1,22 @@
 using ACE.DatLoader;
+using ACE.Entity;
 using ACE.Entity.Enum;
 using ACE.Server.Entity;
+using ACE.Server.Entity.Actions;
 using ACE.Server.Managers;
 using ACE.Server.Network.Enum;
 using ACE.Server.Network.GameEvent.Events;
 using ACE.Server.Network.GameMessages;
 using ACE.Server.Network.GameMessages.Messages;
+using log4net;
 using System.Collections.Generic;
 
 namespace ACE.Server.Network.Handlers
 {
     public static class DDDHandler
     {
+        private static readonly ILog log = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+
         public static IEnumerable<object> ItersWIthKeys { get; private set; }
 
         [GameMessage(GameMessageOpcode.DDD_InterrogationResponse, SessionState.AuthConnected)]
@@ -79,22 +84,37 @@ namespace ACE.Server.Network.Handlers
 
             var dddErrorMsg = new GameMessageDDDErrorMessage(resourceType, dataId, errorType);
 
-            if(PropertyManager.GetBool("enforce_player_movement").Item)
+            session.Network.EnqueueSend(popupMsg, chatMsg, transientMsg, dddErrorMsg);
+            if (PropertyManager.GetBool("enforce_player_movement").Item && session.Player.FirstEnterWorldDone)
             {
-                session.Network.EnqueueSend(popupMsg, chatMsg, transientMsg, dddErrorMsg);
-                if (session.Player.FirstEnterWorldDone)
+                var actionChain = new ActionChain();
+                actionChain.AddDelaySeconds(5.0f);
+                actionChain.AddAction(session.Player, () =>
                 {
-                    var player = session.Player;
-                    player.Teleport(player.SnapPos);
-                }
+                    if (session != null && session.Player != null)
+                        session.Player.Teleport(session.Player.SnapPos);
+                });
+                actionChain.EnqueueChain();
             }
-            else if (session.Player.FirstEnterWorldDone) // Boot client with msg
+            else
             {
-                session.Network.EnqueueSend(new GameMessageBootAccount($"\n{msg}"), dddErrorMsg);
-                session.LogOffPlayer(true);
+                // send to lifestone, or fallback location
+                var fixLoc = session.Player.Sanctuary ?? new Position(0xA9B40019, 84, 7.1f, 94, 0, 0, -0.0784591f, 0.996917f);
+
+                log.Error($"DDD_RequestDataMessage received for {session.Player.Name}, relocating to {fixLoc.ToLOCString()}");
+
+                session.Player.Location = new Position(fixLoc);
+                LandblockManager.AddObject(session.Player, true);
+
+                var actionChain = new ActionChain();
+                actionChain.AddDelaySeconds(5.0f);
+                actionChain.AddAction(session.Player, () =>
+                {
+                    if (session != null && session.Player != null)
+                        session.Player.Teleport(fixLoc);
+                });
+                actionChain.EnqueueChain();
             }
-            else // cannot cleanly boot player that hasn't completed first login, client crashes so msg wouldn't be seen, instead spam msgs until server auto boots them or they disconnect.
-                session.Network.EnqueueSend(popupMsg, chatMsg, transientMsg, dddErrorMsg);
         }
     }
 }
