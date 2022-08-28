@@ -217,7 +217,7 @@ namespace ACE.Server.Factories
                     {
                         // Add some scrolls to chest loot.
                         var treasureRoll = new TreasureRoll(TreasureItemType_Orig.Scroll);
-                        Chest chest = tweakedFor as Chest;
+                        Container container = tweakedFor as Container;
                         int numScrolls = 0;
                         if (ThreadSafeRandom.Next(1, 10) > 8)
                             numScrolls = 1;
@@ -227,7 +227,7 @@ namespace ACE.Server.Factories
                             var scroll = CreateAndMutateWcid(tweakedDeathTreasure, treasureRoll, true);
                             if (scroll != null)
                             {
-                                if (!chest.TryAddToInventory(scroll))
+                                if (!container.TryAddToInventory(scroll))
                                     scroll.Destroy();
                             }
                         }
