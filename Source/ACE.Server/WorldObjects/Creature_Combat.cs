@@ -378,6 +378,9 @@ namespace ACE.Server.WorldObjects
             }
         }
 
+        Skill CachedHighestMeleeSkill = Skill.None;
+        Skill CachedHighestMissileSkill = Skill.None;
+
         /// <summary>
         /// Returns the highest melee skill for the player
         /// (light / heavy / finesse)
@@ -399,6 +402,9 @@ namespace ACE.Server.WorldObjects
             }
             else
             {
+                if (!(this is Player) && CachedHighestMeleeSkill != Skill.None)
+                    return CachedHighestMeleeSkill;
+
                 var axe = GetCreatureSkill(Skill.Axe);
                 var dagger = GetCreatureSkill(Skill.Dagger);
                 var mace = GetCreatureSkill(Skill.Mace);
@@ -420,6 +426,8 @@ namespace ACE.Server.WorldObjects
                     maxMelee = sword;
                 if (unarmed.Current > maxMelee.Current)
                     maxMelee = unarmed;
+
+                CachedHighestMeleeSkill = maxMelee.Skill;
             }
 
             return maxMelee.Skill;
@@ -432,6 +440,9 @@ namespace ACE.Server.WorldObjects
                 return Skill.MissileWeapons;
             else
             {
+                if (!(this is Player) && CachedHighestMissileSkill != Skill.None)
+                    return CachedHighestMissileSkill;
+
                 var bow = GetCreatureSkill(Skill.Bow);
                 var crossbow = GetCreatureSkill(Skill.Crossbow);
                 var thrown = GetCreatureSkill(Skill.ThrownWeapon);
@@ -441,6 +452,8 @@ namespace ACE.Server.WorldObjects
                     maxMissile = crossbow;
                 if (thrown.Current > maxMissile.Current)
                     maxMissile = thrown;
+
+                CachedHighestMissileSkill = maxMissile.Skill;
             }
 
             return maxMissile.Skill;
@@ -557,8 +570,6 @@ namespace ACE.Server.WorldObjects
                     skill = GetHighestMissileSkill();
                 else
                     skill = GetHighestMeleeSkill();
-
-                skill = ConvertToMoASkill(skill);
             }
 
             //Console.WriteLine("Monster weapon skill: " + skill);

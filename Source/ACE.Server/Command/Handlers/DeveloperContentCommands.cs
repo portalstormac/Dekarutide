@@ -4644,10 +4644,201 @@ namespace ACE.Server.Command.Handlers.Processors
                     $"{entry.MagicItemChance}\t{entry.MagicItemMinAmount}\t{entry.MagicItemMaxAmount}\t{entry.MagicItemTreasureTypeSelectionChances}\t" +
                     $"{entry.MundaneItemChance}\t{entry.MundaneItemMinAmount}\t{entry.MundaneItemMaxAmount}\t{entry.MundaneItemTypeSelectionChances}");
                 fileWriter.Flush();
-    }
+            }
 
             fileWriter.Close();
             CommandHandlerHelper.WriteOutputInfo(session, "Done.");
         }
+
+        //[CommandHandler("fixCreatureWeaponSkills", AccessLevel.Developer, CommandHandlerFlag.None, 0, "", "")]
+        //public static void HandleFixCreatureWeaponSkills(Session session, params string[] parameters)
+        //{
+        //    CommandHandlerHelper.WriteOutputInfo(session, "Fixing creature weapon skills...");
+
+        //    var contentFolder = VerifyContentFolder(session, false);
+
+        //    var sep = Path.DirectorySeparatorChar;
+        //    var sql_folder = new DirectoryInfo($"{contentFolder.FullName}{sep}sql{sep}weenies{sep}");
+
+        //    if (!sql_folder.Exists)
+        //        sql_folder.Create();
+
+        //    var WeenieTypes = DatabaseManager.World.GetAllWeenieTypes();
+
+        //    foreach (var weenieTypeEntry in WeenieTypes)
+        //    {
+        //        if (weenieTypeEntry.Value != (int)WeenieType.Creature)
+        //            continue;
+
+        //        var weenie = DatabaseManager.World.GetWeenie(weenieTypeEntry.Key);
+
+        //        var creature = WorldObjectFactory.CreateNewWorldObject(weenie.ClassId) as Creature;
+        //        var highestMeleeSkill = creature.GetHighestMeleeSkill();
+        //        var highestMissileSkill = creature.GetHighestMissileSkill();
+        //        var newSkills = new HashSet<WeeniePropertiesSkill>();
+        //        bool addedMeleeSkill = false;
+        //        bool addedMissileSkill = false;
+        //        WeeniePropertiesSkill highestExistingMeleeSkill = new WeeniePropertiesSkill();
+        //        WeeniePropertiesSkill highestExistingMissileSkill = new WeeniePropertiesSkill();
+        //        foreach (var skill in weenie.WeeniePropertiesSkill)
+        //        {
+        //            switch ((Skill)skill.Type)
+        //            {
+        //                case Skill.Axe:
+        //                case Skill.Dagger:
+        //                case Skill.Spear:
+        //                case Skill.Sword:
+        //                    if ((Skill)skill.Type == highestMeleeSkill)
+        //                    {
+        //                        newSkills.Add(skill);
+        //                        addedMeleeSkill = true;
+        //                        if (skill.InitLevel > highestExistingMeleeSkill.InitLevel)
+        //                            highestExistingMeleeSkill = skill;
+        //                    }
+        //                    break;
+        //                case Skill.Staff:
+        //                    if ((Skill)skill.Type == highestMeleeSkill)
+        //                    {
+        //                        skill.Type = (ushort)Skill.Spear;
+        //                        newSkills.Add(skill);
+        //                        addedMeleeSkill = true;
+        //                        if (skill.InitLevel > highestExistingMeleeSkill.InitLevel)
+        //                            highestExistingMeleeSkill = skill;
+        //                    }
+        //                    break;
+        //                case Skill.Mace:
+        //                    if ((Skill)skill.Type == highestMeleeSkill)
+        //                    {
+        //                        skill.Type = (ushort)Skill.Axe;
+        //                        newSkills.Add(skill);
+        //                        addedMeleeSkill = true;
+        //                        if (skill.InitLevel > highestExistingMeleeSkill.InitLevel)
+        //                            highestExistingMeleeSkill = skill;
+        //                    }
+        //                    break;
+        //                case Skill.UnarmedCombat:
+        //                    // Let's not add Unarmed Combat for now, we will add it below if it's appropriate, many creatures have only unarmed but since it's formula has changed we need to make sure that's the best skill, it usually isn't.
+        //                    if (skill.InitLevel > highestExistingMeleeSkill.InitLevel)
+        //                        highestExistingMeleeSkill = skill;
+        //                    break;
+        //                case Skill.Bow:
+        //                case Skill.ThrownWeapon:
+        //                    if ((Skill)skill.Type == highestMissileSkill)
+        //                    {
+        //                        newSkills.Add(skill);
+        //                        addedMissileSkill = true;
+        //                        if (skill.InitLevel > highestExistingMissileSkill.InitLevel)
+        //                            highestExistingMissileSkill = skill;
+        //                    }
+        //                    break;
+        //                case Skill.Crossbow:
+        //                    if ((Skill)skill.Type == highestMeleeSkill)
+        //                    {
+        //                        skill.Type = (ushort)Skill.Bow;
+        //                        newSkills.Add(skill);
+        //                        addedMissileSkill = true;
+        //                        if (skill.InitLevel > highestExistingMissileSkill.InitLevel)
+        //                            highestExistingMissileSkill = skill;
+        //                    }
+        //                    break;
+        //                default:
+        //                    newSkills.Add(skill);
+        //                    break;
+        //            }
+        //        }
+        //        creature.Destroy();
+
+        //        // Sometimes the highest skill is not even trained! Let's fix that.
+        //        if(!addedMeleeSkill)
+        //        {
+        //            bool added = false;
+        //            foreach (var skill in weenie.WeeniePropertiesSkill)
+        //            {
+        //                switch ((Skill)skill.Type)
+        //                {
+        //                    case Skill.Axe:
+        //                    case Skill.Dagger:
+        //                    case Skill.Mace:
+        //                    case Skill.Spear:
+        //                    case Skill.Staff:
+        //                    case Skill.Sword:
+        //                    case Skill.UnarmedCombat:
+        //                        if(highestExistingMeleeSkill.Type != (ushort)Skill.UnarmedCombat)
+        //                            skill.Type = (ushort)highestMeleeSkill;
+        //                        else
+        //                        {
+        //                            if (weenie.GetProperty(PropertyAttribute.Strength).InitLevel >= weenie.GetProperty(PropertyAttribute.Quickness).InitLevel)
+        //                                skill.Type = (ushort)Skill.Sword;
+        //                            else
+        //                                skill.Type = (ushort)Skill.Dagger;
+        //                        }
+        //                        skill.InitLevel = highestExistingMeleeSkill.InitLevel;
+        //                        newSkills.Add(skill);
+        //                        added = true;
+        //                        break;
+        //                }
+        //                if (added)
+        //                    break;
+        //            }
+        //        }
+
+        //        if (!addedMissileSkill)
+        //        {
+        //            bool added = false;
+        //            foreach (var skill in newSkills)
+        //            {
+        //                switch ((Skill)skill.Type)
+        //                {
+        //                    case Skill.Bow:
+        //                    case Skill.Crossbow:
+        //                    case Skill.ThrownWeapon:
+        //                        skill.Type = (ushort)highestMissileSkill;
+        //                        skill.InitLevel = highestExistingMissileSkill.InitLevel;
+        //                        newSkills.Add(skill);
+        //                        added = true;
+        //                        break;
+        //                }
+        //                if (added)
+        //                    break;
+        //            }
+        //        }
+
+        //        weenie.WeeniePropertiesSkill = newSkills;
+
+        //        if (WeenieSQLWriter == null)
+        //        {
+        //            WeenieSQLWriter = new WeenieSQLWriter();
+        //            WeenieSQLWriter.WeenieNames = DatabaseManager.World.GetAllWeenieNames();
+        //            WeenieSQLWriter.WeenieClassNames = DatabaseManager.World.GetAllWeenieClassNames();
+        //            WeenieSQLWriter.WeenieLevels = DatabaseManager.World.GetAllWeenieLevels();
+        //            WeenieSQLWriter.SpellNames = DatabaseManager.World.GetAllSpellNames();
+        //            WeenieSQLWriter.TreasureDeath = DatabaseManager.World.GetAllTreasureDeath();
+        //            WeenieSQLWriter.TreasureWielded = DatabaseManager.World.GetAllTreasureWielded();
+        //            WeenieSQLWriter.PacketOpCodes = PacketOpCodeNames.Values;
+        //        }
+
+        //        var sql_filename = WeenieSQLWriter.GetDefaultFileName(weenie);
+
+        //        var writer = new StreamWriter(sql_folder + sql_filename);
+
+        //        try
+        //        {
+        //            WeenieSQLWriter.CreateSQLDELETEStatement(weenie, writer);
+        //            writer.WriteLine();
+        //            WeenieSQLWriter.CreateSQLINSERTStatement(weenie, writer);
+        //            writer.Close();
+        //        }
+        //        catch (Exception e)
+        //        {
+        //            Console.WriteLine(e);
+        //            CommandHandlerHelper.WriteOutputInfo(session, $"Failed to export {sql_folder}{sql_filename}");
+        //            return;
+        //        }
+
+        //        CommandHandlerHelper.WriteOutputInfo(session, $"Exported {sql_folder}{sql_filename}");
+        //    }
+
+        //    CommandHandlerHelper.WriteOutputInfo(session, "Done.");
+        //}
     }
 }
