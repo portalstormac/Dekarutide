@@ -1171,7 +1171,7 @@ namespace ACE.Server.Command.Handlers.Processors
                 return;
             }
 
-            sql2json_weenie(session, weenie, sql_folder, sql_file);
+            //sql2json_weenie(session, weenie, sql_folder, sql_file);
         }
 
         private static void ImportSQLRecipe(Session session, string sql_folder, string sql_file)
@@ -1198,7 +1198,7 @@ namespace ACE.Server.Command.Handlers.Processors
                 return;
             }
 
-            sql2json_recipe(session, cookbooks, sql_folder, sql_file);
+            //sql2json_recipe(session, cookbooks, sql_folder, sql_file);
         }
 
         private static void ImportSQLLandblock(Session session, string sql_folder, string sql_file)
@@ -1220,7 +1220,7 @@ namespace ACE.Server.Command.Handlers.Processors
             var instances = DatabaseManager.World.GetCachedInstancesByLandblock(landblockId);
 
             // convert to json file
-            sql2json_landblock(session, instances, sql_folder, sql_file);
+            //sql2json_landblock(session, instances, sql_folder, sql_file);
         }
 
         private static void ImportSQLQuest(Session session, string sql_folder, string sql_file)
@@ -1237,7 +1237,7 @@ namespace ACE.Server.Command.Handlers.Processors
             var quest = DatabaseManager.World.GetCachedQuest(questName);
 
             // convert to json file
-            sql2json_quest(session, quest, sql_folder, sql_file);
+            //sql2json_quest(session, quest, sql_folder, sql_file);
         }
 
         /// <summary>

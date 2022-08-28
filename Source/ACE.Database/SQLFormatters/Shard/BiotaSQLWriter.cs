@@ -293,7 +293,7 @@ namespace ACE.Database.SQLFormatters.Shard
                 $"{input[i].PP.ToString().PadLeft(11)}, " +
                 $"{input[i].InitLevel.ToString().PadLeft(3)}, " +
                 $"{input[i].ResistanceAtLastCheck.ToString().PadLeft(3)}, " +
-                $"{input[i].LastUsedTime}) " +
+                $"{input[i].LastUsedTime}, " +
                 $"{input[i].SecondaryTo}) " +
                 // ReSharper disable once PossibleNullReferenceException
                 $"/* {Enum.GetName(typeof(Skill), input[i].Type).PadRight(19)} {((SkillAdvancementClass)input[i].SAC).ToString()} */");

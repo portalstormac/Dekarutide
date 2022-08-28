@@ -501,7 +501,7 @@ namespace ACE.Server.WorldObjects
                 return armor;
 
             var player = this as Player;
-            if (player != null) // Creatures always have full armor level.
+            if (player != null) // Creatures always have full shield level.
             {
                 // SL cap:
                 // Trained / untrained: 1/2 shield skill
@@ -526,7 +526,7 @@ namespace ACE.Server.WorldObjects
             var player = this as Player;
             if (player != null) // Creatures always have full armor level.
             {
-                // AL  cap:
+                // AL cap:
                 // Trained / untrained: 80% armor skill
                 // Spec: armor skill
                 // AL cap is applied *after* item enchantments
