@@ -27,11 +27,8 @@ namespace ACE.Server.WorldObjects
                 var distSq = PhysicsObj.get_distance_sq_to_object(monster.PhysicsObj, true);
                 //var distSq = Location.SquaredDistanceTo(monster.Location);
 
-                if (!TestSneaking(monster, distSq, $"{monster.Name} sees you, you are no longer sneaking!") && distSq <= monster.VisualAwarenessRangeSq)
-                {
+                if (distSq <= monster.VisualAwarenessRangeSq &&!TestSneaking(monster, distSq, $"{monster.Name} sees you, you are no longer sneaking!"))
                     AlertMonster(monster);
-                    break;
-                }
             }
         }
 
