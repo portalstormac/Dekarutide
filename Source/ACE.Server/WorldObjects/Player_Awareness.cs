@@ -1,6 +1,7 @@
 using ACE.Common;
 using ACE.Entity.Enum;
 using ACE.Server.Entity;
+using ACE.Server.Entity.Actions;
 using ACE.Server.Network.GameEvent.Events;
 using ACE.Server.Network.GameMessages.Messages;
 using System;
@@ -44,7 +45,16 @@ namespace ACE.Server.WorldObjects
 
             Session.Network.EnqueueSend(new GameMessageSystemChat(message == null ? "You stop sneaking." : message, ChatMessageType.Broadcast));
             if (!Teleporting)
-                EnqueueBroadcast(new GameMessageScript(Guid, PlayScript.SneakingEnd));
+            {
+                // Add delay here to avoid remaining translucent indefinitely when EndSneaking is called right after BeginSneaking(like when a creature detects the player instantly).
+                var actionChain = new ActionChain();
+                actionChain.AddDelayForOneTick();
+                actionChain.AddAction(this, () =>
+                {
+                    EnqueueBroadcast(new GameMessageScript(Guid, PlayScript.SneakingEnd));
+                });
+                actionChain.EnqueueChain();
+            }
         }
 
         public bool TestSneaking(Creature creature, double distanceSquared, string failureMessage)
