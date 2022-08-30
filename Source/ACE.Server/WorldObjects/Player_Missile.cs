@@ -143,8 +143,6 @@ namespace ACE.Server.WorldObjects
         /// </summary>
         public void LaunchMissile(WorldObject target, int attackSequence, MotionStance stance, bool subsequent = false)
         {
-            EndSneaking();
-
             if (AttackSequence != attackSequence)
                 return;
 
@@ -193,6 +191,8 @@ namespace ACE.Server.WorldObjects
             // launch animation
             // point of no return beyond this point -- cannot be cancelled
             actionChain.AddAction(this, () => Attacking = true);
+
+            EndSneaking();
 
             if (subsequent)
             {

@@ -257,7 +257,6 @@ namespace ACE.Server.WorldObjects
             //log.Info($"{Name}.Attack({target.Name}, {attackSequence})");
 
             HasPerformedActionsSinceLastMovementUpdate = true;
-            EndSneaking();
 
             if (AttackSequence != attackSequence)
                 return;
@@ -284,6 +283,8 @@ namespace ACE.Server.WorldObjects
 
             // point of no return beyond this point -- cannot be cancelled
             Attacking = true;
+
+            EndSneaking(null, true);
 
             if (subsequent)
             {

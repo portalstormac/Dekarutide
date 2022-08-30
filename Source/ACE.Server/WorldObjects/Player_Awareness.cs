@@ -10,10 +10,13 @@ namespace ACE.Server.WorldObjects
 {
     partial class Player
     {
-        public bool IsSneaking = false;
-        private double SneakingDeltaTimeSum = 0;
         private static int SneakingCheckInterval = 1;
         private static uint EnterSneakingDifficulty = 50;
+
+        public bool IsSneaking = false;
+        public bool IsAttackFromSneaking = false;
+
+        private double SneakingDeltaTimeSum = 0;
         private ACE.Entity.Position PositionAtLastSneakingCheck = null;
 
         public void BeginSneaking()
@@ -36,12 +39,13 @@ namespace ACE.Server.WorldObjects
                 Session.Network.EnqueueSend(new GameMessageSystemChat("You are not trained in sneaking!", ChatMessageType.Broadcast));
         }
 
-        public void EndSneaking(string message = null)
+        public void EndSneaking(string message = null, bool isAttackFromSneaking = false)
         {
             if (!IsSneaking)
                 return;
 
             IsSneaking = false;
+            IsAttackFromSneaking = isAttackFromSneaking;
 
             Session.Network.EnqueueSend(new GameMessageSystemChat(message == null ? "You stop sneaking." : message, ChatMessageType.Broadcast));
             if (!Teleporting)
@@ -59,25 +63,25 @@ namespace ACE.Server.WorldObjects
 
         public bool TestSneaking(Creature creature, double distanceSquared, string failureMessage)
         {
-            if (!IsSneaking || creature == null)
+            if (!IsSneaking)
                 return false;
 
-            if (DamageHistory.Damagers.Count > 0)
-            {
-                Session.Network.EnqueueSend(new GameMessageSystemChat($"{DamageHistory.Damagers.Count}", ChatMessageType.Broadcast));
-                return false;
-            }
+            if (creature == null || distanceSquared > creature.VisualAwarenessRangeSq || !creature.IsDirectVisible(this))
+                return true;
 
             var angle = Math.Abs(creature.GetAngle(this));
-            if (distanceSquared < 2 && angle < 110)
+            if (angle < 110)
             {
-                EndSneaking(failureMessage);
-                return false;
-            }
-            else if (distanceSquared <= creature.VisualAwarenessRangeSq && angle < 110)
-            {
-                var difficulty = (uint)((creature.Level ?? 1) * 3.0f);
-                return TestSneaking(difficulty, failureMessage);
+                if (distanceSquared < 2)
+                {
+                    EndSneaking(failureMessage);
+                    return false;
+                }
+                else
+                {
+                    var difficulty = (uint)((creature.Level ?? 1) * 3.0f);
+                    return TestSneaking(difficulty, failureMessage);
+                }
             }
             else
                 return true;

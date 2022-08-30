@@ -181,6 +181,13 @@ namespace ACE.Server.Entity
             AttackType = attacker.AttackType;
             AttackHeight = attacker.AttackHeight ?? AttackHeight.Medium;
 
+            var isAttackFromSneaking = false;
+            if (playerAttacker != null)
+            {
+                isAttackFromSneaking = playerAttacker.IsAttackFromSneaking;
+                playerAttacker.IsAttackFromSneaking = false;
+            }
+
             // check lifestone protection
             if (playerDefender != null && playerDefender.UnderLifestoneProtection)
             {
@@ -291,7 +298,9 @@ namespace ACE.Server.Entity
                 {
                     if (playerAttacker != null)
                     {
-                        if (attackerTechniqueId == TacticAndTechniqueType.Opportunist)
+                        if (isAttackFromSneaking)
+                            CriticalChance = 1.0f;
+                        else if (attackerTechniqueId == TacticAndTechniqueType.Opportunist)
                         {
                             CriticalChance += playerAttacker.ScaleWithPowerAccuracyBar(0.10f); // Extra critical chance while using the Opportunist technique.
 
