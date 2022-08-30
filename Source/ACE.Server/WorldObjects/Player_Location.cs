@@ -656,6 +656,8 @@ namespace ACE.Server.WorldObjects
             LastTeleportTime = DateTime.UtcNow;
             LastTeleportStartTimestamp = Time.GetUnixTime();
 
+            EndSneaking();
+
             if (fromPortal)
                 LastPortalTeleportTimestamp = LastTeleportStartTimestamp;
 

@@ -2,71 +2,66 @@ using ACE.Common;
 using ACE.Entity.Enum;
 using ACE.Server.Entity;
 using ACE.Server.Network.GameMessages.Messages;
+using System;
 
 namespace ACE.Server.WorldObjects
 {
     partial class Player
     {
-        public bool SneakingPossible = false;
         public bool IsSneaking = false;
-        private double NextSneakingCheckTime = 0;
-        private static int SneakingCheckInterval = 5;
+        private double SneakingDeltaTimeSum = 0;
+        private static int SneakingCheckInterval = 1;
         private static uint EnterSneakingDifficulty = 50;
+        private ACE.Entity.Position PositionAtLastSneakingCheck = null;
 
         public void BeginSneaking()
         {
             if (IsSneaking)
                 return;
 
-            if (NextSneakingCheckTime > Time.GetUnixTime())
-                return;
-            NextSneakingCheckTime = Time.GetFutureUnixTime(SneakingCheckInterval);
-
             var result = TestSneakingInternal(EnterSneakingDifficulty);
             if (result == SneakingTestResult.Success)
             {
                 IsSneaking = true;
+                SneakingDeltaTimeSum = 0;
+                PositionAtLastSneakingCheck = new ACE.Entity.Position(Location);
                 Session.Network.EnqueueSend(new GameMessageSystemChat($"You start sneaking.", ChatMessageType.Broadcast));
+                EnqueueBroadcast(new GameMessageScript(Guid, PlayScript.SneakingBegin));
             }
             else if(result == SneakingTestResult.Failure)
                 Session.Network.EnqueueSend(new GameMessageSystemChat($"You fail on your attempt to start sneaking.", ChatMessageType.Broadcast));
-
-            // TODO: figure out a way to set translucency or other visual cue without having to update the entire object as that sends the player into portal space.
-            //Translucency = 0.5f;            
-            //EnqueueBroadcast(new GameMessageUpdateObject(this));
-            ////EnqueueBroadcast(new GameMessagePublicUpdatePropertyFloat(this, PropertyFloat.Translucency, (double)Translucency));
         }
 
-        public void EndSneaking(string message = null, bool preventSneaking = false)
+        public void EndSneaking(string message = null)
         {
             if (!IsSneaking)
-            {
-                if(preventSneaking)
-                    NextSneakingCheckTime = Time.GetFutureUnixTime(SneakingCheckInterval);
                 return;
-            }
 
             IsSneaking = false;
-            NextSneakingCheckTime = Time.GetFutureUnixTime(SneakingCheckInterval);
 
             Session.Network.EnqueueSend(new GameMessageSystemChat(message == null ? "You stop sneaking." : message, ChatMessageType.Broadcast));
-
-            //Translucency = 0.0f;
-            //EnqueueBroadcast(new GameMessageCreateObject(this));
-            ////EnqueueBroadcast(new GameMessagePublicUpdatePropertyFloat(this, PropertyFloat.Translucency, (double)Translucency));
+            if (!Teleporting)
+                EnqueueBroadcast(new GameMessageScript(Guid, PlayScript.SneakingEnd));
         }
 
         public bool TestSneaking(Creature creature, double distanceSquared, string failureMessage)
         {
-            if (!IsSneaking)
+            if (!IsSneaking || creature == null)
                 return false;
 
-            if (distanceSquared < 2)
+            if (DamageHistory.Damagers.Count > 0)
             {
-                EndSneaking();
+                Session.Network.EnqueueSend(new GameMessageSystemChat($"{DamageHistory.Damagers.Count}", ChatMessageType.Broadcast));
                 return false;
             }
-            else if (distanceSquared < creature.VisualAwarenessRangeSq)
+
+            var angle = Math.Abs(creature.GetAngle(this));
+            if (distanceSquared < 2 && angle < 110)
+            {
+                EndSneaking(failureMessage);
+                return false;
+            }
+            else if (distanceSquared <= creature.VisualAwarenessRangeSq && angle < 110)
             {
                 var difficulty = (uint)((creature.Level ?? 1) * 3.0f);
                 return TestSneaking(difficulty, failureMessage);
@@ -115,35 +110,20 @@ namespace ACE.Server.WorldObjects
             return SneakingTestResult.Failure;
         }
 
-        public void UpdateSneakingState()
+        public void CheckSneaking(double deltaTime)
         {
-            if (!IsAttemptingToSneak)
+            if (!IsSneaking)
                 return;
 
-            var minterp = PhysicsObj.get_minterp();
-            if ((minterp.RawState.ForwardCommand == (uint)MotionCommand.Ready || minterp.RawState.ForwardCommand == (uint)MotionCommand.Invalid) && minterp.RawState.SideStepCommand == (uint)MotionCommand.Invalid)
-            {
-                // Special case: standing still won't turn sneaking on or off.
-                SneakingPossible = true;
+            SneakingDeltaTimeSum += deltaTime;
+            if (SneakingDeltaTimeSum < SneakingCheckInterval)
                 return;
-            }
+            SneakingDeltaTimeSum = 0;
 
-            if (HasAnyMovement())
-            {
-                var isRunning = CheckIsRunning();
+            if (Location.DistanceTo(PositionAtLastSneakingCheck) > 5)
+                EndSneaking("You've moved too quickly to keep sneaking.");
 
-                if (IsJumping || isRunning)
-                    SneakingPossible = false;
-                else
-                    SneakingPossible = true;
-            }
-            else
-                SneakingPossible = true;
-
-            if (!SneakingPossible && IsSneaking)
-                EndSneaking();
-            else if (SneakingPossible && !IsSneaking)
-                BeginSneaking();
+            PositionAtLastSneakingCheck = Location;
         }
 
         public bool IsAware(WorldObject wo)

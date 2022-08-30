@@ -96,31 +96,6 @@ namespace ACE.Server.WorldObjects
             }
         }
 
-        private bool? CachedAttemptToSneak = null;
-        public bool IsAttemptingToSneak
-        {
-            get
-            {
-                if (!CachedAttemptToSneak.HasValue)
-                {
-                    CachedAttemptToSneak = GetCharacterOption(CharacterOption.AttemptToSneak);
-
-                    if (CachedAttemptToSneak ?? false)
-                    {
-                        var sneakingSkill = GetCreatureSkill(Skill.Sneaking);
-                        if (sneakingSkill.AdvancementClass < SkillAdvancementClass.Trained)
-                        {
-                            // Might as well turn it off since we can't use it.
-                            CachedAttemptToSneak = false;
-                            SetCharacterOptions2(CharacterOptions2.NotUsed2, false);
-                        }
-                    }
-                }
-
-                return CachedAttemptToSneak ?? false;
-            }
-        }
-
         public ConfirmationManager ConfirmationManager;
 
         public SquelchManager SquelchManager;

@@ -143,7 +143,7 @@ namespace ACE.Server.WorldObjects
         /// </summary>
         public void LaunchMissile(WorldObject target, int attackSequence, MotionStance stance, bool subsequent = false)
         {
-            EndSneaking(null, true);
+            EndSneaking();
 
             if (AttackSequence != attackSequence)
                 return;

@@ -131,22 +131,6 @@ namespace ACE.Server.WorldObjects
             return false;
         }
 
-        public bool ToggleSneakSetting()
-        {
-            if (Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.CustomDM)
-            {
-                bool newSetting = !GetCharacterOptions2(CharacterOptions2.NotUsed2);
-                SetCharacterOptions2(CharacterOptions2.NotUsed2, newSetting);
-
-                CachedAttemptToSneak = newSetting;
-                return newSetting;
-            }
-
-            CachedAttemptToSneak = false;
-            return false;
-        }
-
-
         // =====================================
         // CharacterPropertiesContract
         // =====================================

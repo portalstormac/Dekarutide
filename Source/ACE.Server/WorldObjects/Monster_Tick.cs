@@ -1,6 +1,3 @@
-using System;
-using System.Diagnostics;
-
 using ACE.Entity.Enum;
 
 namespace ACE.Server.WorldObjects
@@ -67,8 +64,15 @@ namespace ACE.Server.WorldObjects
             var combatPet = this as CombatPet;
 
             var creatureTarget = AttackTarget as Creature;
+            var playerTarget = AttackTarget as Player;
 
-            if (creatureTarget != null && (creatureTarget.IsDead || (combatPet == null && !IsVisibleTarget(creatureTarget))))
+            if (playerTarget != null && playerTarget.IsSneaking)
+            {
+                if (IsDirectVisible(playerTarget))
+                    playerTarget.EndSneaking($"{Name} can still see you! You stop sneaking!");
+            }
+
+            if (creatureTarget != null && (creatureTarget.IsDead || (combatPet == null && !IsVisibleTarget(creatureTarget))) || (playerTarget != null && playerTarget.IsSneaking))
             {
                 FindNextTarget();
                 return;

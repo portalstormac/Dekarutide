@@ -377,7 +377,7 @@ namespace ACE.Server.WorldObjects
 
                 var distSq = PhysicsObj.get_distance_sq_to_object(creature.PhysicsObj, true);
 
-                if (creature is Player player && player.TestSneaking(creature, distSq, $"{creature.Name} sees you, you are no longer sneaking!"))
+                if (creature is Player player && player.TestSneaking(creature, distSq, $"{Name} sees you! You stop sneaking."))
                     continue;
 
                 if (distSq > chaseDistSq)
@@ -489,7 +489,7 @@ namespace ACE.Server.WorldObjects
 
                 //var distSq = Location.SquaredDistanceTo(creature.Location);
                 var distSq = PhysicsObj.get_distance_sq_to_object(creature.PhysicsObj, true);
-                if (player != null && player.TestSneaking(creature, distSq, $"{creature.Name} sees you, you are no longer sneaking!"))
+                if (player != null && player.TestSneaking(creature, distSq, $"{creature.Name} sees you! You stop sneaking."))
                     continue;
 
                 if (distSq < closestDistSq)

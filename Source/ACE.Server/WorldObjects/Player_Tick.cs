@@ -672,7 +672,7 @@ namespace ACE.Server.WorldObjects
                                 }
                             }
 
-                            UpdateSneakingState();
+                            CheckSneaking(deltaTime);
                             CheckMonsters();
                         }
                     }

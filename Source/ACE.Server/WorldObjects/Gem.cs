@@ -179,10 +179,10 @@ namespace ACE.Server.WorldObjects
                                 player.Session.Network.EnqueueSend(new GameMessageSystemChat($"You will no longer attempt to taunt opponents.", ChatMessageType.Broadcast));
                             break;
                         case TacticAndTechniqueType.Sneak:
-                            if (player.ToggleSneakSetting())
-                                player.Session.Network.EnqueueSend(new GameMessageSystemChat($"You will now start attempting to sneak when walking.", ChatMessageType.Broadcast));
+                            if (!player.IsSneaking)
+                                player.BeginSneaking();
                             else
-                                player.Session.Network.EnqueueSend(new GameMessageSystemChat($"You will no longer attempt to sneak when walking.", ChatMessageType.Broadcast));
+                                player.EndSneaking();
                             break;
                     }
                 }

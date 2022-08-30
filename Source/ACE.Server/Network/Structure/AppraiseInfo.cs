@@ -137,10 +137,7 @@ namespace ACE.Server.Network.Structure
                 if (PropertiesInt.ContainsKey(PropertyInt.EncumbranceVal))
                     PropertiesInt.Remove(PropertyInt.EncumbranceVal);
 
-                if (wo.Active)
-                    PropertiesString.Add(PropertyString.ShortDesc, "Armed");
-                else
-                    PropertiesString.Add(PropertyString.ShortDesc, "Disarmed");
+                PropertiesString.Add(PropertyString.ShortDesc, wo.Active ? "Status: Armed" : "Status: Disarmed");
             }
             else if (wo is Door || wo is Chest)
             {

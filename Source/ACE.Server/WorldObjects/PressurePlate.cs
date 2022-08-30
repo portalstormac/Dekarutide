@@ -76,7 +76,7 @@ namespace ACE.Server.WorldObjects
             if (!(activator is Player player))
                 return;
 
-            if (!NextActivationIsFromUse && ResistAwareness.HasValue && player.TestSneaking((uint)ResistAwareness, "You fail to avoid the trigger, you are no longer sneaking!"))
+            if (!NextActivationIsFromUse && ResistAwareness.HasValue && player.TestSneaking((uint)ResistAwareness, "You fail to avoid the trigger! You stop sneaking."))
                 return;
             NextActivationIsFromUse = false;
 
@@ -206,7 +206,10 @@ namespace ACE.Server.WorldObjects
                         success = true;
                         Proficiency.OnSuccessUse(player, lockpickSkill, difficulty);
                         Disarm();
+                        EnqueueBroadcast(new GameMessageSound(Guid, Sound.LockSuccess, 1.0f));
                     }
+                    else
+                        EnqueueBroadcast(new GameMessageSound(Guid, Sound.PicklockFail, 1.0f));
 
                     UnlockerHelper.SendDisarmResultMessage(player, UnlockerHelper.ConsumeUnlocker(player, unlocker, this), this, success);
                 }
