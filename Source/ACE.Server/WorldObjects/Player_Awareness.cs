@@ -1,6 +1,7 @@
 using ACE.Common;
 using ACE.Entity.Enum;
 using ACE.Server.Entity;
+using ACE.Server.Network.GameEvent.Events;
 using ACE.Server.Network.GameMessages.Messages;
 using System;
 
@@ -25,11 +26,13 @@ namespace ACE.Server.WorldObjects
                 IsSneaking = true;
                 SneakingDeltaTimeSum = 0;
                 PositionAtLastSneakingCheck = new ACE.Entity.Position(Location);
-                Session.Network.EnqueueSend(new GameMessageSystemChat($"You start sneaking.", ChatMessageType.Broadcast));
+                Session.Network.EnqueueSend(new GameMessageSystemChat("You start sneaking.", ChatMessageType.Broadcast));
                 EnqueueBroadcast(new GameMessageScript(Guid, PlayScript.SneakingBegin));
             }
             else if(result == SneakingTestResult.Failure)
-                Session.Network.EnqueueSend(new GameMessageSystemChat($"You fail on your attempt to start sneaking.", ChatMessageType.Broadcast));
+                Session.Network.EnqueueSend(new GameMessageSystemChat("You fail on your attempt to start sneaking.", ChatMessageType.Broadcast));
+            else
+                Session.Network.EnqueueSend(new GameMessageSystemChat("You are not trained in sneaking!", ChatMessageType.Broadcast));
         }
 
         public void EndSneaking(string message = null)

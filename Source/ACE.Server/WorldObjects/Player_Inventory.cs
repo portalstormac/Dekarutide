@@ -1612,7 +1612,8 @@ namespace ACE.Server.WorldObjects
                         if (GetCreatureSkill(Skill.Shield).AdvancementClass < SkillAdvancementClass.Trained)
                         {
                             Session.Network.EnqueueSend(new GameEventInventoryServerSaveFailed(Session, item.Guid.Full));
-                            Session.Network.EnqueueSend(new GameEventCommunicationTransientString(Session, $"You are not trained in using shields!"));
+                            //Session.Network.EnqueueSend(new GameEventCommunicationTransientString(Session, "You are not trained in using shields!"));
+                            Session.Network.EnqueueSend(new GameMessageSystemChat("You are not trained in using shields!", ChatMessageType.Broadcast));
                             return false;
                         }
                     }
@@ -1629,7 +1630,8 @@ namespace ACE.Server.WorldObjects
                         if (GetCreatureSkill(Skill.DualWield).AdvancementClass < SkillAdvancementClass.Trained)
                         {
                             Session.Network.EnqueueSend(new GameEventInventoryServerSaveFailed(Session, item.Guid.Full));
-                            Session.Network.EnqueueSend(new GameEventCommunicationTransientString(Session, $"You are not trained in dual wielding weapons!"));
+                            //Session.Network.EnqueueSend(new GameEventCommunicationTransientString(Session, "You are not trained in dual wielding weapons!"));
+                            Session.Network.EnqueueSend(new GameMessageSystemChat("You are not trained in dual wielding weapons!", ChatMessageType.Broadcast));
                             return false;
                         }
                     }
