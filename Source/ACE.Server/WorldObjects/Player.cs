@@ -340,7 +340,12 @@ namespace ACE.Server.WorldObjects
             if (creature != null)
             {
                 player = obj as Player;
-                var skill = player != null ? Skill.AssessPerson : Skill.AssessCreature;
+
+                Skill skill;
+                if (ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.CustomDM)
+                    skill = Skill.AssessCreature;
+                else
+                    skill = player != null ? Skill.AssessPerson : Skill.AssessCreature;
 
                 var currentSkill = (int)GetCreatureSkill(skill).Current;
                 int difficulty = (int)creature.GetCreatureSkill(Skill.Deception).Current;

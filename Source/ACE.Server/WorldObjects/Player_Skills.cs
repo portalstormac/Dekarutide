@@ -644,15 +644,15 @@ namespace ACE.Server.WorldObjects
                     switch (heritageGroup)
                     {
                         case HeritageGroup.Aluvian:
-                            if (skill == Skill.Shield)
+                            if (skill == Skill.Armor)
                                 return false;
                             break;
                         case HeritageGroup.Gharundim:
-                            if (skill == Skill.Salvaging)
+                            if (skill == Skill.Appraise)
                                 return false;
                             break;
                         case HeritageGroup.Sho:
-                            if (skill == Skill.AssessPerson)
+                            if (skill == Skill.AssessCreature)
                                 return false;
                             break;
                     }
@@ -1046,7 +1046,12 @@ namespace ACE.Server.WorldObjects
                 PlayerSkills.Add(Skill.ThrownWeapon);
                 PlayerSkills.Add(Skill.UnarmedCombat);
                 PlayerSkills.Add(Skill.Salvaging);
+                PlayerSkills.Add(Skill.Awareness);
+                PlayerSkills.Add(Skill.Appraise);
+                PlayerSkills.Add(Skill.Armor);
+                PlayerSkills.Add(Skill.Sneaking);
 
+                PlayerSkills.Remove(Skill.AssessPerson);
                 PlayerSkills.Remove(Skill.ItemEnchantment);
                 PlayerSkills.Remove(Skill.CreatureEnchantment);
                 PlayerSkills.Remove(Skill.Crossbow);

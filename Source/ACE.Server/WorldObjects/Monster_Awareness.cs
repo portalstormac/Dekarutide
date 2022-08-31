@@ -163,12 +163,7 @@ namespace ACE.Server.WorldObjects
                 }
                 else
                 {
-                    Entity.CreatureSkill defenseSkill;
-                    if (target.CreatureType == ACE.Entity.Enum.CreatureType.Human)
-                        defenseSkill = GetCreatureSkill(Skill.AssessPerson);
-                    else
-                        defenseSkill = GetCreatureSkill(Skill.AssessCreature);
-
+                    var defenseSkill = GetCreatureSkill(Skill.AssessCreature);
                     var avoidChance = 1.0f - SkillCheck.GetSkillChance(skill.Current, defenseSkill.Current);
 
                     if (avoidChance > ThreadSafeRandom.Next(0.0f, 1.0f))
@@ -214,15 +209,11 @@ namespace ACE.Server.WorldObjects
                         continue;
                     }
 
-                    Entity.CreatureSkill defenseSkill;
-                    if (target.CreatureType == ACE.Entity.Enum.CreatureType.Human)
-                        defenseSkill = GetCreatureSkill(Skill.AssessPerson);
-                    else
-                        defenseSkill = GetCreatureSkill(Skill.AssessCreature);
-
                     target.UpdateVitalDelta(target.Mana, -manaCost); // We're past the activation stage so no matter if we succeed or not we consume the mana.
 
+                    Entity.CreatureSkill defenseSkill = GetCreatureSkill(Skill.AssessCreature);
                     var avoidChance = 1.0f - SkillCheck.GetSkillChance(skill.Current, defenseSkill.Current);
+
                     if (avoidChance > ThreadSafeRandom.Next(0.0f, 1.0f))
                     {
                         target.Session.Network.EnqueueSend(new GameMessageSystemChat($"{Name} sees through your taunt and is having none of it!", ChatMessageType.CombatSelf));

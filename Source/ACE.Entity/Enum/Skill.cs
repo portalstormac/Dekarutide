@@ -66,10 +66,7 @@ namespace ACE.Entity.Enum
         Challenge,          /* Unimplemented */
         Summoning,
         // CustomDM
-        AppraiseMissileItem,
-        AppraiseMeleeItem,
-        AppraiseArmor,
-        AppraiseCasterItem,
+        Appraise,
         Armor,
         Sneaking
     }
@@ -152,6 +149,7 @@ namespace ACE.Entity.Enum
                 ValidSkills.Remove(Skill.VoidMagic);
                 ValidSkills.Remove(Skill.Summoning);
 
+                ValidSkills.Remove(Skill.AssessPerson);
                 ValidSkills.Remove(Skill.ItemEnchantment);
                 ValidSkills.Remove(Skill.CreatureEnchantment);
                 ValidSkills.Remove(Skill.Crossbow);
@@ -170,13 +168,8 @@ namespace ACE.Entity.Enum
                 ValidSkills.Add(Skill.UnarmedCombat);
                 ValidSkills.Add(Skill.Salvaging);
 
-                //ValidSkills.Add(Skill.Spellcraft);
                 ValidSkills.Add(Skill.Awareness);
-                //ValidSkills.Add(Skill.ArmsAndArmorRepair);
-                ValidSkills.Add(Skill.AppraiseMissileItem);
-                ValidSkills.Add(Skill.AppraiseMeleeItem);
-                ValidSkills.Add(Skill.AppraiseArmor);
-                ValidSkills.Add(Skill.AppraiseCasterItem);
+                ValidSkills.Add(Skill.Appraise);
                 ValidSkills.Add(Skill.Armor);
                 ValidSkills.Add(Skill.Sneaking);
             }

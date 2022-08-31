@@ -664,7 +664,7 @@ namespace ACE.Server.WorldObjects
         {
             var attackerAsCreature = attacker as Creature;
             if (!avoided && attackerAsCreature != null)
-                attackerAsCreature.TryCastAssessCreatureAndPersonDebuffs(this, attackType);
+                attackerAsCreature.TryCastAssessDebuff(this, attackType);
 
             numRecentAttacksReceived++;
         }
@@ -1186,7 +1186,7 @@ namespace ACE.Server.WorldObjects
                 playerTarget.SendMessage(msg, ChatMessageType.Combat, this);
         }
 
-        public void TryCastAssessCreatureAndPersonDebuffs(Creature target, CombatType combatType)
+        public void TryCastAssessDebuff(Creature target, CombatType combatType)
         {
             if (Common.ConfigManager.Config.Server.WorldRuleset != Common.Ruleset.CustomDM)
                 return;
@@ -1194,12 +1194,7 @@ namespace ACE.Server.WorldObjects
             Player sourceAsPlayer = this as Player;
             Player targetAsPlayer = target as Player;
 
-            Entity.CreatureSkill skill;
-            if (target.CreatureType == ACE.Entity.Enum.CreatureType.Human)
-                skill = GetCreatureSkill(Skill.AssessPerson);
-            else
-                skill = GetCreatureSkill(Skill.AssessCreature);
-
+            Entity.CreatureSkill skill = GetCreatureSkill(Skill.AssessCreature);
             var activationChance = ThreadSafeRandom.Next(0.0f, 1.0f);
             if (skill.AdvancementClass == SkillAdvancementClass.Specialized && activationChance > 0.25)
                 return;
@@ -1300,11 +1295,10 @@ namespace ACE.Server.WorldObjects
                 case 6: spellTypePrefix = "a crippling"; break;
             }
 
-            string skillMessage = skill.Skill == Skill.AssessCreature ? "creature" : "person";
             if (sourceAsPlayer != null)
-                sourceAsPlayer.Session.Network.EnqueueSend(new GameMessageSystemChat($"Your assess {skillMessage} knowledge allows you to expose {spellTypePrefix} {spellType} vulnerability on {target.Name}!", ChatMessageType.Magic));
+                sourceAsPlayer.Session.Network.EnqueueSend(new GameMessageSystemChat($"Your assess knowledge allows you to expose {spellTypePrefix} {spellType} vulnerability on {target.Name}!", ChatMessageType.Magic));
             if (targetAsPlayer != null)
-                targetAsPlayer.Session.Network.EnqueueSend(new GameMessageSystemChat($"{Name}'s assess {skillMessage} knowledge exposes {spellTypePrefix} {spellType} vulnerability on you!", ChatMessageType.Magic));
+                targetAsPlayer.Session.Network.EnqueueSend(new GameMessageSystemChat($"{Name}'s assess knowledge exposes {spellTypePrefix} {spellType} vulnerability on you!", ChatMessageType.Magic));
         }
 
         /// <summary>

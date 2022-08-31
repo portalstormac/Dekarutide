@@ -128,10 +128,6 @@
             "name": "Run"
         },
         {
-            "id": "27",
-            "name": "Assess Creature"
-        },
-        {
             "id": "28",
             "name": "Weapon Tinkering"
         },
@@ -949,7 +945,7 @@
         },
         {
             "id": "55",
-            "name": "Appraise Missile Item",
+            "name": "Appraise",
             "gear": [
                 {
                     "weenieId": "50077",
@@ -960,39 +956,17 @@
         },
         {
             "id": "56",
-            "name": "Appraise Melee Item",
+            "name": "Armor",
             "gear": [
                 {
-                    "weenieId": "50077",
-                    "name": "Magnifying Glass",
+                    "weenieId": "47",
+                    "name": "Leather Coat",
                     "stacksize": "1"
                 }
             ]
         },
         {
             "id": "57",
-            "name": "Appraise Armor",
-            "gear": [
-                {
-                    "weenieId": "50077",
-                    "name": "Magnifying Glass",
-                    "stacksize": "1"
-                }
-            ]
-        },
-        {
-            "id": "58",
-            "name": "Appraise Caster Item",
-            "gear": [
-                {
-                    "weenieId": "50077",
-                    "name": "Magnifying Glass",
-                    "stacksize": "1"
-                }
-            ]
-        },
-        {
-            "id": "60",
             "name": "Sneaking",
             "gear": [
                 {

@@ -456,10 +456,11 @@ namespace ACE.Server.Factories.Tables
                 // one-handed melee weapons
                 spellSelectionGroup6 = new ChanceTable<SpellId>()
                 {
-                    ( SpellId.QuicknessSelf1,            0.325f ),
+                    ( SpellId.QuicknessSelf1,            0.225f ),
                     ( SpellId.StrengthSelf1,             0.225f ),
                     ( SpellId.EnduranceSelf1,            0.225f ),
                     ( SpellId.CoordinationSelf1,         0.225f ),
+                    ( SpellId.DualWieldMasterySelf1,     0.100f ),
                 };
 
                 // bracers, breastplates, coats, cuirasses, girths, hauberks, pauldrons, chest armor, sleeves
@@ -479,22 +480,24 @@ namespace ACE.Server.Factories.Tables
                 // shields
                 spellSelectionGroup8 = new ChanceTable<SpellId>()
                 {
-                    ( SpellId.ImpregnabilitySelf1,  0.17f ),
-                    ( SpellId.InvulnerabilitySelf1, 0.17f ),
+                    ( SpellId.ImpregnabilitySelf1,  0.15f ),
+                    ( SpellId.InvulnerabilitySelf1, 0.15f ),
 
-                    ( SpellId.StrengthSelf1,        0.11f ),
-                    ( SpellId.EnduranceSelf1,       0.11f ),
+                    ( SpellId.StrengthSelf1,        0.10f ),
+                    ( SpellId.EnduranceSelf1,       0.10f ),
 
-                    ( SpellId.RejuvenationSelf1,    0.16f ),
+                    ( SpellId.RejuvenationSelf1,    0.15f ),
 
-                    ( SpellId.FealtySelf1,          0.17f ),
-                    ( SpellId.MagicResistanceSelf1, 0.11f ),
+                    ( SpellId.FealtySelf1,          0.15f ),
+                    ( SpellId.MagicResistanceSelf1, 0.10f ),
+
+                    ( SpellId.ShieldMasterySelf1,   0.10f ),
                 };
 
                 // gauntlets
                 spellSelectionGroup9 = new ChanceTable<SpellId>()
                 {
-                    ( SpellId.CoordinationSelf1,          0.20f ),
+                    ( SpellId.CoordinationSelf1,          0.13f ),
 
                     ( SpellId.HealingMasterySelf1,        0.10f ),
 
@@ -508,24 +511,27 @@ namespace ACE.Server.Factories.Tables
                     ( SpellId.MissileWeaponsMasterySelf1, 0.07f ), // BowMasterySelf1
                     ( SpellId.CrossbowMasterySelf1,       0.07f ),
                     ( SpellId.ThrownWeaponMasterySelf1,   0.07f ),
+                    ( SpellId.ShieldMasterySelf1,         0.07f ),
                 };
 
                 // helms, basinets, helmets, coifs, cowls, heaumes, kabutons
                 spellSelectionGroup10 = new ChanceTable<SpellId>()
                 {
-                    ( SpellId.MagicResistanceSelf1,      0.15f ),
-                    ( SpellId.ImpregnabilitySelf1,       0.11f ),
-                    ( SpellId.InvulnerabilitySelf1,      0.11f ),
+                    ( SpellId.MagicResistanceSelf1,      0.16f ),
+                    ( SpellId.ImpregnabilitySelf1,       0.12f ),
+                    ( SpellId.InvulnerabilitySelf1,      0.12f ),
 
-                    ( SpellId.ArmorExpertiseSelf1,       0.07f ),
-                    ( SpellId.ItemExpertiseSelf1,        0.07f ),
-                    ( SpellId.WeaponExpertiseSelf1,      0.07f ),
-                    ( SpellId.MonsterAttunementSelf1,    0.07f ),
-                    ( SpellId.HealingMasterySelf1,       0.07f ),
-                    ( SpellId.RegenerationSelf1,         0.07f ),
-                    ( SpellId.RejuvenationSelf1,         0.07f ),
-                    ( SpellId.ManaRenewalSelf1,          0.07f ),
-                    ( SpellId.FealtySelf1,               0.07f ),
+                    ( SpellId.ArmorExpertiseSelf1,       0.06f ),
+                    ( SpellId.ItemExpertiseSelf1,        0.06f ),
+                    ( SpellId.WeaponExpertiseSelf1,      0.06f ),
+                    ( SpellId.MonsterAttunementSelf1,    0.06f ),
+                    ( SpellId.HealingMasterySelf1,       0.06f ),
+                    ( SpellId.RegenerationSelf1,         0.06f ),
+                    ( SpellId.RejuvenationSelf1,         0.06f ),
+                    ( SpellId.ManaRenewalSelf1,          0.06f ),
+                    ( SpellId.FealtySelf1,               0.06f ),
+
+                    ( SpellId.DualWieldMasterySelf1,     0.06f ),
                 };
 
                 // boots, chiran sandals, sollerets
@@ -580,7 +586,6 @@ namespace ACE.Server.Factories.Tables
                     ( SpellId.ItemExpertiseSelf1,              0.8f ),
                     ( SpellId.WeaponExpertiseSelf1,            0.8f ),
                     ( SpellId.MonsterAttunementSelf1,          0.8f ),
-                    ( SpellId.PersonAttunementSelf1,           0.8f ),
                 };
 
                 // cloth gloves (1 entry?)
@@ -668,7 +673,6 @@ namespace ACE.Server.Factories.Tables
                     ( SpellId.AlchemyMasterySelf1,             0.8f ),
 
                     ( SpellId.ItemExpertiseSelf1,              0.7f ),
-                    ( SpellId.PersonAttunementSelf1,           0.7f ),
                     ( SpellId.WeaponExpertiseSelf1,            0.7f ),
                     ( SpellId.ArmorExpertiseSelf1,             0.7f ),
 

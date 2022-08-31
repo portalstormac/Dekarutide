@@ -114,31 +114,14 @@ namespace ACE.Server.Entity
 
         public static void PerformAppraisal(Player player, WorldObject source, WorldObject target)
         {
-            CreatureSkill appraisalSkill;
-
-            switch (target.ItemType)
+            if(!target.OriginalValue.HasValue)
             {
-                case ItemType.Armor:
-                case ItemType.Clothing:
-                    appraisalSkill = player.GetCreatureSkill(Skill.AppraiseArmor);
-                    break;
-                case ItemType.Caster:
-                case ItemType.Gem:
-                case ItemType.Jewelry:
-                    appraisalSkill = player.GetCreatureSkill(Skill.AppraiseCasterItem);
-                    break;
-                case ItemType.MeleeWeapon:
-                    appraisalSkill = player.GetCreatureSkill(Skill.AppraiseMeleeItem);
-                    break;
-                case ItemType.MissileWeapon:
-                    appraisalSkill = player.GetCreatureSkill(Skill.AppraiseMissileItem);
-                    break;
-                default:
-                    player.Session.Network.EnqueueSend(new GameMessageSystemChat("You can't appraise that.", ChatMessageType.Broadcast));
-                    player.SendUseDoneEvent();
-                    return;
+                player.Session.Network.EnqueueSend(new GameMessageSystemChat("You can't appraise that.", ChatMessageType.Broadcast));
+                player.SendUseDoneEvent();
+                return;
             }
 
+            CreatureSkill appraisalSkill = player.GetCreatureSkill(Skill.Appraise);
             if (appraisalSkill.AdvancementClass < SkillAdvancementClass.Trained)
             {
                 player.Session.Network.EnqueueSend(new GameEventCommunicationTransientString(player.Session, $"You must have {appraisalSkill.Skill.ToSentence()} trained to appraise that."));
@@ -156,12 +139,14 @@ namespace ACE.Server.Entity
             {
                 Proficiency.OnSuccessUse(player, appraisalSkill, diff);
 
-                target.SetProperty(PropertyInt.Value, trueValue);
-
                 player.Session.Network.EnqueueSend(new GameMessageSystemChat($"You appraise the {target.NameWithMaterial} to be worth {trueValue} Pyreals.", ChatMessageType.Broadcast));
-                player.Session.Network.EnqueueSend(new GameMessagePrivateUpdatePropertyInt(target, PropertyInt.Value, trueValue));
+                if (currValue != trueValue)
+                {
+                    target.SetProperty(PropertyInt.Value, trueValue);
+                    player.Session.Network.EnqueueSend(new GameMessagePrivateUpdatePropertyInt(target, PropertyInt.Value, trueValue));
 
-                target.SaveBiotaToDatabase();
+                    target.SaveBiotaToDatabase();
+                }
             }
             else
                 player.Session.Network.EnqueueSend(new GameMessageSystemChat($"You fail to appraise the value of the {target.NameWithMaterial}.", ChatMessageType.Broadcast));

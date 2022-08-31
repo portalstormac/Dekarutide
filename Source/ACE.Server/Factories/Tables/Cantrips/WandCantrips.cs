@@ -139,7 +139,6 @@ namespace ACE.Server.Factories.Tables
                     ( SpellId.CANTRIPLOCKPICKPROWESS1,                1.0f ),
                     ( SpellId.CANTRIPMAGICITEMEXPERTISE1,             1.0f ),
                     ( SpellId.CANTRIPMONSTERATTUNEMENT1,              1.0f ),
-                    ( SpellId.CANTRIPPERSONATTUNEMENT1,               1.0f ),
                     ( SpellId.CantripSalvaging1,                      1.0f ),
                     ( SpellId.CANTRIPSPRINT1,                         1.0f ),
                     ( SpellId.CANTRIPWEAPONEXPERTISE1,                1.0f ),
