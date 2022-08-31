@@ -1519,10 +1519,8 @@ namespace ACE.Server.Factories
                     return null;
                 }
 
-                if (treasureRoll.WeaponType == TreasureWeaponType.Thrown)
-                    wo.SetStackSize(30);
-                else if (treasureRoll.ItemType == TreasureItemType_Orig.ArtObject && wo.WeenieType == WeenieType.Missile) // thrown weapons(not dinnerware!)
-                    wo.SetStackSize(30);
+                if ((treasureRoll.ItemType == TreasureItemType_Orig.ArtObject || treasureRoll.WeaponType == TreasureWeaponType.Thrown) && wo.WeenieType == WeenieType.Missile && wo.MaxStackSize > 1) // thrown weapons(not dinnerware!)
+                    wo.SetStackSize(Math.Min(30, (int)(wo.MaxStackSize ?? 1)));
                 else if (wo.ItemType == ItemType.SpellComponents)
                 {
                     uint componentId = wo.GetProperty(PropertyDataId.SpellComponent) ?? 0;

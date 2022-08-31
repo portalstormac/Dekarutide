@@ -151,7 +151,7 @@ namespace ACE.Server.Factories.Tables.Wcids
 
                 T5_Chances = new ChanceTable<WeenieClassName>(ChanceTableType.Weight)
                 {
-                    ( WeenieClassName.bowlong,                      4.0f ),
+                    ( WeenieClassName.bowlong,                     16.0f ),
 
                     ( WeenieClassName.bowslashing,                  1.0f ),
                     ( WeenieClassName.bowpiercing,                  1.0f ),

@@ -76,6 +76,7 @@ namespace ACE.Server.Factories.Tables.Wcids
                 case TreasureWeaponType.Crossbow:
                     return RollCrossbowWcid(treasureDeath, treasureRoll);
 
+                case TreasureWeaponType.Thrown:
                 case TreasureWeaponType.Atlatl:
                     return RollAtlatlWcid(treasureDeath, treasureRoll);
 
