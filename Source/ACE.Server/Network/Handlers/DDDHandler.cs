@@ -9,6 +9,7 @@ using ACE.Server.Network.GameEvent.Events;
 using ACE.Server.Network.GameMessages;
 using ACE.Server.Network.GameMessages.Messages;
 using log4net;
+using System;
 using System.Collections.Generic;
 
 namespace ACE.Server.Network.Handlers
@@ -73,16 +74,23 @@ namespace ACE.Server.Network.Handlers
 
             // True DAT patching would be triggered by this msg, but as we're not supporting that, respond instead with warning and push to external download
 
+            var resourceType = message.Payload.ReadUInt32();
+            var dataId = message.Payload.ReadUInt32();
+            var errorType = 1u; // unknown enum... this seems to trigger reattempt request by client.
+            var dddErrorMsg = new GameMessageDDDErrorMessage(resourceType, dataId, errorType);
+
+            var currentTime = DateTime.UtcNow;
+            if (currentTime - session.LastDDDTime < Session.DDDInterval) // Let's keep things sane otherwise the server will spam the client with warning messages.
+            {
+                session.Network.EnqueueSend(dddErrorMsg);
+                return;
+            }
+            session.LastDDDTime = currentTime;
+
             var msg = PropertyManager.GetString("dat_warning_msg").Item;
             var popupMsg = new GameEventPopupString(session, msg);
             var chatMsg = new GameMessageSystemChat(msg, ChatMessageType.WorldBroadcast);
             var transientMsg = new GameEventCommunicationTransientString(session, msg);
-
-            var resourceType = message.Payload.ReadUInt32();
-            var dataId = message.Payload.ReadUInt32();
-            var errorType = 1u; // unknown enum... this seems to trigger reattempt request by client.
-
-            var dddErrorMsg = new GameMessageDDDErrorMessage(resourceType, dataId, errorType);
 
             session.Network.EnqueueSend(popupMsg, chatMsg, transientMsg, dddErrorMsg);
             if (PropertyManager.GetBool("enforce_player_movement").Item && session.Player.FirstEnterWorldDone)
