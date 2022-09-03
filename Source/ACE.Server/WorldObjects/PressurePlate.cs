@@ -10,6 +10,7 @@ using ACE.Server.Factories;
 using ACE.Server.Network.GameEvent.Events;
 using ACE.Server.Network.GameMessages.Messages;
 using System;
+using System.Numerics;
 using Time = ACE.Common.Time;
 
 namespace ACE.Server.WorldObjects
@@ -98,15 +99,11 @@ namespace ACE.Server.WorldObjects
         {
         }
 
-        public override bool EnterWorld()
-        {
-            DetermineTier();
-
-            return base.EnterWorld();
-        }
-
         public override void Heartbeat(double currentUnixTime)
         {
+            if(!Tier.HasValue)
+                DetermineTier();
+
             base.Heartbeat(currentUnixTime);
 
             if (NextRearm != 0 && NextRearm <= currentUnixTime)
@@ -116,7 +113,6 @@ namespace ACE.Server.WorldObjects
         public void DetermineTier()
         {
             var instances = DatabaseManager.World.GetCachedInstancesByLandblock(CurrentLandblock.Id.Landblock);
-
             foreach (var instance in instances)
             {
                 Position instancePos = new Position(instance.ObjCellId, instance.OriginX, instance.OriginY, instance.OriginZ, instance.AnglesX, instance.AnglesY, instance.AnglesZ, instance.AnglesW);
@@ -136,11 +132,51 @@ namespace ACE.Server.WorldObjects
                 }
             }
 
+            var encounters = DatabaseManager.World.GetCachedEncountersByLandblock(CurrentLandblock.Id.Landblock, out _);
+            foreach (var encounter in encounters)
+            {
+                var xPos = Math.Clamp((encounter.CellX * 24.0f) + 12.0f, 0.5f, 191.5f);
+                var yPos = Math.Clamp((encounter.CellY * 24.0f) + 12.0f, 0.5f, 191.5f);
+
+                var pos = new Physics.Common.Position();
+                pos.ObjCellID = (uint)(CurrentLandblock.Id.Landblock << 16) | 1;
+                pos.Frame = new Physics.Animation.AFrame(new Vector3(xPos, yPos, 0), Quaternion.Identity);
+                pos.adjust_to_outside();
+                pos.Frame.Origin.Z = CurrentLandblock.PhysicsLandblock.GetZ(pos.Frame.Origin);
+
+                Position encounterPos = new Position(pos.ObjCellID, pos.Frame.Origin, pos.Frame.Orientation);
+                if (Location.DistanceTo(encounterPos) < 50)
+                {
+                    var weenie = DatabaseManager.World.GetCachedWeenie(encounter.WeenieClassId);
+
+                    foreach (var generatorEntry in weenie.PropertiesGenerator)
+                    {
+                        var generatedWeenie = DatabaseManager.World.GetCachedWeenie(generatorEntry.WeenieClassId);
+
+                        var deathTreasureId = generatedWeenie.GetProperty(PropertyDataId.DeathTreasureType) ?? 0;
+                        if (deathTreasureId != 0)
+                        {
+                            var deathTreasure = LootGenerationFactory.GetTweakedDeathTreasureProfile(deathTreasureId, this);
+                            if (deathTreasure.Tier > (Tier ?? 0))
+                            {
+                                Tier = deathTreasure.Tier;
+                                break;
+                            }
+                        }
+                    }
+
+                    if (Tier.HasValue)
+                        break;
+                }
+            }
+
             if (Tier.HasValue)
             {
                 ResistLockpick = Tier * 75;
                 ResistAwareness = Tier * 50;
             }
+            else
+                Tier = 3;
         }
 
         private bool DefaultActive;
@@ -176,8 +212,9 @@ namespace ACE.Server.WorldObjects
 
         public void AttemptDisarm(Player player, WorldObject unlocker)
         {
-            if (!DefaultActive)
+            if (!DefaultActive || !Tier.HasValue)
             {
+                player.Session.Network.EnqueueSend(new GameEventUseDone(player.Session, WeenieError.YouCannotLockOrUnlockThat));
                 return;
             }
 
