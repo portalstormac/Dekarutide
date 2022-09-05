@@ -86,7 +86,7 @@ namespace ACE.Server.WorldObjects
 
             // send network actions
             var targetDist = GetDistanceToTarget();
-            var turnTo = IsRanged || (CurrentAttack == CombatType.Magic && targetDist <= GetSpellMaxRange()) || AiImmobile;
+            var turnTo = (IsRanged && targetDist <= MaxRange) || (CurrentAttack == CombatType.Magic && targetDist <= GetSpellMaxRange()) || AiImmobile;
             if (turnTo)
                 TurnTo(AttackTarget);
             else

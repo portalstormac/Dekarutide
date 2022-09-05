@@ -104,7 +104,7 @@ namespace ACE.Server.WorldObjects
 
             if (weapon == null && CurrentAttack != null && CurrentAttack == CombatType.Missile)
             {
-                EquipInventoryItems(true);
+                EquipInventoryItems(true, false, true, false);
                 DoAttackStance();
                 CurrentAttack = null;
             }
@@ -126,7 +126,7 @@ namespace ACE.Server.WorldObjects
             var targetDist = GetDistanceToTarget();
             //Console.WriteLine($"{Name} ({Guid}) - Dist: {targetDist}");
 
-            if (CurrentAttack != CombatType.Missile)
+            if (CurrentAttack != CombatType.Missile || Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.CustomDM)
             {
                 if (targetDist > MaxRange || (!IsFacing(AttackTarget) && !IsSelfCast()))
                 {
@@ -134,7 +134,12 @@ namespace ACE.Server.WorldObjects
                     if (!IsTurning && !IsMoving)
                         StartTurn();
                     else
-                        Movement();
+                    {
+                        if (CurrentAttack == CombatType.Melee && targetDist > 20 && HasRangedWeapon && !SwitchWeaponsPending && LastWeaponSwitchTime + 5 < currentUnixTime && Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.CustomDM)
+                            TrySwitchToMissileAttack();
+                        else
+                            Movement();
+                    }
                 }
                 else
                 {
