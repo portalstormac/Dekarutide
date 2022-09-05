@@ -467,24 +467,8 @@
                     "stacksize": "10"
                 },
                 {
-                    "weenieId": "764",
-                    "name": "Vitriol",
-                    "stacksize": "10"
-                },
-                {
-                    "weenieId": "763",
-                    "name": "Verdigris",
-                    "stacksize": "10",
-                    "specializedOnly": "true"
-                },
-                {
                     "weenieId": "762",
                     "name": "Turpeth",
-                    "stacksize": "10"
-                },
-                {
-                    "weenieId": "760",
-                    "name": "Realgar",
                     "stacksize": "10"
                 },
                 {
@@ -557,18 +541,8 @@
                     "specializedOnly": "false"
                 },
                 {
-                    "spellId": "86",
-                    "name": "Force Bolt I",
-                    "specializedOnly": "false"
-                },
-                {
                     "spellId": "28",
                     "name": "Frost Bolt I",
-                    "specializedOnly": "false"
-                },
-                {
-                    "spellId": "64",
-                    "name": "Shock Wave I",
                     "specializedOnly": "false"
                 },
                 {
@@ -581,11 +555,6 @@
                     "name": "Lightning Bolt I",
                     "specializedOnly": "true"
                 },
-                {
-                    "spellId": "92",
-                    "name": "Whirling Blade I",
-                    "specializedOnly": "true"
-                }
             ]
         },
         {
