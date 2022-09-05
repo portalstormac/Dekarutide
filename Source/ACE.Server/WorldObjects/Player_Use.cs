@@ -36,6 +36,8 @@ namespace ACE.Server.WorldObjects
 
             StopExistingMoveToChains();
 
+            EndSneaking();
+
             // source item is always in our possession
             var sourceItem = FindObject(sourceObjectGuid, SearchLocations.MyInventory | SearchLocations.MyEquippedItems, out _, out _, out var sourceItemIsEquipped);
 
@@ -182,6 +184,8 @@ namespace ACE.Server.WorldObjects
             }
 
             StopExistingMoveToChains();
+
+            EndSneaking();
 
             var item = FindObject(itemGuid, SearchLocations.MyInventory | SearchLocations.MyEquippedItems | SearchLocations.Landblock);
 
