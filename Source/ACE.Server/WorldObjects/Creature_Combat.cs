@@ -1279,9 +1279,9 @@ namespace ACE.Server.WorldObjects
             var spell = new Spell(spellLevels[spellLevel]);
 
             if (spell.NonComponentTargetType == ItemType.None)
-                TryCastSpell(spell, null, this, null, false, false, false);
+                TryCastSpell(spell, null, this, null, false, false, false, false);
             else
-                TryCastSpell(spell, target, this, null, false, false, false);
+                TryCastSpell(spell, target, this, null, false, false, false, false);
 
             string spellTypePrefix;
             switch(spellLevel + 1)

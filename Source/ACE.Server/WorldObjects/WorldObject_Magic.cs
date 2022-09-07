@@ -32,7 +32,7 @@ namespace ACE.Server.WorldObjects
         /// <summary>
         /// Instantly casts a spell for a WorldObject (ie. spell traps)
         /// </summary>
-        public void TryCastSpell(Spell spell, WorldObject target, WorldObject itemCaster = null, WorldObject weapon = null, bool isWeaponSpell = false, bool fromProc = false, bool tryResist = true)
+        public void TryCastSpell(Spell spell, WorldObject target, WorldObject itemCaster = null, WorldObject weapon = null, bool isWeaponSpell = false, bool fromProc = false, bool tryResist = true, bool showMsg = true)
         {
             // TODO: look into further normalizing this / caster / weapon
 
@@ -53,13 +53,13 @@ namespace ACE.Server.WorldObjects
                 var fellows = targetPlayer.Fellowship.GetFellowshipMembers();
 
                 foreach (var fellow in fellows.Values)
-                    TryCastSpell_Inner(spell, fellow, itemCaster, weapon, isWeaponSpell, fromProc, tryResist);
+                    TryCastSpell_Inner(spell, fellow, itemCaster, weapon, isWeaponSpell, fromProc, tryResist, showMsg);
             }
             else
-                TryCastSpell_Inner(spell, target, itemCaster, weapon, isWeaponSpell, fromProc, tryResist);
+                TryCastSpell_Inner(spell, target, itemCaster, weapon, isWeaponSpell, fromProc, tryResist, showMsg);
         }
 
-        public void TryCastSpell_Inner(Spell spell, WorldObject target, WorldObject itemCaster = null, WorldObject weapon = null, bool isWeaponSpell = false, bool fromProc = false, bool tryResist = true)
+        public void TryCastSpell_Inner(Spell spell, WorldObject target, WorldObject itemCaster = null, WorldObject weapon = null, bool isWeaponSpell = false, bool fromProc = false, bool tryResist = true, bool showMsg = true)
         {
             // verify before resist, still consumes source item
             if (spell.MetaSpellType == SpellType.Dispel && !VerifyDispelPKStatus(itemCaster, target))
@@ -70,7 +70,7 @@ namespace ACE.Server.WorldObjects
                 return;
 
             // if not resisted, cast spell
-            HandleCastSpell(spell, target, itemCaster, weapon, isWeaponSpell, fromProc);
+            HandleCastSpell(spell, target, itemCaster, weapon, isWeaponSpell, fromProc, showMsg);
         }
 
         /// <summary>
@@ -274,7 +274,7 @@ namespace ACE.Server.WorldObjects
         /// <summary>
         /// Creates a spell based on MetaSpellType
         /// </summary>
-        protected bool HandleCastSpell(Spell spell, WorldObject target, WorldObject itemCaster = null, WorldObject weapon = null, bool isWeaponSpell = false, bool fromProc = false, bool equip = false)
+        protected bool HandleCastSpell(Spell spell, WorldObject target, WorldObject itemCaster = null, WorldObject weapon = null, bool isWeaponSpell = false, bool fromProc = false, bool equip = false, bool showMsg = true)
         {
             var targetCreature = !spell.IsSelfTargeted || spell.IsFellowshipSpell ? target as Creature : this as Creature;
 
@@ -299,21 +299,21 @@ namespace ACE.Server.WorldObjects
 
                     // TODO: replace with some kind of 'rootOwner unless equip' concept?
                     if (itemCaster != null && (equip || itemCaster is Gem || itemCaster is Food))
-                        CreateEnchantment(targetCreature ?? target, itemCaster, itemCaster, spell, equip);
+                        CreateEnchantment(targetCreature ?? target, itemCaster, itemCaster, spell, equip, showMsg);
                     else
-                        CreateEnchantment(targetCreature ?? target, this, this, spell, equip);
+                        CreateEnchantment(targetCreature ?? target, this, this, spell, equip, showMsg);
 
                     break;
 
                 case SpellType.Boost:
                 case SpellType.FellowBoost:
 
-                    HandleCastSpell_Boost(spell, targetCreature);
+                    HandleCastSpell_Boost(spell, targetCreature, showMsg);
                     break;
 
                 case SpellType.Transfer:
 
-                    HandleCastSpell_Transfer(spell, targetCreature);
+                    HandleCastSpell_Transfer(spell, targetCreature, showMsg);
                     break;
 
                 case SpellType.Projectile:
@@ -351,7 +351,7 @@ namespace ACE.Server.WorldObjects
                 case SpellType.Dispel:
                 case SpellType.FellowDispel:
 
-                    HandleCastSpell_Dispel(spell, targetCreature ?? target);
+                    HandleCastSpell_Dispel(spell, targetCreature ?? target, showMsg);
                     break;
 
                 default:
@@ -388,7 +388,7 @@ namespace ACE.Server.WorldObjects
         /// Handles casting SpellType.Enchantment / FellowEnchantment spells
         /// this is also called if SpellType.EnchantmentProjectile successfully hits
         /// </summary>
-        public void CreateEnchantment(WorldObject target, WorldObject caster, WorldObject weapon, Spell spell, bool equip = false, bool fromProc = false)
+        public void CreateEnchantment(WorldObject target, WorldObject caster, WorldObject weapon, Spell spell, bool equip = false, bool fromProc = false, bool showMsg = true)
         {
             // weird itemCaster -> caster collapsing going on here -- fixme
 
@@ -458,7 +458,8 @@ namespace ACE.Server.WorldObjects
                     if (target == this)
                         targetName = casterCheck ? "yourself" : "you";
 
-                    player.SendChatMessage(player, $"{casterName} cast {spell.Name} on {targetName}{suffix}", ChatMessageType.Magic);
+                    if(showMsg)
+                        player.SendChatMessage(player, $"{casterName} cast {spell.Name} on {targetName}{suffix}", ChatMessageType.Magic);
                 }
             }
 
@@ -481,7 +482,8 @@ namespace ACE.Server.WorldObjects
             {
                 var targetName = target == playerTarget ? "you" : $"your {target.Name}";
 
-                playerTarget.SendChatMessage(this, $"{caster.Name} cast {spell.Name} on {targetName}{suffix}", ChatMessageType.Magic);
+                if (showMsg)
+                    playerTarget.SendChatMessage(this, $"{caster.Name} cast {spell.Name} on {targetName}{suffix}", ChatMessageType.Magic);
             }
         }
 
@@ -489,7 +491,7 @@ namespace ACE.Server.WorldObjects
         /// Handles casting SpellType.Boost / FellowBoost spells
         /// typically for Life Magic, ie. Heal, Harm
         /// </summary>
-        private void HandleCastSpell_Boost(Spell spell, Creature targetCreature)
+        private void HandleCastSpell_Boost(Spell spell, Creature targetCreature, bool showMsg = true)
         {
             var player = this as Player;
             var creature = this as Creature;
@@ -571,7 +573,8 @@ namespace ACE.Server.WorldObjects
                     casterMessage = $"You cast {spell.Name} and {verb} {Math.Abs(boost)} points of your {srcVital}.";
                 }
 
-                player.SendChatMessage(player, casterMessage, ChatMessageType.Magic);
+                if (showMsg)
+                    player.SendChatMessage(player, casterMessage, ChatMessageType.Magic);
             }
 
             if (targetCreature is Player targetPlayer && player != targetPlayer)
@@ -588,7 +591,8 @@ namespace ACE.Server.WorldObjects
                         targetPlayer.SetCurrentAttacker(creature);
                 }
 
-                targetPlayer.SendChatMessage(player, targetMessage, ChatMessageType.Magic);
+                if(showMsg)
+                    targetPlayer.SendChatMessage(player, targetMessage, ChatMessageType.Magic);
             }
 
             if (targetCreature != this && targetCreature.IsAlive && spell.VitalDamageType == DamageType.Health && boost < 0)
@@ -711,7 +715,7 @@ namespace ACE.Server.WorldObjects
         /// Handles casting SpellType.Transfer spells
         /// usually for Life Magic, ie. Stamina to Mana, Drain
         /// </summary>
-        private void HandleCastSpell_Transfer(Spell spell, Creature targetCreature)
+        private void HandleCastSpell_Transfer(Spell spell, Creature targetCreature, bool showMsg = true)
         {
             var player = this as Player;
             var creature = this as Creature;
@@ -872,10 +876,10 @@ namespace ACE.Server.WorldObjects
                 }
             }
 
-            if (player != null && sourceMsg != null)
+            if (player != null && sourceMsg != null && showMsg)
                 player.SendChatMessage(player, sourceMsg, ChatMessageType.Magic);
 
-            if (targetPlayer != null && targetMsg != null)
+            if (targetPlayer != null && targetMsg != null && showMsg)
                 targetPlayer.SendChatMessage(caster, targetMsg, ChatMessageType.Magic);
 
 
@@ -1399,7 +1403,7 @@ namespace ACE.Server.WorldObjects
         /// <summary>
         /// Handles casting SpellType.Dispel / FellowDispel spells
         /// </summary>
-        private void HandleCastSpell_Dispel(Spell spell, WorldObject target)
+        private void HandleCastSpell_Dispel(Spell spell, WorldObject target, bool showMsg = true)
         {
             var player = this as Player;
             var creature = this as Creature;
@@ -1425,14 +1429,16 @@ namespace ACE.Server.WorldObjects
                 else
                     casterMsg = $"You cast {spell.Name} on {target.Name}{suffix}";
 
-                player.SendChatMessage(player, casterMsg, ChatMessageType.Magic);
+                if(showMsg)
+                    player.SendChatMessage(player, casterMsg, ChatMessageType.Magic);
             }
 
             if (target is Player targetPlayer && targetPlayer != player)
             {
                 var targetMsg = $"{Name} casts {spell.Name} on you{suffix.Replace("and dispel", "and dispels")}";
 
-                targetPlayer.SendChatMessage(this, targetMsg, ChatMessageType.Magic);
+                if (showMsg)
+                    targetPlayer.SendChatMessage(this, targetMsg, ChatMessageType.Magic);
 
                 // all dispels appear to be listed as non-beneficial, even the ones that only dispel negative spells
                 // we filter here to positive or all
