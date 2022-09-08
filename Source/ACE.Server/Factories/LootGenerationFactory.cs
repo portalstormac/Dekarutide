@@ -52,7 +52,7 @@ namespace ACE.Server.Factories
             {
                 coinRanges = new List<(int, int)>()
                 {
-                    ( 400, 1000), // T1
+                    ( 300,  600), // T1
                     ( 800, 2000), // T2
                     (1200, 4000), // T3
                     (2000, 5000), // T4
