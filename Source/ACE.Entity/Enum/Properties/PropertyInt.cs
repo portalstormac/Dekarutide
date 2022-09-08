@@ -645,6 +645,8 @@ namespace ACE.Entity.Enum.Properties
         RecentMoneyOutflow                       = 10006,
         Tier                                     = 10007,
         ResistAwareness                          = 10008,
+        [ServerOnly]
+        EmptyId                                  = 10009,
     }
 
     public static class PropertyIntExtensions

@@ -74,6 +74,16 @@
                     "weenieId": "50045",
                     "name": "Combat Manual",
                     "stacksize": "1"
+                },
+                {
+                    "weenieId": "151",
+                    "name": "Empty Flask",
+                    "stacksize": "10"
+                },
+                {
+                    "weenieId": "4746",
+                    "name": "Water",
+                    "stacksize": "10"
                 }
             ],
             "heritage": [

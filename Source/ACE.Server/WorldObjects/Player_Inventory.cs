@@ -87,12 +87,19 @@ namespace ACE.Server.WorldObjects
         /// <summary>
         /// If enough burden is available, this will try to add (via create) an item to the main pack. If the main pack is full, it will try to add it to the first side pack with room.
         /// </summary>
-        public bool TryCreateInInventoryWithNetworking(WorldObject item, out Container container)
+        public bool TryCreateInInventoryWithNetworking(WorldObject item, out Container container, bool allowStacking = false)
         {
-            if (!TryAddToInventory(item, out container)) // We don't have enough burden available or no empty pack slot.
+            var currentStack = item.StackSize;
+            if (!TryAddToInventory(ref item, out container, 0, false, true, allowStacking)) // We don't have enough burden available or no empty pack slot.
                 return false;
 
-            Session.Network.EnqueueSend(new GameMessageCreateObject(item));
+            if(allowStacking && item.StackSize != currentStack)
+            {
+                // We've been merged.
+                item.EnqueueBroadcast(new GameMessageSetStackSize(item));
+            }
+            else
+                Session.Network.EnqueueSend(new GameMessageCreateObject(item));
 
             if (item is Container itemAsContainer)
             {
@@ -3532,7 +3539,7 @@ namespace ACE.Server.WorldObjects
             if (itemBeingGiven.IsUniqueOrContainsUnique && !CheckUniques(itemBeingGiven, giver))
                 return false;
 
-            if (!TryCreateInInventoryWithNetworking(itemBeingGiven))
+            if (!TryCreateInInventoryWithNetworking(itemBeingGiven, out _, true))
             {
                 var msg = new GameMessageSystemChat($"{giver.Name} tries to give you {(itemBeingGiven.StackSize > 1 ? $"{itemBeingGiven.StackSize} " : "")}{itemBeingGiven.GetNameWithMaterial(itemBeingGiven.StackSize)}.", ChatMessageType.Broadcast);
                 Session.Network.EnqueueSend(msg);

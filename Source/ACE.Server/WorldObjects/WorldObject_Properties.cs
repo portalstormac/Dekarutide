@@ -3113,6 +3113,12 @@ namespace ACE.Server.WorldObjects
             set { if (!value.HasValue) RemoveProperty(PropertyInt.Tier); else SetProperty(PropertyInt.Tier, value.Value); }
         }
 
+        public int EmptyId
+        {
+            get => GetProperty(PropertyInt.EmptyId) ?? 0;
+            set { if (value == 0) RemoveProperty(PropertyInt.EmptyId); else SetProperty(PropertyInt.EmptyId, value); }
+        }
+
         public bool HasMissileFlightPlacement => CSetup.HasMissileFlightPlacement;
 
         /// <summary>

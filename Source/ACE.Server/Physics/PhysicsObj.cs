@@ -2397,7 +2397,7 @@ namespace ACE.Server.Physics
 
                 foreach(var entry in newlyVisible)
                 {
-                    if(entry.WeenieObj.WorldObject.ResistAwareness.HasValue)
+                    if(entry.WeenieObj != null && entry.WeenieObj.WorldObject != null && entry.WeenieObj.WorldObject.ResistAwareness.HasValue)
                         entry.WeenieObj.WorldObject.CheckAwareness();
                 }
             }

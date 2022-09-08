@@ -397,11 +397,11 @@ namespace ACE.Server.WorldObjects
         /// If enough burden is available, this will try to add an item to the main pack. If the main pack is full, it will try to add it to the first side pack with room.<para />
         /// It will also increase the EncumbranceVal and Value.
         /// </summary>
-        public bool TryAddToInventory(WorldObject worldObject, int placementPosition = 0, bool limitToMainPackOnly = false, bool burdenCheck = true)
+        public bool TryAddToInventory(WorldObject worldObject, int placementPosition = 0, bool limitToMainPackOnly = false, bool burdenCheck = true, bool allowStacking = false)
         {
             if (worldObject == null) return false;
 
-            return TryAddToInventory(worldObject, out _, placementPosition, limitToMainPackOnly, burdenCheck);
+            return TryAddToInventory(ref worldObject, out _, placementPosition, limitToMainPackOnly, burdenCheck, allowStacking);
         }
 
         /// <summary>
@@ -610,7 +610,7 @@ namespace ACE.Server.WorldObjects
         /// If enough burden is available, this will try to add an item to the main pack. If the main pack is full, it will try to add it to the first side pack with room.<para />
         /// It will also increase the EncumbranceVal and Value.
         /// </summary>
-        public bool TryAddToInventory(WorldObject worldObject, out Container container, int placementPosition = 0, bool limitToMainPackOnly = false, bool burdenCheck = true)
+        public bool TryAddToInventory(ref WorldObject worldObject, out Container container, int placementPosition = 0, bool limitToMainPackOnly = false, bool burdenCheck = true, bool allowStacking = false)
         {
             // bug: should be root owner
             if (this is Player player && burdenCheck)
@@ -638,6 +638,24 @@ namespace ACE.Server.WorldObjects
             {
                 containerItems = Inventory.Values.Where(i => !i.UseBackpackSlot).ToList();
 
+                if (allowStacking && Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.CustomDM && worldObject.MaxStackSize > 0 && worldObject.StackSize < worldObject.MaxStackSize)
+                {
+                    var wo = worldObject;
+                    var availableStack = containerItems.FirstOrDefault(i => i.WeenieClassId == wo.WeenieClassId && i.StackSize < wo.MaxStackSize - wo.StackSize);
+                    if(availableStack != null)
+                    {
+                        availableStack.SetStackSize(availableStack.StackSize + worldObject.StackSize);
+
+                        EncumbranceVal += (worldObject.EncumbranceVal ?? 0);
+                        Value += (worldObject.Value ?? 0);
+
+                        worldObject.Destroy();
+                        worldObject = availableStack;
+                        container = this;
+                        return true;
+                    }
+                }
+
                 if ((ItemCapacity ?? 0) <= containerItems.Count)
                 {
                     // Can we add this to any side pack?
@@ -648,7 +666,7 @@ namespace ACE.Server.WorldObjects
 
                         foreach (var sidePack in containers)
                         {
-                            if (sidePack.TryAddToInventory(worldObject, out container, placementPosition, true))
+                            if (sidePack.TryAddToInventory(ref worldObject, out container, placementPosition, true))
                             {
                                 EncumbranceVal += (worldObject.EncumbranceVal ?? 0);
                                 Value += (worldObject.Value ?? 0);

@@ -1093,7 +1093,7 @@ namespace ACE.Server.Managers
             if (amount > 1)
                 wo.SetStackSize((int)amount);
 
-            player.TryCreateInInventoryWithNetworking(wo);
+            player.TryCreateInInventoryWithNetworking(wo, out _, true);
             return wo;
         }
 
