@@ -1186,9 +1186,16 @@ namespace ACE.Server.WorldObjects
                 playerTarget.SendMessage(msg, ChatMessageType.Combat, this);
         }
 
+        private double NextAssessDebuffActivationTime = 0;
+        private static double AssessDebuffActivationInterval = 10;
         public void TryCastAssessDebuff(Creature target, CombatType combatType)
         {
             if (Common.ConfigManager.Config.Server.WorldRuleset != Common.Ruleset.CustomDM)
+                return;
+
+            var currentTime = Time.GetUnixTime();
+
+            if (NextAssessDebuffActivationTime > currentTime)
                 return;
 
             Player sourceAsPlayer = this as Player;
@@ -1196,12 +1203,14 @@ namespace ACE.Server.WorldObjects
 
             Entity.CreatureSkill skill = GetCreatureSkill(Skill.AssessCreature);
             var activationChance = ThreadSafeRandom.Next(0.0f, 1.0f);
-            if (skill.AdvancementClass == SkillAdvancementClass.Specialized && activationChance > 0.25)
+            if (skill.AdvancementClass == SkillAdvancementClass.Specialized && activationChance > 0.50)
                 return;
-            else if (skill.AdvancementClass == SkillAdvancementClass.Trained && activationChance > 0.10)
+            else if (skill.AdvancementClass == SkillAdvancementClass.Trained && activationChance > 0.25)
                 return;
             else if (skill.AdvancementClass == SkillAdvancementClass.Untrained || skill.AdvancementClass == SkillAdvancementClass.Inactive)
                 return;
+
+            NextAssessDebuffActivationTime = currentTime + AssessDebuffActivationInterval;
 
             Entity.CreatureSkill defenseSkill = target.GetCreatureSkill(Skill.Deception);
 

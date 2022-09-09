@@ -961,10 +961,20 @@ namespace ACE.Server.WorldObjects
             return HasProc && ProcSpell == spellID;
         }
 
+        private double NextProcAttemptTime = 0;
+        private static double ProcAttemptInterval = 10;
         public void TryProcItem(WorldObject attacker, Creature target)
         {
-            if (Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.CustomDM && ItemMaxMana > 0 && !IsAffecting)
-                return; // The item spells must be active for the item to proc.
+            var currentTime = Time.GetUnixTime();
+
+            if (Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.CustomDM)
+            {
+                if (ItemMaxMana > 0 && !IsAffecting)
+                    return; // The item spells must be active for the item to proc.
+
+                if (NextProcAttemptTime > currentTime)
+                    return;
+            }
 
             // roll for a chance of casting spell
             var chance = ProcSpellRate ?? 0.0f;
@@ -983,6 +993,9 @@ namespace ACE.Server.WorldObjects
             var rng = ThreadSafeRandom.Next(0.0f, 1.0f);
             if (rng >= chance)
                 return;
+
+            if (Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.CustomDM)
+                NextProcAttemptTime = currentTime + ProcAttemptInterval;
 
             var spell = new Spell(ProcSpell.Value);
 
