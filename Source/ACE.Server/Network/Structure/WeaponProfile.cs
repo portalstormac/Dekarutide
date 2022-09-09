@@ -54,7 +54,7 @@ namespace ACE.Server.Network.Structure
             DamageVariance = GetDamageVariance(weapon);
             DamageMod = GetDamageMultiplier(weapon);
             WeaponLength = weapon.GetProperty(PropertyFloat.WeaponLength) ?? 1.0f;
-            if(weapon.WeenieType == WeenieType.Missile)
+            if(weapon.ItemType == ItemType.MissileWeapon && weapon.WeaponSkill == Skill.ThrownWeapon)
             {
                 if (weapon.Wielder == null)
                 {

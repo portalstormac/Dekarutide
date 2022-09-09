@@ -70,7 +70,7 @@ namespace ACE.Server.WorldObjects
                 return;
 
             // if not resisted, cast spell
-            HandleCastSpell(spell, target, itemCaster, weapon, isWeaponSpell, fromProc, showMsg);
+            HandleCastSpell(spell, target, itemCaster, weapon, isWeaponSpell, fromProc, false, showMsg);
         }
 
         /// <summary>
@@ -299,9 +299,9 @@ namespace ACE.Server.WorldObjects
 
                     // TODO: replace with some kind of 'rootOwner unless equip' concept?
                     if (itemCaster != null && (equip || itemCaster is Gem || itemCaster is Food))
-                        CreateEnchantment(targetCreature ?? target, itemCaster, itemCaster, spell, equip, showMsg);
+                        CreateEnchantment(targetCreature ?? target, itemCaster, itemCaster, spell, equip, false, showMsg);
                     else
-                        CreateEnchantment(targetCreature ?? target, this, this, spell, equip, showMsg);
+                        CreateEnchantment(targetCreature ?? target, this, this, spell, equip, false, showMsg);
 
                     break;
 
