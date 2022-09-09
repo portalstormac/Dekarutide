@@ -105,6 +105,8 @@ namespace ACE.Server.WorldObjects
                     unlocker.Structure = 0;
 
                 structure = unlocker.Structure ?? 0;
+                
+                unlocker.Value -= unlocker.StructureUnitValue;
 
                 if (unlocker.Structure == 0)
                 {
