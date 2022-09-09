@@ -845,21 +845,6 @@ namespace ACE.Server.WorldObjects
             corpse.TryAddToInventory(slag);
         }
 
-        /// <summary>
-        /// Generates random amounts of slag on a corpse
-        /// when an OlthoiPlayer is the killer
-        /// </summary>
-        private void GenerateTreasure_Olthoi(DamageHistoryInfo killer, Corpse corpse)
-        {
-            if (DeathTreasure == null) return;
-
-            var slag = LootGenerationFactory.RollSlag(DeathTreasure);
-
-            if (slag == null) return;
-
-            corpse.TryAddToInventory(slag);
-        }
-
         public void DoCantripLogging(DamageHistoryInfo killer, WorldObject wo)
         {
             var epicCantrips = wo.EpicCantrips;
