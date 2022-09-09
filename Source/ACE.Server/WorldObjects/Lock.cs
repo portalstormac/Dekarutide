@@ -201,7 +201,7 @@ namespace ACE.Server.WorldObjects
                             break;
                         case UnlockResults.PickLockFailed:
                             target.EnqueueBroadcast(new GameMessageSound(target.Guid, Sound.PicklockFail, 1.0f));
-                            SendUnlockResultMessage(player, ConsumeUnlocker(player, unlocker, target), isLockpick, target, true);
+                            SendUnlockResultMessage(player, ConsumeUnlocker(player, unlocker, target), isLockpick, target, false);
                             break;
                         case UnlockResults.CannotBePicked:
                             player.Session.Network.EnqueueSend(new GameEventUseDone(player.Session, WeenieError.YouCannotLockOrUnlockThat));
