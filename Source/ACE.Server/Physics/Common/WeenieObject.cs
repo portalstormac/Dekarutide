@@ -90,7 +90,7 @@ namespace ACE.Server.Physics.Common
             if (stamina == 0)
                 jumpSkill = 0;
 
-            var height = MovementSystem.GetJumpHeight((float)burden, jumpSkill, extent, 1.0f);
+            var height = MovementSystem.GetJumpHeight((float)burden, jumpSkill, extent, ACE.Common.ConfigManager.Config.Server.WorldRuleset == ACE.Common.Ruleset.CustomDM ? 1.5f : 1.0f);
 
             velocity_z = (float)Math.Sqrt(height * 19.6);
 
