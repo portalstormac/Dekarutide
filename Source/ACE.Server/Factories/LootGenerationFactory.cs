@@ -1521,13 +1521,15 @@ namespace ACE.Server.Factories
 
                 if ((treasureRoll.ItemType == TreasureItemType_Orig.ArtObject || treasureRoll.WeaponType == TreasureWeaponType.Thrown) && wo.WeenieType == WeenieType.Missile && wo.MaxStackSize > 1) // thrown weapons(not dinnerware!)
                     wo.SetStackSize(Math.Min(30, (int)(wo.MaxStackSize ?? 1)));
-                else if (wo.ItemType == ItemType.SpellComponents)
+                else if (treasureRoll.ItemType == TreasureItemType_Orig.Consumable && wo.MaxStackSize > 1)
+                    wo.SetStackSize(Math.Min(5, (int)(wo.MaxStackSize ?? 1)));
+                else if (wo.ItemType == ItemType.SpellComponents && wo.MaxStackSize > 1)
                 {
                     uint componentId = wo.GetProperty(PropertyDataId.SpellComponent) ?? 0;
                     if ((componentId > 6 && componentId < 49) || (componentId > 62 && componentId < 75)) // herbs, powders, potions and tapers
-                        wo.SetStackSize(2 * treasureDeath.Tier);
+                        wo.SetStackSize(Math.Min(2 * treasureDeath.Tier, wo.MaxStackSize ?? 1));
                     else if((wo.GetProperty(PropertyDataId.SpellComponent) ?? 0) < 63) // scarabs and talismans
-                        wo.SetStackSize(treasureDeath.Tier);
+                        wo.SetStackSize(Math.Min(treasureDeath.Tier, wo.MaxStackSize ?? 1));
                 }
 
                 treasureRoll.BaseArmorLevel = wo.ArmorLevel ?? 0;

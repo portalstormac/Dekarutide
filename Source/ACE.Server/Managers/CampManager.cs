@@ -6,6 +6,7 @@ using log4net;
 using ACE.Common;
 using ACE.Database.Models.Shard;
 using ACE.Server.WorldObjects;
+using ACE.Entity.Enum;
 
 namespace ACE.Server.Managers
 {
@@ -259,7 +260,7 @@ namespace ACE.Server.Managers
         public uint GetMaxInteractions(uint campId)
         {
             if (campId == 0) // Rest camp
-                return 3000;
+                return 1000;
             else if (campId > 0x0000FFFF) // Area Camp
                 return 500;
             else
@@ -279,10 +280,14 @@ namespace ACE.Server.Managers
             if (camp == null)
                 return;
 
-            float decayRate = 60.0f; // The amount of seconds it takes for a interaction to decay.
+            float decayRate = 120.0f; // The amount of seconds it takes for an interaction to decay.
+
+            if (camp.CampId == 0)
+                decayRate /= 4.0f; // Rest camp decays at a higher rate
 
             double secondsSinceLastCheck = Time.GetUnixTime() - camp.LastDecayTime;
             uint amountToDecay = (uint)Math.Max(Math.Floor(secondsSinceLastCheck / decayRate), 0);
+
             if (amountToDecay > 0)
             {
                 camp.LastDecayTime = (uint)Time.GetUnixTime();
@@ -298,6 +303,48 @@ namespace ACE.Server.Managers
                 Player.CharacterChangesDetected = true;
             }
 
+        }
+        public void GetCurrentCampBonus(CreatureType creatureType, out float typeCampBonus, out float areaCampBonus, out float restCampBonus)
+        {
+            typeCampBonus = 0;
+            areaCampBonus = 0;
+            restCampBonus = 0;
+
+            if (creatureType != CreatureType.Invalid)
+            {
+                uint typeCampId = (uint)creatureType;
+                if (typeCampId != 0)
+                {
+                    var typeCamp = GetOrCreateCamp(typeCampId, out _);
+                    if (typeCamp != null)
+                    {
+                        CheckDecay(typeCamp);
+                        typeCampBonus = 1.0f - ((float)typeCamp.NumInteractions / GetMaxInteractions(typeCamp.CampId));
+                    }
+                }
+            }
+
+            uint areaCampId;
+            if (Player.CurrentLandblock.IsDungeon)
+                areaCampId = Player.CurrentLandblock.Id.Raw & 0xFFFF0000;
+            else
+                areaCampId = Player.CurrentLandblock.Id.Raw & 0xF0F00000;
+            if (areaCampId != 0)
+            {
+                var areaCamp = GetOrCreateCamp(areaCampId, out _);
+                if (areaCamp != null)
+                {
+                    CheckDecay(areaCamp);
+                    areaCampBonus = 1.0f - ((float)areaCamp.NumInteractions / GetMaxInteractions(areaCamp.CampId));
+                }
+            }
+
+            var restCamp = GetOrCreateCamp(0, out _);
+            if (restCamp != null)
+            {
+                CheckDecay(restCamp);
+                restCampBonus = 1.0f - ((float)restCamp.NumInteractions / GetMaxInteractions(restCamp.CampId));
+            }
         }
 
         public void HandleCampInteraction(Creature creature, out float typeCampBonus, out float areaCampBonus, out float restCampBonus)

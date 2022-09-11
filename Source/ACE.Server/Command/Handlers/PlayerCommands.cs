@@ -648,6 +648,21 @@ namespace ACE.Server.Command.Handlers
             }
         }
 
+        [CommandHandler("tar", AccessLevel.Player, CommandHandlerFlag.None, 0, "Show current T.A.R. experience multipliers", "<creatureType>")]
+        public static void HandleRest(Session session, params string[] parameters)
+        {
+            if (parameters.Length > 0 && Enum.TryParse(parameters[0], true, out CreatureType creatureType))
+            {
+                session.Player.CampManager.GetCurrentCampBonus(creatureType, out var typeCampBonus, out var areaCampBonus, out var restCampBonus);
+                CommandHandlerHelper.WriteOutputInfo(session, $"Current T.A.R. experience multipliers:\n   Type({creatureType}): {(typeCampBonus * 100).ToString("0")}%\n   Area: {(areaCampBonus * 100).ToString("0")}%\n   Rest: {(restCampBonus * 100).ToString("0")}%");
+            }
+            else
+            {
+                session.Player.CampManager.GetCurrentCampBonus(CreatureType.Invalid, out _, out var areaCampBonus, out var restCampBonus);
+                CommandHandlerHelper.WriteOutputInfo(session, $"Current T.A.R. experience multipliers:\n   Area: {(areaCampBonus * 100).ToString("0")}%\n   Rest: {(restCampBonus * 100).ToString("0")}%");
+            }
+        }
+
         public class ActivityRecommendation
         {
             public HashSet<Skill> Skills = new HashSet<Skill>();

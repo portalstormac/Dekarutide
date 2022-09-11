@@ -210,7 +210,7 @@ namespace ACE.Server.WorldObjects
                     totalXP = (thirdXP * typeCampBonus) + (thirdXP * areaCampBonus) + (thirdXP * restCampBonus);
 
                     if (!CurrentLandblock.IsDungeon)
-                        totalXP *= 1.5f; // Surface provides 50% xp bonus to account for lower creature density.
+                        totalXP *= 1.25f; // Surface provides 25% xp bonus to account for lower creature density.
 
                     // Delay sending this message for one tick to make it appear after the kill message.
                     var sendRestMessageChain = new ActionChain();
