@@ -402,6 +402,9 @@ namespace ACE.Server.WorldObjects
             get => GetProperty(PropertyFloat.LeyLineTriggerChance);
             set { if (!value.HasValue) RemoveProperty(PropertyFloat.LeyLineTriggerChance); else SetProperty(PropertyFloat.LeyLineTriggerChance, value.Value); }
         }
+
+        public double NextLeyLineTriggerTime = 0;
+        public static double LeyLineTriggerInterval = 10;
         public override int? ItemCurMana
         {
             get => GetProperty(PropertyInt.ItemCurMana);

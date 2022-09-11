@@ -925,39 +925,45 @@ namespace ACE.Server.WorldObjects
                         {
                             if (amulet != null && (amulet.LeyLineTriggerChance ?? 0) > 0 && (amulet.LeyLineEffectId == (uint)LeyLineEffect.MirrorSpell || amulet.LeyLineEffectId == (uint)LeyLineEffect.CastExtraSpellOther || amulet.LeyLineEffectId == (uint)LeyLineEffect.CastExtraSpellSelf || amulet.LeyLineEffectId == (uint)LeyLineEffect.ExtraSpellIntensity))
                             {
-                                var rng = ThreadSafeRandom.Next(0.0f, 1.0f);
-                                if (amulet.LeyLineTriggerChance > rng)
+                                var currentTime = Time.GetUnixTime();
+                                if (amulet.LeyLineTriggerChance == 1.0f || amulet.NextLeyLineTriggerTime <= currentTime)
                                 {
-                                    SpellId triggerSpellLevel1Id = (SpellId)(amulet.LeyLineTriggerSpellId ?? 0);
-                                    if (triggerSpellLevel1Id != SpellId.Undef)
+                                    var rng = ThreadSafeRandom.Next(0.0f, 1.0f);
+                                    if (amulet.LeyLineTriggerChance > rng)
                                     {
-                                        var triggerSpellLvl1 = new Spell(triggerSpellLevel1Id);
-                                        if (triggerSpellLvl1 != null && triggerSpellLvl1.Category == spell.Category)
-                                        {
-                                            if (amulet.LeyLineEffectId == (uint)LeyLineEffect.ExtraSpellIntensity)
-                                            {
-                                                spell.IntensityMod = 1.3f;
-                                            }
-                                            else
-                                            {
-                                                SpellId castSpellLevel1Id = (SpellId)(amulet.LeyLineCastSpellId ?? 0);
-                                                if (castSpellLevel1Id != SpellId.Undef)
-                                                {
-                                                    SpellId castSpellId = SpellLevelProgression.GetSpellAtLevel(castSpellLevel1Id, (int)spell.Level - 1, true);
-                                                    if (castSpellId != SpellId.Undef)
-                                                    {
-                                                        var castSpell = new Spell(castSpellId);
-                                                        var mirrorSpellChain = new ActionChain();
-                                                        mirrorSpellChain.AddDelaySeconds(0.3);
-                                                        mirrorSpellChain.AddAction(this, () =>
-                                                        {
-                                                            if (amulet.LeyLineEffectId == (uint)LeyLineEffect.CastExtraSpellSelf)
-                                                                CreatePlayerSpell(this, castSpell, isWeaponSpell);
-                                                            else
-                                                                CreatePlayerSpell(target, castSpell, isWeaponSpell);
-                                                        });
+                                        amulet.NextLeyLineTriggerTime = currentTime + LeyLineAmulet.LeyLineTriggerInterval;
 
-                                                        mirrorSpellChain.EnqueueChain();
+                                        SpellId triggerSpellLevel1Id = (SpellId)(amulet.LeyLineTriggerSpellId ?? 0);
+                                        if (triggerSpellLevel1Id != SpellId.Undef)
+                                        {
+                                            var triggerSpellLvl1 = new Spell(triggerSpellLevel1Id);
+                                            if (triggerSpellLvl1 != null && triggerSpellLvl1.Category == spell.Category)
+                                            {
+                                                if (amulet.LeyLineEffectId == (uint)LeyLineEffect.ExtraSpellIntensity)
+                                                {
+                                                    spell.IntensityMod = 1.3f;
+                                                }
+                                                else
+                                                {
+                                                    SpellId castSpellLevel1Id = (SpellId)(amulet.LeyLineCastSpellId ?? 0);
+                                                    if (castSpellLevel1Id != SpellId.Undef)
+                                                    {
+                                                        SpellId castSpellId = SpellLevelProgression.GetSpellAtLevel(castSpellLevel1Id, (int)spell.Level - 1, true);
+                                                        if (castSpellId != SpellId.Undef)
+                                                        {
+                                                            var castSpell = new Spell(castSpellId);
+                                                            var mirrorSpellChain = new ActionChain();
+                                                            mirrorSpellChain.AddDelaySeconds(0.3);
+                                                            mirrorSpellChain.AddAction(this, () =>
+                                                            {
+                                                                if (amulet.LeyLineEffectId == (uint)LeyLineEffect.CastExtraSpellSelf)
+                                                                    CreatePlayerSpell(this, castSpell, isWeaponSpell);
+                                                                else
+                                                                    CreatePlayerSpell(target, castSpell, isWeaponSpell);
+                                                            });
+
+                                                            mirrorSpellChain.EnqueueChain();
+                                                        }
                                                     }
                                                 }
                                             }
