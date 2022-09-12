@@ -270,12 +270,17 @@ namespace ACE.Database
 
             var context = new ShardDbContext();
 
+            var currentTime = (uint)Time.GetUnixTime();
+
             var camps = context.CharacterPropertiesCampRegistry.ToList();
             foreach (var camp in camps)
             {
                 float decayRate = 60.0f; // The amount of seconds it takes for a kill to decay, make sure this matches the value used in CampManager
 
-                double secondsSinceLastCheck = Time.GetUnixTime() - camp.LastDecayTime;
+                if (camp.CampId == 0)
+                    decayRate /= 2.0f; // Rest camp decays at a higher rate
+
+                double secondsSinceLastCheck = currentTime - camp.LastDecayTime;
                 uint amountToDecay = (uint)Math.Max(Math.Floor(secondsSinceLastCheck / decayRate), 0);
                 if (camp.NumInteractions < amountToDecay)
                 {

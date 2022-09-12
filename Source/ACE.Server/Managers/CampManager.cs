@@ -267,30 +267,38 @@ namespace ACE.Server.Managers
                 return 2000; // Type Camp
         }
 
-        public CharacterPropertiesCampRegistry CheckDecay(uint campId)
+        public CharacterPropertiesCampRegistry CheckDecay(uint campId, bool isInteraction)
         {
             var camp = GetCamp(campId);
-            CheckDecay(camp);
+            CheckDecay(camp, isInteraction);
 
             return camp;
         }
 
-        public void CheckDecay(CharacterPropertiesCampRegistry camp)
+        public void CheckDecay(CharacterPropertiesCampRegistry camp, bool isInteraction)
         {
             if (camp == null)
                 return;
 
-            float decayRate = 120.0f; // The amount of seconds it takes for an interaction to decay.
-
-            if (camp.CampId == 0)
-                decayRate /= 4.0f; // Rest camp decays at a higher rate
+            var currentTime = (uint)Time.GetUnixTime();
 
             double secondsSinceLastCheck = Time.GetUnixTime() - camp.LastDecayTime;
+            if (isInteraction && secondsSinceLastCheck < 120) // Time after an interaction before we start decaying.
+            {
+                camp.LastDecayTime = currentTime;
+                return;
+            }
+
+            float decayRate = 60.0f; // The amount of seconds it takes for an interaction to decay.
+
+            if (camp.CampId == 0)
+                decayRate /= 2.0f; // Rest camp decays at a higher rate
+
             uint amountToDecay = (uint)Math.Max(Math.Floor(secondsSinceLastCheck / decayRate), 0);
 
             if (amountToDecay > 0)
             {
-                camp.LastDecayTime = (uint)Time.GetUnixTime();
+                camp.LastDecayTime = currentTime;
 
                 if (camp.NumInteractions >= amountToDecay)
                     camp.NumInteractions -= amountToDecay;
@@ -318,7 +326,7 @@ namespace ACE.Server.Managers
                     var typeCamp = GetOrCreateCamp(typeCampId, out _);
                     if (typeCamp != null)
                     {
-                        CheckDecay(typeCamp);
+                        CheckDecay(typeCamp, false);
                         typeCampBonus = 1.0f - ((float)typeCamp.NumInteractions / GetMaxInteractions(typeCamp.CampId));
                     }
                 }
@@ -334,7 +342,7 @@ namespace ACE.Server.Managers
                 var areaCamp = GetOrCreateCamp(areaCampId, out _);
                 if (areaCamp != null)
                 {
-                    CheckDecay(areaCamp);
+                    CheckDecay(areaCamp, false);
                     areaCampBonus = 1.0f - ((float)areaCamp.NumInteractions / GetMaxInteractions(areaCamp.CampId));
                 }
             }
@@ -342,7 +350,7 @@ namespace ACE.Server.Managers
             var restCamp = GetOrCreateCamp(0, out _);
             if (restCamp != null)
             {
-                CheckDecay(restCamp);
+                CheckDecay(restCamp, false);
                 restCampBonus = 1.0f - ((float)restCamp.NumInteractions / GetMaxInteractions(restCamp.CampId));
             }
         }
@@ -365,7 +373,7 @@ namespace ACE.Server.Managers
                 var typeCamp = GetOrCreateCamp(typeCampId, out _);
                 if (typeCamp != null)
                 {
-                    CheckDecay(typeCamp);
+                    CheckDecay(typeCamp, true);
                     typeCampBonus = 1.0f - ((float)typeCamp.NumInteractions / GetMaxInteractions(typeCamp.CampId));
                     Increment(typeCamp);
                 }
@@ -381,7 +389,7 @@ namespace ACE.Server.Managers
                 var areaCamp = GetOrCreateCamp(areaCampId, out _);
                 if (areaCamp != null)
                 {
-                    CheckDecay(areaCamp);
+                    CheckDecay(areaCamp, true);
                     areaCampBonus = 1.0f - ((float)areaCamp.NumInteractions / GetMaxInteractions(areaCamp.CampId));
                     Increment(areaCamp);
                 }
@@ -390,7 +398,7 @@ namespace ACE.Server.Managers
             var restCamp = GetOrCreateCamp(0, out _);
             if (restCamp != null)
             {
-                CheckDecay(restCamp);
+                CheckDecay(restCamp, true);
                 restCampBonus = 1.0f - ((float)restCamp.NumInteractions / GetMaxInteractions(restCamp.CampId));
                 Increment(restCamp);
             }

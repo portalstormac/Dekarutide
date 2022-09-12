@@ -5,6 +5,7 @@ using ACE.Common.Extensions;
 using ACE.DatLoader;
 using ACE.Entity.Enum;
 using ACE.Entity.Enum.Properties;
+using ACE.Server.Command.Handlers;
 using ACE.Server.Entity.Actions;
 using ACE.Server.Managers;
 using ACE.Server.Network.GameMessages.Messages;
@@ -469,6 +470,15 @@ namespace ACE.Server.WorldObjects
                 PlayParticleEffect(PlayScript.LevelUp, Guid);
 
                 Session.Network.EnqueueSend(new GameMessageSystemChat(message, ChatMessageType.Advancement), currentCredits);
+
+                // Let's take the opportinity to send an activity recommendation to the player.
+                var recommendationChain = new ActionChain();
+                recommendationChain.AddDelaySeconds(5);
+                recommendationChain.AddAction(this, () =>
+                {
+                    PlayerCommands.HandleSingleRecommendation(Session);
+                });
+                recommendationChain.EnqueueChain();
             }
         }
 

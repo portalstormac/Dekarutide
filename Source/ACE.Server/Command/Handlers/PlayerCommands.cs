@@ -526,13 +526,53 @@ namespace ACE.Server.Command.Handlers
 
         static List<ActivityRecommendation> Recommendations = new List<ActivityRecommendation>()
         {
-            new ActivityRecommendation(1, 10, new HashSet<string>{ "HoltburgAfrinCorn1204", "HoltburgAfrinRye1204", "HoltburgAfrinWheat1204","HoltburgAfrinDrudge1204"}, "XP: Recover Stolen Supplies from the Drudge Hideout near Holtburg at 41.3N, 33.3E and deliver them to Alfrin in Holtburg."),
-            new ActivityRecommendation(1, 10, new HashSet<string>{ "AxeBrogordQuest", "HoltburgNoteBrogord1204"}, "XP: Recover Brogord's Axe and a Letter to Ryndya from the Cave of Alabree near Holtburg at 41.8N, 32.1E and deliver them to Flinrala Ryndmad in Holtburg."),
-            new ActivityRecommendation(1, 10, new HashSet<string>{ "HoltburgRedoubtCandlestick1204", "HoltburgRedoubtBowl1204", "AntiquePlatterQuest", "HoltburgRedoubtLamp1204","HoltburgRedoubtHandbell1204","HardunnaBandQuest","HoltburgRedoubtMug1204","HoltburgRedoubtGoblet1204"}, "XP: Recover Heirlooms from the Holtburg Redoubt near Holtburg at 40.4N, 34.4E and return them to Worcer in Holtburg."),
-            new ActivityRecommendation(1, 10, new HashSet<string>{ "RITHWICMINDORLALETTER"}, "XP: Visit Rithwic East and help Mindorla with an errand."),
-            new ActivityRecommendation(1, 10, new HashSet<string>{ "RITHWICCELCYNDRING"}, "XP: Recover a letter from the Old Warehouse near Rithwic at 7.6N, 58.4E and deliver it to Celcynd the Dour in Rithwic."),
-            new ActivityRecommendation(14, 25, "OlthoiHunting1", "XP: Kill Olthois in the Abandoned Tumerok Site near Redspire at 42.0N, 82.2W and bring a Harvester Pincer to Behdo Yii in Redspire."),
-            new ActivityRecommendation(18, 30, "OlthoiHunting2", "XP: Kill Olthois in the Dark Lair near Greenspire at 43.8N, 68.4W and bring a Gardener Pincer to Behdo Yii in Redspire."),
+            // Starter
+            //new ActivityRecommendation(2, 10, new HashSet<string>{ "RITHWICMINDORLALETTER"}, "XP: Visit Rithwic East and help Mindorla with an errand."),
+            //new ActivityRecommendation(2, 10, new HashSet<string>{ "RITHWICCELCYNDRING"}, "XP: Recover a letter from the Old Warehouse near Rithwic at 7.6N, 58.4E and deliver it to Celcynd the Dour in Rithwic."),
+
+            // General
+            new ActivityRecommendation(10, 80, new HashSet<Skill>{Skill.Axe, Skill.Dagger, Skill.Mace, Skill.Spear, Skill.Staff, Skill.Sword, Skill.UnarmedCombat}, "Equipment: Hunt Golems for Motes to craft Atlan and Isparian Weapons at the Crater Lake Village."),
+            new ActivityRecommendation(10, 80, new HashSet<Skill>{Skill.Bow, Skill.Crossbow, Skill.ThrownWeapon, Skill.WarMagic, Skill.LifeMagic}, "Equipment: Hunt Golems for Motes to craft Isparian Weapons at the Crater Lake Village."),
+            new ActivityRecommendation(15, 126, Skill.Lockpick, "XP: Hunt Undead for Mnemosynes. Unlock them with keys made using Lockpicking from Golem Hearts, and turn them in at the Mnemosyne Collection Site near Samsur at 2.5S, 16.4E."),
+            new ActivityRecommendation(15, 126, Skill.Lockpick, "Equipment: Hunt Undead for Mnemosynes. Unlock them with keys made using Lockpicking from Golem Hearts, and turn them in at the Undead Hunter's tent near Tufa at 13.3S, 5.1E."),
+            new ActivityRecommendation(15, 126, "Equipment: Hunt Shadows and Crystals for shards to craft Shadow Armor near Eastham at 18.5N, 62.8E, near Al-Jalima at 7.1N, 3.0E or near Kara at 82.9S, 46.0E."),
+            //new ActivityRecommendation(10, 126, "Hunting Grounds: Hunt Olthois in the Olthoi Arcade near Redspire at 39.1N 81.2W."),
+
+            // T1
+            new ActivityRecommendation(1, 1, "RecruitSent", "XP/Equipment: Go through the Training Academy Portal and complete the tutorial for equipment and experience."),
+            new ActivityRecommendation(2, 15, "Equipment: Collect Red and Gold Letters, gather stamps and trade them in for Exploration Society Equipment. For more information talk to Exploration Society Agents, usually located in taverns wearing green clothes."),
+
+            //new ActivityRecommendation(2, 5, new HashSet<string>{ "HoltburgAfrinCorn1204", "HoltburgAfrinRye1204", "HoltburgAfrinWheat1204","HoltburgAfrinDrudge1204"}, "XP: Recover Stolen Supplies from the Drudge Hideout near Holtburg at 41.3N, 33.3E and deliver them to Alfrin in Holtburg."),
+            //new ActivityRecommendation(2, 5, new HashSet<string>{ "AxeBrogordQuest", "HoltburgNoteBrogord1204"}, "XP: Recover Brogord's Axe and a Letter to Ryndya from the Cave of Alabree near Holtburg at 41.8N, 32.1E and deliver them to Flinrala Ryndmad in Holtburg."),
+            //new ActivityRecommendation(2, 5, new HashSet<string>{ "HoltburgRedoubtCandlestick1204", "HoltburgRedoubtBowl1204", "AntiquePlatterQuest", "HoltburgRedoubtLamp1204","HoltburgRedoubtHandbell1204","HardunnaBandQuest","HoltburgRedoubtMug1204","HoltburgRedoubtGoblet1204"}, "XP: Recover Heirlooms from the Holtburg Redoubt near Holtburg at 40.4N, 34.4E and return them to Worcer in Holtburg."),
+            //TODO: Add Yaraq/Shoushi starter quests
+
+            new ActivityRecommendation(5, 10, "OlthoiHunting1", "XP: Kill Olthois in the Abandoned Tumerok Site near Redspire at 42.0N, 82.2W and bring a Harvester Pincer to Behdo Yii in Redspire."),
+            new ActivityRecommendation(12, 20, "OlthoiHunting2", "XP: Kill Olthois in the Dark Lair near Greenspire at 43.8N, 68.4W and bring a Gardener Pincer to Behdo Yii in Redspire."),
+
+            new ActivityRecommendation(5, 20, Skill.Lockpick, "Equipment: Explore Eastham Sewer near Eastham at 18.7N, 63.4E for the Metal Round Shield. Bring lockpicks!"),
+
+            new ActivityRecommendation(10, 20, Skill.Axe, new HashSet<string>{"BanderlingMaceShaft", "BanderlingMaceHead"}, "Equipment: Explore Banderling Conquest near Sawato at 29.0S, 50.5E for the Banderling Mace Shaft and Mosswart Maze near Al-Arqas at 25.2S, 19.4E for Banderling Mace Head and bring them to Olivier Rognath in Eastham for the Mace of the Explorer."),
+            new ActivityRecommendation(10, 20, Skill.Axe, "CrimsonRepairedHaft", "Equipment: Reclaim the Silifi of Crimson Stars, start by exploring Leikotha's Crypt at 10.1S 31.3E and then visit Kayna bint Iswas at 1.7S, 36.6E."),
+            new ActivityRecommendation(12, 20, Skill.Axe, "TumerokVanguardMorningstar", "Equipment: Explore the North Tumerok Vanguard Outpost near Tufa at 7.5S, 0.0W for the Vanguard Leader's Morningstar and Vanguard Leader's Amulet."),
+            new ActivityRecommendation(12, 20, Skill.Bow, "TumerokVanguardCrossbow", "Equipment: Explore the South Tumerok Vanguard Outpost near Khayyaban at 45.9S, 14.2E for the Vanguard Leader's Crossbow and Vanguard Leader's Amulet."),
+            new ActivityRecommendation(10, 20, Skill.Dagger, "Equipment: Explore the Folthid Estate near Yanshi at 8.6S, 52.9EE for the Dagger of Tikola and Dull Dagger. Speak with Raxanza Folthid at 8.8S, 53.7E for more information."),
+            new ActivityRecommendation(5, 20, Skill.Spear, "MosswartExodusSpear", "Equipment: Help Bleeargh retrieve the Spear of Kreerg, Bleeargh can be found in Yanshi at 12.8S, 46.2E."),
+            new ActivityRecommendation(5, 20, Skill.Spear, "Equipment: Recover the Quarter Staff of Fire from Banderlings camped near Edelbar at 43.9N, 25.1E."),
+
+            new ActivityRecommendation(5, 20, "IceTachiTurnedIn", "XP/Equipment: Retrieve the fabled Ice Tachi from the mosswart camp at 27.5S, 71.0E near Shoushi, keep it or deliver it to an Ivory Crafter for an experience reward."),
+            new ActivityRecommendation(10, 20, "AcidAxeTurnedIn", "XP/Equipment: Explore Suntik Village near Zaikhal at 16.2N 4.3E for the Acid Axe, keep it or deliver it to an Ivory Crafter for an experience reward."),
+            new ActivityRecommendation(10, 20, "GivenTibriSpear", "XP/Equipment: Explore a Cave near Cragstone at 23.2N, 44.0E for Tibri's Fire Spear, keep it or deliver it to Tibri also in the cave for an experience reward."),
+            new ActivityRecommendation(10, 20, "LilithasBowGiven", "XP/Equipment: Explore Hunter's Leap near Holtburg at 35.7N, 32.6E for Lilitha's Bow, keep it or deliver it to Eldrista at 35.7N, 33.4E for an experience reward."),
+
+            new ActivityRecommendation(10, 20, Skill.Armor, "Equipment: Explore the Glenden Wood Dungeon near Glenden Wood at 29.9N, 26.4E for the Platemail Hauberk of the Ogre."),
+            new ActivityRecommendation(10, 20, new HashSet<Skill>{Skill.Armor, Skill.Shield}, "Equipment: Explore the Halls of the Helm near Zaikhal at 15.8N, 2.1E for the Fiery Shield and Superior Helmet."),
+            new ActivityRecommendation(10, 20, new HashSet<Skill>{Skill.Axe, Skill.Shield}, "Equipment: Explore Trothyr's Rest near Rithwic at 10.3N, 54.9E for Trothyr's War Hammer and Trothyr's Shield. Talk to Ringoshu the Apple Seller at 13.6N, 50.7E for more information."),
+            new ActivityRecommendation(5, 20, new HashSet<Skill>{Skill.Armor, Skill.Spear}, "Equipment: Explore the Green Mire Grave near Shoushi at 27.8S, 71.6E for the Green Mire Warrior's Yoroi Cuirass and the Green Mire Yari."),
+            //new ActivityRecommendation(10, 20, "Hunting Grounds: Eastham Beach - Hunt following the coastline out of Eastham."),
+
+
+            // Higher
             new ActivityRecommendation(30, 999, "OlthoiHunting3", "XP: Kill Olthois in the Crumbling Empyrean Mansion near Greenspire at 46.8N, 67.8W and bring a Worker Pincer to Behdo Yii in Redspire."),
             new ActivityRecommendation(35, 999, "OlthoiHunting4", "XP: Kill Olthois in An Olthoi Soldier Nest in the Marescent Plateau at 45.2N, 76.3W and bring a Soldier Pincer to Behdo Yii in Redspire."),
             new ActivityRecommendation(40, 999, "OlthoiHunting5", "XP: Kill Olthois in the Ancient Empyrean Grotto in the Marescent Plateau at 52.6N, 73.1W and bring a Legionary Pincer to Behdo Yii in Redspire."),
@@ -553,31 +593,14 @@ namespace ACE.Server.Command.Handlers
             new ActivityRecommendation(70, 999, "TuskPlatedPickup", "XP: Kill Tuskers in the Tusker Tunnels in Alphus Lassel at 0.4N, 86.4E and bring a Plated Tusker Tusk to Brighteyes in Oolutanga's Refuge. You can get to Alphus lassel via the Tusker Temples: 10.5S 65.6E for levels 1-20, 59.8N 28.4E for levels 20-40 and 0.7N 68.1W for levels 40+."),
             new ActivityRecommendation(80, 999, "TuskAssailerPickup", "XP: Kill Tuskers in the Tusker Honeycombs in Alphus Lassel at 1.3S, 86.9E and bring a Assailer Tusk to Brighteyes in Oolutanga's Refuge. You can get to Alphus lassel via the Tusker Temples: 10.5S 65.6E for levels 1-20, 59.8N 28.4E for levels 20-40 and 0.7N 68.1W for levels 40+."),
             new ActivityRecommendation(100, 999, "TuskDevastatorPickup", "XP: Kill Tuskers in the Tusker Lacuna in Alphus Lassel at 9.9S, 90.7E and bring a Devastator Tusk to Brighteyes in Oolutanga's Refuge. You can get to Alphus lassel via the Tusker Temples: 10.5S 65.6E for levels 1-20, 59.8N 28.4E for levels 20-40 and 0.7N 68.1W for levels 40+."),
-            new ActivityRecommendation(1, 20, "Equipment: Collect Red and Gold Letters, gather stamps and trade them in for Exploration Society Equipment. For more information talk to Exploration Society Agents, usually located in taverns wearing green clothes."),
-            new ActivityRecommendation(10, 80, new HashSet<Skill>{Skill.Axe, Skill.Dagger, Skill.Mace, Skill.Spear, Skill.Staff, Skill.Sword, Skill.UnarmedCombat}, "Equipment: Hunt Golems for Motes to craft Atlan and Isparian Weapons at the Crater Lake Village."),
-            new ActivityRecommendation(10, 80, new HashSet<Skill>{Skill.Bow, Skill.Crossbow, Skill.ThrownWeapon, Skill.WarMagic, Skill.LifeMagic}, "Equipment: Hunt Golems for Motes to craft Isparian Weapons at the Crater Lake Village."),
-            new ActivityRecommendation(15, 126, "Equipment: Hunt Shadows and Crystals for shards to craft Shadow Armor near Eastham at 18.5N, 62.8E, near Al-Jalima at 7.1N, 3.0E or near Kara at 82.9S, 46.0E."),
-            new ActivityRecommendation(15, 126, Skill.Lockpick, "XP: Hunt Undead for Mnemosynes. Unlock them with keys made using Lockpicking from Golem Hearts, and turn them in at the Mnemosyne Collection Site near Samsur at 2.5S, 16.4E."),
-            new ActivityRecommendation(15, 126, Skill.Lockpick, "Equipment: Hunt Undead for Mnemosynes. Unlock them with keys made using Lockpicking from Golem Hearts, and turn them in at the Undead Hunter's tent near Tufa at 13.3S, 5.1E."),
-            new ActivityRecommendation(15, 25, "Equipment: Explore the Glenden Wood Dungeon near Glenden Wood at 29.9N, 26.4E for the Platemail Hauberk of the Ogre."),
-            new ActivityRecommendation(18, 25, "Equipment: Explore the Halls of the Helm near Zaikhal at 15.8N, 2.1E for the Fiery Shield and Superior Helmet."),
-            new ActivityRecommendation(15, 25, "GivenTibriSpear", "XP/Equipment: Explore a Cave near Cragstone at 23.2N, 44.0E for Tibri's Fire Spear and deliver it to Tibri also in the cave or keep it."),
-            new ActivityRecommendation(15, 25, "Equipment: Explore Trothyr's Rest near Rithwic at 10.3N, 54.9E for Trothyr's War Hammer and Trothyr's Shield. Talk to Ringoshu the Apple Seller at 13.6N, 50.7E for more information."),
-            new ActivityRecommendation(10, 20, "Equipment: Explore the Green Mire Grave near Shoushi at 27.8S, 71.6E for the Green Mire Warrior's Yoroi Cuirass and the Green Mire Yari."),
-            new ActivityRecommendation(5, 20, Skill.Lockpick, "Equipment: Explore Eastham Sewer near Eastham at 18.7N, 63.4E for the Metal Round Shield. Bring lockpicks!"),
-            new ActivityRecommendation(10, 20, Skill.Dagger, "Equipment: Explore the Folthid Estate near Yanshi at 8.6S, 52.9EE for the Dagger of Tikola and Dull Dagger. Speak with Raxanza Folthid at 8.8S, 53.7E for more information."),
-            new ActivityRecommendation(12, 126, "Hunting Grounds: Hunt Olthois in the Olthoi Arcade near Redspire at 39.1N 81.2W."),
-            new ActivityRecommendation(10, 20, "Hunting Grounds: Eastham Beach - Hunt following the coastline out of Eastham."),
             new ActivityRecommendation(20, 30, "Hunting Grounds: Lost Wish Range - Go through the Mountain Shortcut portal near Arwic at 34.9N, 56.0E and hunt along the mountains."),
             new ActivityRecommendation(20, 30, "Hunting Grounds: Northern Tiofor Woods - Hunt Shadows for Dark Slivers around 60.0N 19.0E."),
             new ActivityRecommendation(25, 35, "Hunting Grounds: The very bottom of the Fenmalain Chamber is a great place to hunt Fragments for Tiny Shards. To get there you need to use Fenmalain Keys at the bottom of the Fenmalain Vestibule near Baishi at 46.9S, 55.2E."),
-            new ActivityRecommendation(25, 30, Skill.Axe, "Equipment: Explore Suntik Village near Zaikhal at 16.2N 4.3E for the Acid Axe."),
             new ActivityRecommendation(25, 30, Skill.Axe, "Equipment: Explore the Bellig Tower near Zaikhal at 17.8N, 16.0E for the Hammer of Lightning."),
             new ActivityRecommendation(25, 35, Skill.Mace, "JitteKrauLiLesser", "Equipment: Explore the Catacombs of the Forgotten in the Plains of Gaerwel at 17.3N, 32.8E for Mi Krau-Li's Jitte."),
-            new ActivityRecommendation(10, 20, Skill.Mace, new HashSet<string>{ "BanderlingMaceShaft", "BanderlingMaceHead"}, "Equipment: Explore Banderling Conquest near Sawato at 29.0S, 50.5E for the Banderling Mace Shaft and Mosswart Maze near Al-Arqas at 25.2S, 19.4E for Banderling Mace Head and bring them to Olivier Rognath in Eastham for the Mace of the Explorer."),
         };
 
-        [CommandHandler("rec", AccessLevel.Player, CommandHandlerFlag.RequiresWorld, "Recommend activities appropriate to the character.")]
+        [CommandHandler("recs", AccessLevel.Player, CommandHandlerFlag.RequiresWorld, "Recommend activities appropriate to the character.")]
         public static void HandleRecommend(Session session, params string[] parameters)
         {
             if (Common.ConfigManager.Config.Server.WorldRuleset != Common.Ruleset.CustomDM)
@@ -586,14 +609,7 @@ namespace ACE.Server.Command.Handlers
                 return;
             }
 
-            List<ActivityRecommendation> validRecommendations = new List<ActivityRecommendation>();
-            foreach (var recommendation in Recommendations)
-            {
-                if (recommendation.IsApplicable(session.Player))
-                {
-                    validRecommendations.Add(recommendation);
-                }
-            }
+            var validRecommendations = BuildRecommendationList(session.Player);
 
             if (validRecommendations.Count == 0)
                 session.Network.EnqueueSend(new GameMessageSystemChat("No recommendations at the moment.", ChatMessageType.WorldBroadcast));
@@ -605,6 +621,35 @@ namespace ACE.Server.Command.Handlers
                     session.Network.EnqueueSend(new GameMessageSystemChat(recommendation.RecommendationText, ChatMessageType.WorldBroadcast));
                 }
             }
+        }
+
+        [CommandHandler("rec", AccessLevel.Player, CommandHandlerFlag.RequiresWorld, "Recommend an activity appropriate to the character.")]
+        public static void HandleSingleRecommendation(Session session, params string[] parameters)
+        {
+            var validRecommendations = BuildRecommendationList(session.Player);
+
+            if (validRecommendations.Count > 0)
+            {
+                var recommendation = validRecommendations[ThreadSafeRandom.Next(0, validRecommendations.Count - 1)];
+                session.Network.EnqueueSend(new GameMessageSystemChat($"Activity Recommendation:\n{recommendation.RecommendationText}", ChatMessageType.WorldBroadcast));
+            }
+        }
+
+        public static List<ActivityRecommendation> BuildRecommendationList(Player player)
+        {
+            if (player == null)
+                return new List<ActivityRecommendation>();
+
+            var validRecommendations = new List<ActivityRecommendation>();
+            foreach (var recommendation in Recommendations)
+            {
+                if (recommendation.IsApplicable(player))
+                {
+                    validRecommendations.Add(recommendation);
+                }
+            }
+
+            return validRecommendations;
         }
 
         [CommandHandler("xptracker", AccessLevel.Player, CommandHandlerFlag.RequiresWorld, 0, "Return XP tracking information.", "<reset>")]

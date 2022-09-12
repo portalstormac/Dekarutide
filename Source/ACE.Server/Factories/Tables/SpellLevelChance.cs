@@ -156,8 +156,8 @@ namespace ACE.Server.Factories.Tables
             {
                 T1_SpellLevelChances = new ChanceTable<int>()
                 {
-                    ( 1, 0.75f ),
-                    ( 2, 0.23f ),
+                    ( 1, 0.65f ),
+                    ( 2, 0.33f ),
                     ( 3, 0.02f ),
                 };
 

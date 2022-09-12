@@ -666,7 +666,7 @@ namespace ACE.Server.Factories
 
         public static int GetSpellPower(Server.Entity.Spell spell)
         {
-            if (Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.Infiltration)
+            if (Common.ConfigManager.Config.Server.WorldRuleset <= Common.Ruleset.Infiltration)
             {
                 switch (spell.Formula.Level)
                 {
@@ -685,7 +685,7 @@ namespace ACE.Server.Factories
                 switch (spell.Formula.Level)
                 {
                     case 1: return 20; // EoR is 1
-                    case 2: return 50; // EoR is 50
+                    case 2: return 40; // EoR is 50
                     case 3: return 100; // EoR is 100
                     case 4: return 150; // EoR is 150
                     case 5: return 200; // EoR is 200
@@ -903,7 +903,7 @@ namespace ACE.Server.Factories
             if (Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.CustomDM)
             {
                 if (wo.ItemSkillLevelLimit > 0)
-                    itemSkillLevelFactor = wo.ItemSkillLevelLimit.Value / 4.0f;
+                    itemSkillLevelFactor = wo.ItemSkillLevelLimit.Value / 3.0f;
             }
             else
             {
@@ -912,6 +912,9 @@ namespace ACE.Server.Factories
             }
 
             var fArcane = spellcraft - itemSkillLevelFactor;
+
+            if (Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.CustomDM && (roll.IsClothing || roll.IsJewelry))
+                fArcane *= 0.75f;
 
             if (wo.ItemAllegianceRankLimit > 0)
                 fArcane -= (float)wo.ItemAllegianceRankLimit * 10.0f;
