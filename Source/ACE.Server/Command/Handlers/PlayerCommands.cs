@@ -553,7 +553,7 @@ namespace ACE.Server.Command.Handlers
             new ActivityRecommendation(5, 20, Skill.Lockpick, "Equipment: Explore Eastham Sewer near Eastham at 18.7N, 63.4E for the Metal Round Shield. Bring lockpicks!"),
 
             new ActivityRecommendation(10, 20, Skill.Axe, new HashSet<string>{"BanderlingMaceShaft", "BanderlingMaceHead"}, "Equipment: Explore Banderling Conquest near Sawato at 29.0S, 50.5E for the Banderling Mace Shaft and Mosswart Maze near Al-Arqas at 25.2S, 19.4E for Banderling Mace Head and bring them to Olivier Rognath in Eastham for the Mace of the Explorer."),
-            new ActivityRecommendation(10, 20, Skill.Axe, "CrimsonRepairedHaft", "Equipment: Reclaim the Silifi of Crimson Stars, start by exploring Leikotha's Crypt at 10.1S 31.3E and then visit Kayna bint Iswas at 1.7S, 36.6E."),
+            new ActivityRecommendation(10, 20, Skill.Axe, "CrimsonBrokenHaft", "Equipment: Reclaim the Silifi of Crimson Stars, start by exploring Leikotha's Crypt at 10.1S 31.3E and then visit Kayna bint Iswas at 1.7S, 36.6E."),
             new ActivityRecommendation(12, 20, Skill.Axe, "TumerokVanguardMorningstar", "Equipment: Explore the North Tumerok Vanguard Outpost near Tufa at 7.5S, 0.0W for the Vanguard Leader's Morningstar and Vanguard Leader's Amulet."),
             new ActivityRecommendation(12, 20, Skill.Bow, "TumerokVanguardCrossbow", "Equipment: Explore the South Tumerok Vanguard Outpost near Khayyaban at 45.9S, 14.2E for the Vanguard Leader's Crossbow and Vanguard Leader's Amulet."),
             new ActivityRecommendation(10, 20, Skill.Dagger, "Equipment: Explore the Folthid Estate near Yanshi at 8.6S, 52.9EE for the Dagger of Tikola and Dull Dagger. Speak with Raxanza Folthid at 8.8S, 53.7E for more information."),
