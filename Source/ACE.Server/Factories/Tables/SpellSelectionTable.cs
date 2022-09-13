@@ -431,6 +431,59 @@ namespace ACE.Server.Factories.Tables
         {
             if (Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.CustomDM)
             {
+                // jewelry
+                spellSelectionGroup2 = new ChanceTable<SpellId>(ChanceTableType.Weight)
+                {
+                    ( SpellId.ArcaneEnlightenmentSelf1, 5.0f ),
+                    ( SpellId.MagicResistanceSelf1,     5.0f ),
+                    ( SpellId.ArmorSelf1,               5.0f ),
+                    ( SpellId.AcidProtectionSelf1,      5.0f ),
+                    ( SpellId.BludgeonProtectionSelf1,  5.0f ),
+                    ( SpellId.ColdProtectionSelf1,      5.0f ),
+                    ( SpellId.LightningProtectionSelf1, 5.0f ),
+                    ( SpellId.FireProtectionSelf1,      5.0f ),
+                    ( SpellId.BladeProtectionSelf1,     5.0f ),
+                    ( SpellId.PiercingProtectionSelf1,  5.0f ),
+                    ( SpellId.StrengthSelf1,            4.0f ),
+                    ( SpellId.EnduranceSelf1,           4.0f ),
+                    ( SpellId.CoordinationSelf1,        4.0f ),
+                    ( SpellId.QuicknessSelf1,           4.0f ),
+                    ( SpellId.FocusSelf1,               4.0f ),
+                    ( SpellId.WillpowerSelf1,           4.0f ),
+                    ( SpellId.ManaRenewalSelf1,         4.0f ),
+                    ( SpellId.ManaMasterySelf1,         4.0f ),
+                    ( SpellId.RegenerationSelf1,        3.0f ),
+                    ( SpellId.RejuvenationSelf1,        3.0f ),
+                    ( SpellId.ItemExpertiseSelf1,       3.0f ),
+                    ( SpellId.ArmorExpertiseSelf1,      2.0f ),
+                    ( SpellId.DeceptionMasterySelf1,    1.0f ),
+                    ( SpellId.FealtySelf1,              1.0f ),
+                    ( SpellId.MonsterAttunementSelf1,   1.0f ),
+                    ( SpellId.ArcanumSalvagingSelf1,    1.0f ),
+                    ( SpellId.MagicItemExpertiseSelf1,  1.0f ),
+                    ( SpellId.WeaponExpertiseSelf1,     1.0f ),
+                };
+
+                // crowns
+                spellSelectionGroup3 = new ChanceTable<SpellId>(ChanceTableType.Weight)
+                {
+                    ( SpellId.LeadershipMasterySelf1,    2.0f),
+                    ( SpellId.ImpregnabilitySelf1,       2.0f),
+                    ( SpellId.InvulnerabilitySelf1,      2.0f),
+                    ( SpellId.MagicResistanceSelf1,      2.0f),
+                    ( SpellId.FocusSelf1,                1.0f),
+                    ( SpellId.WillpowerSelf1,            1.0f),
+                    ( SpellId.ArmorSelf1,                1.0f),
+                    ( SpellId.RegenerationSelf1,         1.0f),
+                    ( SpellId.RejuvenationSelf1,         1.0f),
+                    ( SpellId.ManaRenewalSelf1,          1.0f),
+                    ( SpellId.ManaMasterySelf1,          1.0f),
+                    ( SpellId.ArcaneEnlightenmentSelf1,  1.0f),
+                    ( SpellId.HealingMasterySelf1,       1.0f),
+                    ( SpellId.DeceptionMasterySelf1,     1.0f),
+                    ( SpellId.MonsterAttunementSelf1,    1.0f),
+                };
+
                 // orbs
                 spellSelectionGroup4 = new ChanceTable<SpellId>(ChanceTableType.Weight)
                 {
