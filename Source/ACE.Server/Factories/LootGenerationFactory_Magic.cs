@@ -913,9 +913,6 @@ namespace ACE.Server.Factories
 
             var fArcane = spellcraft - itemSkillLevelFactor;
 
-            if (Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.CustomDM && (roll.IsClothing || roll.IsJewelry))
-                fArcane *= 0.75f;
-
             if (wo.ItemAllegianceRankLimit > 0)
                 fArcane -= (float)wo.ItemAllegianceRankLimit * 10.0f;
 
