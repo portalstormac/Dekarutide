@@ -526,31 +526,37 @@ namespace ACE.Server.Command.Handlers
 
         static List<ActivityRecommendation> Recommendations = new List<ActivityRecommendation>()
         {
-            // Starter
-            //new ActivityRecommendation(2, 10, new HashSet<string>{ "RITHWICMINDORLALETTER"}, "XP: Visit Rithwic East and help Mindorla with an errand."),
-            //new ActivityRecommendation(2, 10, new HashSet<string>{ "RITHWICCELCYNDRING"}, "XP: Recover a letter from the Old Warehouse near Rithwic at 7.6N, 58.4E and deliver it to Celcynd the Dour in Rithwic."),
-
             // General
             new ActivityRecommendation(10, 80, new HashSet<Skill>{Skill.Axe, Skill.Dagger, Skill.Mace, Skill.Spear, Skill.Staff, Skill.Sword, Skill.UnarmedCombat}, "Equipment: Hunt Golems for Motes to craft Atlan and Isparian Weapons at the Crater Lake Village."),
             new ActivityRecommendation(10, 80, new HashSet<Skill>{Skill.Bow, Skill.Crossbow, Skill.ThrownWeapon, Skill.WarMagic, Skill.LifeMagic}, "Equipment: Hunt Golems for Motes to craft Isparian Weapons at the Crater Lake Village."),
             new ActivityRecommendation(15, 126, Skill.Lockpick, "XP: Hunt Undead for Mnemosynes. Unlock them with keys made using Lockpicking from Golem Hearts, and turn them in at the Mnemosyne Collection Site near Samsur at 2.5S, 16.4E."),
             new ActivityRecommendation(15, 126, Skill.Lockpick, "Equipment: Hunt Undead for Mnemosynes. Unlock them with keys made using Lockpicking from Golem Hearts, and turn them in at the Undead Hunter's tent near Tufa at 13.3S, 5.1E."),
             new ActivityRecommendation(15, 126, "Equipment: Hunt Shadows and Crystals for shards to craft Shadow Armor near Eastham at 18.5N, 62.8E, near Al-Jalima at 7.1N, 3.0E or near Kara at 82.9S, 46.0E."),
-            //new ActivityRecommendation(10, 126, "Hunting Grounds: Hunt Olthois in the Olthoi Arcade near Redspire at 39.1N 81.2W."),
+            new ActivityRecommendation(10, 126, "Hunting Grounds: Hunt Olthois in the Olthoi Arcade near Redspire at 39.1N 81.2W."),
 
             // T1
             new ActivityRecommendation(1, 1, "RecruitSent", "XP/Equipment: Go through the Training Academy Portal and complete the tutorial for equipment and experience."),
             new ActivityRecommendation(2, 15, "Equipment: Collect Red and Gold Letters, gather stamps and trade them in for Exploration Society Equipment. For more information talk to Exploration Society Agents, usually located in taverns wearing green clothes."),
 
-            //new ActivityRecommendation(2, 5, new HashSet<string>{ "HoltburgAfrinCorn1204", "HoltburgAfrinRye1204", "HoltburgAfrinWheat1204","HoltburgAfrinDrudge1204"}, "XP: Recover Stolen Supplies from the Drudge Hideout near Holtburg at 41.3N, 33.3E and deliver them to Alfrin in Holtburg."),
-            //new ActivityRecommendation(2, 5, new HashSet<string>{ "AxeBrogordQuest", "HoltburgNoteBrogord1204"}, "XP: Recover Brogord's Axe and a Letter to Ryndya from the Cave of Alabree near Holtburg at 41.8N, 32.1E and deliver them to Flinrala Ryndmad in Holtburg."),
-            //new ActivityRecommendation(2, 5, new HashSet<string>{ "HoltburgRedoubtCandlestick1204", "HoltburgRedoubtBowl1204", "AntiquePlatterQuest", "HoltburgRedoubtLamp1204","HoltburgRedoubtHandbell1204","HardunnaBandQuest","HoltburgRedoubtMug1204","HoltburgRedoubtGoblet1204"}, "XP: Recover Heirlooms from the Holtburg Redoubt near Holtburg at 40.4N, 34.4E and return them to Worcer in Holtburg."),
-            //TODO: Add Yaraq/Shoushi starter quests
+            //new ActivityRecommendation(2, 5, new HashSet<string>{ "RITHWICMINDORLALETTER"}, "XP: Visit Rithwic East and help Mindorla with an errand."),
+            //new ActivityRecommendation(2, 5, new HashSet<string>{ "RITHWICCELCYNDRING"}, "XP: Recover a letter from the Old Warehouse near Rithwic at 7.6N, 58.4E and deliver it to Celcynd the Dour in Rithwic."),
+
+            new ActivityRecommendation(2, 8, new HashSet<string>{ "HoltburgAfrinCorn1204", "HoltburgAfrinRye1204", "HoltburgAfrinWheat1204","HoltburgAfrinDrudge1204"}, "XP: Recover Stolen Supplies from the Drudge Hideout near Holtburg at 41.3N, 33.3E and deliver them to Alfrin in Holtburg."),
+            new ActivityRecommendation(2, 8, new HashSet<string>{ "AxeBrogordQuest", "HoltburgNoteBrogord1204"}, "XP: Recover Brogord's Axe and a Letter to Ryndya from the Cave of Alabree near Holtburg at 41.8N, 32.1E and deliver them to Flinrala Ryndmad in Holtburg."),
+            new ActivityRecommendation(2, 8, new HashSet<string>{ "HoltburgRedoubtCandlestick1204", "HoltburgRedoubtBowl1204", "AntiquePlatterQuest", "HoltburgRedoubtLamp1204","HoltburgRedoubtHandbell1204","HardunnaBandQuest","HoltburgRedoubtMug1204","HoltburgRedoubtGoblet1204"}, "XP: Recover Heirlooms from the Holtburg Redoubt near Holtburg at 40.4N, 34.4E and return them to Worcer in Holtburg."),
+
+            new ActivityRecommendation(2, 8, new HashSet<string>{ "YaojiLouKaQuest", "ShoushiBraidBracelet1204", "ShoushiBraidKatar1204", "ShoushiBraidNecklace1204", "ShoushiBraidRing1204", "ShoushiBraidShuriken1204", "ShoushiBraidTrident1204"}, "XP: Recover Lou Ka's Stolen Items from Braid Mansion Ruin just outside of Shoushi, at 34.2S 72.0E and return them to Lou Ka in the bar in Shoushi."),
+            new ActivityRecommendation(2, 8, new HashSet<string>{ "ShoushiNenAiCheese1204", "ShoushiNenAiCider1204"}, "XP: Help Nen Ai feed her pet drudge at 34.8S, 71.2E near Shoushi."),
+            new ActivityRecommendation(2, 8, new HashSet<string>{ "ShoushiStoneCompassion", "ShoushiStoneDetachment", "ShoushiStoneDiscipline1204", "ShoushiStoneHumility1204"}, "XP: Recover the four Stones of Jojii from the Shreth Hive at 32.4S, 71.0E near Shoushi and bring them to Oi-Tong Ye in Shoushi."),
+
+            new ActivityRecommendation(2, 8, new HashSet<string>{ "PerfectlyAgedCoveCiderQuest", "YaraqAppleCovePerfect1204", "YaraqApplePieHot1204", "YaraqBakingPanCoveApple1204", "YaraqCiderCoveAppleAged1204", "YaraqCiderHardCoveApple1204", "YaraqKnifeCoveApple1204", "YaraqWineCoveApple1204"}, "XP: Retrieve Lubziklan al-Luq stolen items from the Sea Temple Catacombs at 20.2S, 4.4W near Yaraq and return them to Lubziklan al-Luq at 22.4S, 1.9W near Yaraq."),
+            new ActivityRecommendation(2, 8, new HashSet<string>{ "YaraqNasunLetter", "YaraqAhyaraLetter" }, "XP: Help Nasun ibn Tifar and Ahyara by delivering some letters, they can be found in the North Yaraq Outpost and the East Yaraq Outpost respectively."),
+            new ActivityRecommendation(2, 8, new HashSet<string>{ "NoteDrudgeScrawledPickup", "YaraqHeadMarionetteMadStar1204" }, "XP: Help Ma'yad ibn Ibsar locate her missing brother and investigate the mystery of the Mad Star. Meet her at the Cerulean Cove Pub in Yaraq."),
 
             new ActivityRecommendation(5, 10, "OlthoiHunting1", "XP: Kill Olthois in the Abandoned Tumerok Site near Redspire at 42.0N, 82.2W and bring a Harvester Pincer to Behdo Yii in Redspire."),
             new ActivityRecommendation(12, 20, "OlthoiHunting2", "XP: Kill Olthois in the Dark Lair near Greenspire at 43.8N, 68.4W and bring a Gardener Pincer to Behdo Yii in Redspire."),
 
-            new ActivityRecommendation(5, 20, Skill.Lockpick, "Equipment: Explore Eastham Sewer near Eastham at 18.7N, 63.4E for the Metal Round Shield. Bring lockpicks!"),
+            new ActivityRecommendation(5, 10, Skill.Lockpick, "Equipment: Explore Eastham Sewer near Eastham at 18.7N, 63.4E for the Metal Round Shield. Bring lockpicks!"),
 
             new ActivityRecommendation(10, 20, Skill.Axe, new HashSet<string>{"BanderlingMaceShaft", "BanderlingMaceHead"}, "Equipment: Explore Banderling Conquest near Sawato at 29.0S, 50.5E for the Banderling Mace Shaft and Mosswart Maze near Al-Arqas at 25.2S, 19.4E for Banderling Mace Head and bring them to Olivier Rognath in Eastham for the Mace of the Explorer."),
             new ActivityRecommendation(10, 20, Skill.Axe, "CrimsonBrokenHaft", "Equipment: Reclaim the Silifi of Crimson Stars, start by exploring Leikotha's Crypt at 10.1S 31.3E and then visit Kayna bint Iswas at 1.7S, 36.6E."),
@@ -569,8 +575,9 @@ namespace ACE.Server.Command.Handlers
             new ActivityRecommendation(10, 20, new HashSet<Skill>{Skill.Armor, Skill.Shield}, "Equipment: Explore the Halls of the Helm near Zaikhal at 15.8N, 2.1E for the Fiery Shield and Superior Helmet."),
             new ActivityRecommendation(10, 20, new HashSet<Skill>{Skill.Axe, Skill.Shield}, "Equipment: Explore Trothyr's Rest near Rithwic at 10.3N, 54.9E for Trothyr's War Hammer and Trothyr's Shield. Talk to Ringoshu the Apple Seller at 13.6N, 50.7E for more information."),
             new ActivityRecommendation(5, 20, new HashSet<Skill>{Skill.Armor, Skill.Spear}, "Equipment: Explore the Green Mire Grave near Shoushi at 27.8S, 71.6E for the Green Mire Warrior's Yoroi Cuirass and the Green Mire Yari."),
-            //new ActivityRecommendation(10, 20, "Hunting Grounds: Eastham Beach - Hunt following the coastline out of Eastham."),
 
+            new ActivityRecommendation(5, 10, "Hunting Grounds: Eastham Beach - Hunt following the coastline out of Eastham."),
+            new ActivityRecommendation(20, 30, "Hunting Grounds: Hunt Lugians in the Hills Citadel near Lin at 56.6S, 66.9E."),
 
             // Higher
             new ActivityRecommendation(30, 999, "OlthoiHunting3", "XP: Kill Olthois in the Crumbling Empyrean Mansion near Greenspire at 46.8N, 67.8W and bring a Worker Pincer to Behdo Yii in Redspire."),
