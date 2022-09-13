@@ -473,7 +473,7 @@ namespace ACE.Server.WorldObjects
 
                 // Let's take the opportinity to send an activity recommendation to the player.
                 var recommendationChain = new ActionChain();
-                recommendationChain.AddDelaySeconds(5);
+                recommendationChain.AddDelaySeconds(5.0f);
                 recommendationChain.AddAction(this, () =>
                 {
                     PlayerCommands.HandleSingleRecommendation(Session);

@@ -25,6 +25,7 @@ using ACE.Server.Physics.Common;
 
 using Character = ACE.Database.Models.Shard.Character;
 using Position = ACE.Entity.Position;
+using ACE.Server.Command.Handlers;
 
 namespace ACE.Server.Managers
 {
@@ -277,12 +278,21 @@ namespace ACE.Server.Managers
 
             var server_motd = PropertyManager.GetString("server_motd").Item;
             if (!string.IsNullOrEmpty(server_motd))
-                session.Network.EnqueueSend(new GameMessageSystemChat($"{server_motd}\n", ChatMessageType.Broadcast));
+            {
+                // Delay sending the MotD so it doesn't get lost in the login spam.
+                var motdChain = new ActionChain();
+                motdChain.AddDelaySeconds(15.0f);
+                motdChain.AddAction(player, () =>
+                {
+                    session.Network.EnqueueSend(new GameMessageSystemChat($"{server_motd}\n", ChatMessageType.Broadcast));
+                });
+                motdChain.EnqueueChain();
+            }
 
             if (olthoiPlayerReturnedToLifestone)
                 session.Network.EnqueueSend(new GameMessageSystemChat("You have returned to the Olthoi Queen to serve the hive.", ChatMessageType.Broadcast));
             else if (playerLoggedInOnNoLogLandblock) // see http://acpedia.org/wiki/Mount_Elyrii_Hive
-                session.Network.EnqueueSend(new GameMessageSystemChat("The currents of portal space cannot return you from whence you came. Your previous location forbids login.", ChatMessageType.Broadcast));            
+                session.Network.EnqueueSend(new GameMessageSystemChat("The currents of portal space cannot return you from whence you came. Your previous location forbids login.", ChatMessageType.Broadcast));
         }
 
         private static string AppendLines(params string[] lines)
