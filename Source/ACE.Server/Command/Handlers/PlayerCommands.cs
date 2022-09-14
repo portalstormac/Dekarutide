@@ -533,6 +533,7 @@ namespace ACE.Server.Command.Handlers
             new ActivityRecommendation(15, 126, Skill.Lockpick, "Equipment: Hunt Undead for Mnemosynes. Unlock them with keys made using Lockpicking from Golem Hearts, and turn them in at the Undead Hunter's tent near Tufa at 13.3S, 5.1E."),
             new ActivityRecommendation(15, 126, Skill.Armor, "Equipment: Hunt Shadows and Crystals for shards to craft Shadow Armor near Eastham at 18.5N, 62.8E, near Al-Jalima at 7.1N, 3.0E or near Kara at 82.9S, 46.0E."),
             new ActivityRecommendation(10, 126, "Hunting Grounds: Hunt Olthois in the Olthoi Arcade near Redspire at 39.1N 81.2W."),
+            new ActivityRecommendation(20, 126, "GaerlanDefeated" , "Fellowship - Equipment: Explore Gaerlan's Citadel and recover Olthoi Slayer equipment."),
 
             // T1
             new ActivityRecommendation(1, 1, "RecruitSent", "XP/Equipment: Go through the Training Academy Portal and complete the tutorial for equipment and experience."),
@@ -567,6 +568,7 @@ namespace ACE.Server.Command.Handlers
             new ActivityRecommendation(10, 20, Skill.Dagger, "Equipment: Explore the Folthid Estate near Yanshi at 8.6S, 52.9EE for the Dagger of Tikola and Dull Dagger. Speak with Raxanza Folthid at 8.8S, 53.7E for more information."),
             new ActivityRecommendation(5, 20, Skill.Spear, "MosswartExodusSpear", "Equipment: Help Bleeargh retrieve the Spear of Kreerg, Bleeargh can be found in Yanshi at 12.8S, 46.2E."),
             new ActivityRecommendation(5, 20, Skill.Spear, "Equipment: Recover the Quarter Staff of Fire from Banderlings camped near Edelbar at 43.9N, 25.1E."),
+            new ActivityRecommendation(10, 20, "RegicideComplete", "Equipment: Speak with Sir Rylanan in Holtburg, Sir Tenshin in Shoushi or Dame Tsaya in Yaraq to help with an investigation and be rewarded with Elysa's Favor."),
 
             new ActivityRecommendation(5, 20, "IceTachiTurnedIn", "XP/Equipment: Retrieve the fabled Ice Tachi from the mosswart camp at 27.5S, 71.0E near Shoushi, keep it or deliver it to an Ivory Crafter for an experience reward."),
             new ActivityRecommendation(10, 20, "AcidAxeTurnedIn", "XP/Equipment: Explore Suntik Village near Zaikhal at 16.2N 4.3E for the Acid Axe, keep it or deliver it to an Ivory Crafter for an experience reward."),
@@ -595,10 +597,11 @@ namespace ACE.Server.Command.Handlers
             new ActivityRecommendation(20, 35, "Hunting Grounds: The very bottom of the Fenmalain Chamber is a great place to hunt Fragments for Tiny Shards. To get there you need to use Fenmalain Keys at the bottom of the Fenmalain Vestibule near Baishi at 46.9S, 55.2E."),
             new ActivityRecommendation(20, 30, Skill.Axe, "Equipment: Explore the Bellig Tower near Zaikhal at 17.8N, 16.0E for the Hammer of Lightning."),
             new ActivityRecommendation(20, 35, Skill.Mace, "JitteKrauLiLesser", "Equipment: Explore the Catacombs of the Forgotten in the Plains of Gaerwel at 17.3N, 32.8E for Mi Krau-Li's Jitte."),
-            new ActivityRecommendation(20, 35, Skill.Armor, new HashSet<string>{"PickedUpBroodMatronTail", "PickedUpBroodMatronTarsus", "PickedUpBroodMatronTibia", "PickedUpBroodQueenCarapace", "PickedUpBroodQueenClaw", "PickedUpBroodQueenCrest", "PickedUpBroodQueenFemur", "PickedUpBroodQueenHead", "PickedUpBroodQueenMetathorax"}, "Fellowship - Equipment: Explore the Olthoi Brood Hives at 51.2N 48.1E or 44.2N, 66.2E for the Lesser Olthoi Armor."),
             new ActivityRecommendation(20, 50, Skill.Axe, "Equipment: Kill the lugians in the Gotrok Raider Camp at 80.8S, 37.6E for the Lugian Scepter and Cloth of the Arm and take them to Master Ulkas in Livak Tukal for the Scepter of Might and Sleeves of Inexhaustibility."),
             new ActivityRecommendation(20, 50, new HashSet<Skill>{Skill.Shield, Skill.WarMagic}, "Equipment: Kill the lugians in the Gotrok Raider Camp at 87.2S, 27.3E for the Lugian Crest and Sceptre of the Mind and take them to Master Ulkas in Livak Tukal for the Crest of Kings and Staff of Clarity."),
             new ActivityRecommendation(20, 50, new HashSet<Skill>{Skill.Spear, Skill.Armor}, "Equipment: Kill the lugians in the Gotrok Raider Camp at 67.9S, 32.8E for the Lugian Pauldron and Blade of the Heart and take them to Master Ulkas in Livak Tukal for the Helm of the Crag and Spear of Purity."),
+
+            new ActivityRecommendation(20, 35, Skill.Armor, new HashSet<string>{"PickedUpBroodMatronTail", "PickedUpBroodMatronTarsus", "PickedUpBroodMatronTibia", "PickedUpBroodQueenCarapace", "PickedUpBroodQueenClaw", "PickedUpBroodQueenCrest", "PickedUpBroodQueenFemur", "PickedUpBroodQueenHead", "PickedUpBroodQueenMetathorax"}, "Fellowship - Equipment: Explore the Olthoi Brood Hives at 51.2N 48.1E or 44.2N, 66.2E for the Lesser Olthoi Armor."),
 
             // Higher
             new ActivityRecommendation(35, 999, "OlthoiHunting4", "XP: Kill Olthois in An Olthoi Soldier Nest in the Marescent Plateau at 45.2N, 76.3W and bring a Soldier Pincer to Behdo Yii in Redspire."),
