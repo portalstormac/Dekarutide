@@ -98,6 +98,25 @@ namespace ACE.Server.WorldObjects
             SpellId.ManaBolt1,
         };
 
+        private static readonly List<SpellId> PossibleLifeMagicOtherTriggerSpells = new List<SpellId>()
+        {
+            SpellId.HealOther1,
+
+            SpellId.RevitalizeOther1,
+
+            SpellId.HarmOther1,
+            SpellId.EnfeebleOther1,
+            SpellId.ManaDrainOther1,
+
+            SpellId.DrainHealth1,
+            SpellId.DrainStamina1,
+            SpellId.DrainMana1,
+
+            SpellId.HealthBolt1,
+            SpellId.StaminaBolt1,
+            SpellId.ManaBolt1,
+        };
+
         private static readonly List<SpellId> PossibleLifeMagicOffensiveTriggerSpells = new List<SpellId>()
         {
             SpellId.HarmOther1,
@@ -668,7 +687,7 @@ namespace ACE.Server.WorldObjects
                     break;
 
                 case LeyLineEffect.CastExtraSpellOther:
-                    GetSpell(pseudoRandom, out triggerSpellId, out triggerSpellName, out isBeneficial, isWarAmulet ? PossibleWarMagicTriggerSpells : PossibleLifeMagicTriggerSpells);
+                    GetSpell(pseudoRandom, out triggerSpellId, out triggerSpellName, out isBeneficial, isWarAmulet ? PossibleWarMagicTriggerSpells : PossibleLifeMagicOtherTriggerSpells);
                     GetSpell(pseudoRandom, out castSpellId, out castSpellName, out _, isBeneficial ? PossibleBeneficialOtherSpells : PossibleOffensiveSpells);
                     LeyLineTriggerSpellId = (uint)triggerSpellId;
                     LeyLineCastSpellId = (uint)castSpellId;
