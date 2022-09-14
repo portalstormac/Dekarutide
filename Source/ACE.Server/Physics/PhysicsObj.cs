@@ -4373,34 +4373,26 @@ namespace ACE.Server.Physics
 
                 RequestPos.ObjCellID = requestCell;
 
-                var hasForwardOrBackwardsMovement = minterp.RawState.ForwardCommand != (uint)MotionCommand.Ready;
-                var isSideStepping = minterp.RawState.SideStepCommand != (uint)MotionCommand.Invalid;
-
-                bool hasNonAutonomousMovement = false;
-                var player = WeenieObj.WorldObject as Player;
-                if(player != null)
-                    hasNonAutonomousMovement = player.IsMoving || player.IsPlayerMovingTo || player.IsPlayerMovingTo2;
-
-                //if (success)
-                if (success && (forcePos || hasForwardOrBackwardsMovement || isSideStepping || hasNonAutonomousMovement))
+                if (success)
                 {
+                    var player = WeenieObj.WorldObject as Player;
                     var valid = false;
-                    float dist = 0;
+                    float dist;
 
                     bool needCollisions = false;
                     if (deltaTime <= PhysicsGlobals.MinQuantum && transit == null)
-                    {
                         needCollisions = true;
-                        transit = transition(Position, RequestPos, false);
-                    }
 
-                    if (transit != null)
+                    Transition fullTransition = transition(Position, RequestPos, false);
+                    if (fullTransition != null)
                     {
-                        dist = transit.SpherePath.CurPos.Distance(transit.SpherePath.EndPos);
+                        dist = fullTransition.SpherePath.CurPos.Distance(fullTransition.SpherePath.EndPos);
 
-                        if (dist < 0.25f)
+                        if (dist < 0.01f)
                             valid = true;
                     }
+                    else
+                        dist = Position.Distance(RequestPos);
 
                     if (valid || forcePos || player?.GodState != null)
                     {
@@ -4415,26 +4407,15 @@ namespace ACE.Server.Physics
 
                         set_current_pos(RequestPos);
                     }
-                    else
+                    else if (dist > 0.1)
                     {
-                        //if (player != null)
-                        //    player.Session.Network.EnqueueSend(new GameMessageSystemChat($"Force position - distance: {dist.ToString("0.00")}", ChatMessageType.Broadcast));
-
                         WeenieObj.WorldObject.Location = new ACE.Entity.Position(Position.ObjCellID, Position.Frame.Origin, Position.Frame.Orientation);
                         WeenieObj.WorldObject.Sequences.GetNextSequence(SequenceType.ObjectForcePosition);
                         WeenieObj.WorldObject.SendUpdatePosition();
                         success = false;
 
-                        if (player != null && dist > 0.6f)
-                        {
-                            player.MovementEnforcementCounter++;
-                            if (player.MovementEnforcementCounter > 10)
-                            {
-                                // Kick players when they go over 10 enforcements in a minute.
-                                player.Session.Terminate(SessionTerminationReason.MovementEnforcementFailure, new GameMessageBootAccount(" because there is a divergence between your server and client locations"));
-                                return false;
-                            }
-                        }
+                        //if (player != null)
+                        //    player.Session.Network.EnqueueSend(new GameMessageSystemChat($"Force position - distance: {dist.ToString("0.00")} Transit was null: {transit == null}", ChatMessageType.Broadcast));
                     }
                 }
             }

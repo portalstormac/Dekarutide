@@ -158,6 +158,7 @@ namespace ACE.Server.WorldObjects
             {
                 if (!wasAlreadyEnforcing)
                 {
+                    MovementEnforcementCounter = 0;
                     Location = PhysicsObj.Position.ACEPosition();
                     SnapPos = Location;
                     PrevMovementUpdateMaxSpeed = 0.0f;
@@ -165,6 +166,9 @@ namespace ACE.Server.WorldObjects
                     LastPlayerMovementCheckTime = currentUnixTime;
                     HasPerformedActionsSinceLastMovementUpdate = false;
                 }
+
+                if (MovementEnforcementCounter > 0)
+                    MovementEnforcementCounter--;
 
                 if (!HasAnyMovement() && currentUnixTime > LastPlayerMovementCheckTime + 5)
                 {
@@ -737,7 +741,7 @@ namespace ACE.Server.WorldObjects
 
                             if (dist > currentMaxSpeed)
                             {
-                                if (MovementEnforcementCounter < 11)
+                                if (MovementEnforcementCounter < 10 || !PropertyManager.GetBool("enforce_player_movement_kick").Item)
                                 {
                                     if (MovementEnforcementCounter == 0 && currentMaxSpeed != 0 && dist < currentMaxSpeed * 1.5)
                                     {
