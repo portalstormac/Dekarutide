@@ -324,18 +324,26 @@ namespace ACE.Server.WorldObjects
 
                     if (player != null)
                     {
-                        var techniqueTrinket = player.GetEquippedTrinket();
-                        if (techniqueTrinket != null && techniqueTrinket.TacticAndTechniqueId == (int)TacticAndTechniqueType.Opportunist)
+                        var currentTime = Time.GetUnixTime();
+                        if (player.NextTechniqueNegativeActivationTime <= currentTime)
                         {
-                            if (player != creatureTarget && ThreadSafeRandom.Next(0.0f, 1.0f) < 0.15) // Chance of inflicting self damage while using the Opportunist technique.
+                            var techniqueTrinket = player.GetEquippedTrinket();
+                            if (techniqueTrinket != null && techniqueTrinket.TacticAndTechniqueId == (int)TacticAndTechniqueType.Opportunist)
                             {
-                                var criticalSelf = false;
-                                var critDefendedSelf = false;
-                                var overpowerSelf = false;
-                                var resistedSelf = false;
+                                var chance = 0.15f;
+                                if (player != creatureTarget && chance > ThreadSafeRandom.Next(0.0f, 1.0f))
+                                {
+                                    // Chance of inflicting self damage while using the Opportunist technique.
+                                    var criticalSelf = false;
+                                    var critDefendedSelf = false;
+                                    var overpowerSelf = false;
+                                    var resistedSelf = false;
 
-                                var damage2 = CalculateDamage(ProjectileSource, player, ref criticalSelf, ref critDefendedSelf, ref overpowerSelf, ref resistedSelf);
-                                DamageTarget(player, damage2.Value, criticalSelf, critDefendedSelf, overpowerSelf);
+                                    var damage2 = CalculateDamage(ProjectileSource, player, ref criticalSelf, ref critDefendedSelf, ref overpowerSelf, ref resistedSelf);
+                                    DamageTarget(player, damage2.Value, criticalSelf, critDefendedSelf, overpowerSelf);
+
+                                    player.NextTechniqueNegativeActivationTime = currentTime + Player.TechniqueNegativeActivationInterval;
+                                }
                             }
                         }
                     }

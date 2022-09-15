@@ -289,10 +289,9 @@ namespace ACE.Server.Managers
                 return;
             }
 
-            float decayRate = 60.0f; // The amount of seconds it takes for an interaction to decay.
-
+            float decayRate = 300.0f; // The amount of seconds it takes for an interaction to decay.
             if (camp.CampId == 0)
-                decayRate /= 2.0f; // Rest camp decays at a higher rate
+                decayRate = 30.0f; // Rest camp decays at a higher rate
 
             uint amountToDecay = (uint)Math.Max(Math.Floor(secondsSinceLastCheck / decayRate), 0);
 

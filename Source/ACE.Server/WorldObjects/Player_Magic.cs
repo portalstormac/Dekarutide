@@ -931,7 +931,7 @@ namespace ACE.Server.WorldObjects
                                     var rng = ThreadSafeRandom.Next(0.0f, 1.0f);
                                     if (amulet.LeyLineTriggerChance > rng)
                                     {
-                                        amulet.NextLeyLineTriggerTime = currentTime + LeyLineAmulet.NextLeyLineActivationInterval;
+                                        amulet.NextLeyLineTriggerTime = currentTime + LeyLineAmulet.LeyLineTriggerInterval;
 
                                         SpellId triggerSpellLevel1Id = (SpellId)(amulet.LeyLineTriggerSpellId ?? 0);
                                         if (triggerSpellLevel1Id != SpellId.Undef)

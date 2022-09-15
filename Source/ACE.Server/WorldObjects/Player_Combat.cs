@@ -13,6 +13,7 @@ using ACE.Server.Entity.Actions;
 using ACE.Server.Network.Enum;
 using ACE.Server.Network.GameEvent.Events;
 using ACE.Server.Network.GameMessages.Messages;
+using ACE.Server.Physics.Combat;
 
 namespace ACE.Server.WorldObjects
 {
@@ -99,12 +100,25 @@ namespace ACE.Server.WorldObjects
         {
             if (Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.CustomDM && CombatMode == CombatMode.Melee && avoided && AttackTarget == attacker)
             {
-                Creature creatureAttacker = attacker as Creature;
-                if (creatureAttacker != null && 0.3f > ThreadSafeRandom.Next(0.0f, 1.0f)) // 30% chance of striking back at the target when successfully evading an attack while using the Riposte technique.
+                var currentTime = Time.GetUnixTime();
+                if (NextTechniqueActivationTime <= currentTime)
                 {
                     var techniqueTrinket = GetEquippedTrinket();
                     if (techniqueTrinket != null && techniqueTrinket.TacticAndTechniqueId == (int)TacticAndTechniqueType.Riposte)
-                        DamageTarget(creatureAttacker, GetEquippedMeleeWeapon());
+                    {
+                        Creature creatureAttacker = attacker as Creature;
+                        if (creatureAttacker != null)
+                        {
+                            var chance = 0.3f;
+                            if (chance > ThreadSafeRandom.Next(0.0f, 1.0f))
+                            {
+                                // Chance of striking back at the target when successfully evading an attack while using the Riposte technique.
+                                Session.Network.EnqueueSend(new GameMessageSystemChat($"You see an opening and quickly strike back at the {attacker.Name}!", ChatMessageType.CombatSelf));
+                                DamageTarget(creatureAttacker, GetEquippedMeleeWeapon());
+                                NextTechniqueActivationTime = currentTime + TechniqueActivationInterval;
+                            }
+                        }
+                    }
                 }
             }
             base.OnAttackReceived(attacker, attackType, critical, avoided);

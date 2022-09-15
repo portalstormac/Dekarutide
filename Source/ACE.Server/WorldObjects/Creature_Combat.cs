@@ -1193,6 +1193,9 @@ namespace ACE.Server.WorldObjects
             if (Common.ConfigManager.Config.Server.WorldRuleset != Common.Ruleset.CustomDM)
                 return;
 
+            if (this == target)
+                return; // We don't want to find vulnerabilities on ourselves!
+
             var currentTime = Time.GetUnixTime();
 
             if (NextAssessDebuffActivationTime > currentTime)

@@ -267,6 +267,7 @@ namespace ACE.Server.Entity
                         CreatureSkill defenderMeleeDef = defender.GetCreatureSkill(Skill.MeleeDefense);
 
                         var activationChance = SkillCheck.GetSkillChance(attackerMeleeDef.Current, defenderMeleeDef.Current);
+                        activationChance += playerAttacker.ScaleWithPowerAccuracyBar((float)activationChance);
                         if (activationChance > ThreadSafeRandom.Next(0.0f, 1.0f))
                             RecklessnessMod = 1.20f; // Extra damage dealt while attacking with the Reckless technique.
                     }
@@ -302,10 +303,16 @@ namespace ACE.Server.Entity
                             CriticalChance = 1.0f;
                         else if (attackerTechniqueId == TacticAndTechniqueType.Opportunist)
                         {
-                            CriticalChance += playerAttacker.ScaleWithPowerAccuracyBar(0.10f); // Extra critical chance while using the Opportunist technique.
+                            CriticalChance += 0.10f + playerAttacker.ScaleWithPowerAccuracyBar(0.10f); // Extra critical chance while using the Opportunist technique.
 
-                            if (attacker != defender && ThreadSafeRandom.Next(0.0f, 1.0f) < 0.15f + playerAttacker.ScaleWithPowerAccuracyBar(0.15f)) // Chance of inflicting self damage while using the Opportunist technique.
+                            var currentTime = Time.GetUnixTime();
+                            var chance = 0.15f + playerAttacker.ScaleWithPowerAccuracyBar(0.15f);
+                            if (attacker != defender && playerAttacker.NextTechniqueNegativeActivationTime <= currentTime && chance > ThreadSafeRandom.Next(0.0f, 1.0f))
+                            {
+                                // Chance of inflicting self damage while using the Opportunist technique.
+                                playerAttacker.NextTechniqueNegativeActivationTime = currentTime + Player.TechniqueNegativeActivationInterval;
                                 playerAttacker.DamageTarget(playerAttacker, damageSource);
+                            }
                         }
 
                         if (CombatType != CombatType.Magic)

@@ -275,10 +275,9 @@ namespace ACE.Database
             var camps = context.CharacterPropertiesCampRegistry.ToList();
             foreach (var camp in camps)
             {
-                float decayRate = 60.0f; // The amount of seconds it takes for a kill to decay, make sure this matches the value used in CampManager
-
+                float decayRate = 300.0f; // The amount of seconds it takes for an interaction to decay. Make sure this matches the value used in CampManager
                 if (camp.CampId == 0)
-                    decayRate /= 2.0f; // Rest camp decays at a higher rate
+                    decayRate = 30.0f; // Rest camp decays at a higher rate
 
                 double secondsSinceLastCheck = currentTime - camp.LastDecayTime;
                 uint amountToDecay = (uint)Math.Max(Math.Floor(secondsSinceLastCheck / decayRate), 0);
