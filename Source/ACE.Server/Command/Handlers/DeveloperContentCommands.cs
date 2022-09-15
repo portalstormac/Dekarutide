@@ -3493,13 +3493,13 @@ namespace ACE.Server.Command.Handlers.Processors
             var newRotation = Quaternion.Normalize(obj.PhysicsObj.Position.Frame.Orientation * q);
 
             // get landblock for static guid
-            var landblock_id = (ushort)(objGuid >> 12);
+            var landblock_id = (ushort)(obj.Guid.Full >> 12);
 
             // get instances for landblock
             var instances = DatabaseManager.World.GetCachedInstancesByLandblock(landblock_id);
 
             // find instance
-            var instance = instances.FirstOrDefault(i => i.Guid == objGuid);
+            var instance = instances.FirstOrDefault(i => i.Guid == obj.Guid.Full);
 
             if (instance == null)
             {
