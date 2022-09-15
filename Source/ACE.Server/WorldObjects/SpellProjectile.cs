@@ -1,6 +1,3 @@
-using System;
-using System.Numerics;
-
 using ACE.Common;
 using ACE.Entity;
 using ACE.Entity.Enum;
@@ -12,6 +9,8 @@ using ACE.Server.Managers;
 using ACE.Server.Network.GameEvent.Events;
 using ACE.Server.Network.GameMessages.Messages;
 using ACE.Server.WorldObjects.Entity;
+using System;
+using System.Numerics;
 
 namespace ACE.Server.WorldObjects
 {
@@ -322,7 +321,7 @@ namespace ACE.Server.WorldObjects
                 {
                     DamageTarget(creatureTarget, damage.Value, critical, critDefended, overpower);
 
-                    if (player != null)
+                    if (player != null && player != creatureTarget)
                     {
                         var currentTime = Time.GetUnixTime();
                         if (player.NextTechniqueNegativeActivationTime <= currentTime)
@@ -330,8 +329,8 @@ namespace ACE.Server.WorldObjects
                             var techniqueTrinket = player.GetEquippedTrinket();
                             if (techniqueTrinket != null && techniqueTrinket.TacticAndTechniqueId == (int)TacticAndTechniqueType.Opportunist)
                             {
-                                var chance = 0.15f;
-                                if (player != creatureTarget && chance > ThreadSafeRandom.Next(0.0f, 1.0f))
+                                var chance = 0.225f;
+                                if (chance > ThreadSafeRandom.Next(0.0f, 1.0f))
                                 {
                                     // Chance of inflicting self damage while using the Opportunist technique.
                                     var criticalSelf = false;
@@ -340,7 +339,8 @@ namespace ACE.Server.WorldObjects
                                     var resistedSelf = false;
 
                                     var damage2 = CalculateDamage(ProjectileSource, player, ref criticalSelf, ref critDefendedSelf, ref overpowerSelf, ref resistedSelf);
-                                    DamageTarget(player, damage2.Value, criticalSelf, critDefendedSelf, overpowerSelf);
+                                    if(damage2 != null)
+                                        DamageTarget(player, damage2.Value, criticalSelf, critDefendedSelf, overpowerSelf);
 
                                     player.NextTechniqueNegativeActivationTime = currentTime + Player.TechniqueNegativeActivationInterval;
                                 }
@@ -455,6 +455,13 @@ namespace ACE.Server.WorldObjects
 
             // critical hit
             var criticalChance = GetWeaponMagicCritFrequency(weapon, sourceCreature, attackSkill, target);
+
+            if (sourcePlayer != null && source != target)
+            {
+                var techniqueTrinket = sourcePlayer.GetEquippedTrinket();
+                if (techniqueTrinket != null && techniqueTrinket.TacticAndTechniqueId == (int)TacticAndTechniqueType.Opportunist)
+                    criticalChance += 0.10f;
+            }
 
             if (ThreadSafeRandom.Next(0.0f, 1.0f) < criticalChance)
             {

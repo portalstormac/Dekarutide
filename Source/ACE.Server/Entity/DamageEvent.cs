@@ -303,7 +303,8 @@ namespace ACE.Server.Entity
                             CriticalChance = 1.0f;
                         else if (attackerTechniqueId == TacticAndTechniqueType.Opportunist)
                         {
-                            CriticalChance += 0.10f + playerAttacker.ScaleWithPowerAccuracyBar(0.10f); // Extra critical chance while using the Opportunist technique.
+                            if(attacker != defender)
+                                CriticalChance += 0.10f + playerAttacker.ScaleWithPowerAccuracyBar(0.10f); // Extra critical chance while using the Opportunist technique.
 
                             var currentTime = Time.GetUnixTime();
                             var chance = 0.15f + playerAttacker.ScaleWithPowerAccuracyBar(0.15f);
