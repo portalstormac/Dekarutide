@@ -254,17 +254,25 @@ namespace ACE.Server.Managers
             }
         }
 
+        public static uint MaxInteractionsRestCamp = 1000;
+        public static uint MaxInteractionsAreaCamp = 500;
+        public static uint MaxInteractionsTypeCamp = 2000;
+
+        public static float DelayBeforeDecayStart = 120.0f;
+        public static float DecayRate = 300.0f;
+        public static float DecayRateRest = 30.0f;
+
         /// <summary>
         /// Returns the maximum # of interactions for this camp
         /// </summary>
         public uint GetMaxInteractions(uint campId)
         {
             if (campId == 0) // Rest camp
-                return 1000;
+                return MaxInteractionsRestCamp;
             else if (campId > 0x0000FFFF) // Area Camp
-                return 500;
+                return MaxInteractionsAreaCamp;
             else
-                return 2000; // Type Camp
+                return MaxInteractionsTypeCamp; // Type Camp
         }
 
         public CharacterPropertiesCampRegistry CheckDecay(uint campId, bool isInteraction)
@@ -283,15 +291,15 @@ namespace ACE.Server.Managers
             var currentTime = (uint)Time.GetUnixTime();
 
             double secondsSinceLastCheck = Time.GetUnixTime() - camp.LastDecayTime;
-            if (isInteraction && secondsSinceLastCheck < 120) // Time after an interaction before we start decaying.
+            if (isInteraction && secondsSinceLastCheck < DelayBeforeDecayStart) // Time after an interaction before we start decaying.
             {
                 camp.LastDecayTime = currentTime;
                 return;
             }
 
-            float decayRate = 300.0f; // The amount of seconds it takes for an interaction to decay.
+            float decayRate = DecayRate; // The amount of seconds it takes for an interaction to decay.
             if (camp.CampId == 0)
-                decayRate = 30.0f; // Rest camp decays at a higher rate
+                decayRate = DecayRateRest; // Rest camp decays at a higher rate
 
             uint amountToDecay = (uint)Math.Max(Math.Floor(secondsSinceLastCheck / decayRate), 0);
 
@@ -311,11 +319,14 @@ namespace ACE.Server.Managers
             }
 
         }
-        public void GetCurrentCampBonus(CreatureType creatureType, out float typeCampBonus, out float areaCampBonus, out float restCampBonus)
+        public void GetCurrentCampBonus(CreatureType creatureType, out float typeCampBonus, out float areaCampBonus, out float restCampBonus, out TimeSpan typeRecovery, out TimeSpan areaRecovery, out TimeSpan restRecovery)
         {
             typeCampBonus = 0;
             areaCampBonus = 0;
             restCampBonus = 0;
+            typeRecovery = new TimeSpan();
+            areaRecovery = new TimeSpan();
+            restRecovery = new TimeSpan();
 
             if (creatureType != CreatureType.Invalid)
             {
@@ -327,6 +338,7 @@ namespace ACE.Server.Managers
                     {
                         CheckDecay(typeCamp, false);
                         typeCampBonus = 1.0f - ((float)typeCamp.NumInteractions / GetMaxInteractions(typeCamp.CampId));
+                        typeRecovery = TimeSpan.FromSeconds(((GetMaxInteractions(typeCamp.CampId) - (GetMaxInteractions(typeCamp.CampId) - typeCamp.NumInteractions)) * DecayRate) + DelayBeforeDecayStart);
                     }
                 }
             }
@@ -343,6 +355,7 @@ namespace ACE.Server.Managers
                 {
                     CheckDecay(areaCamp, false);
                     areaCampBonus = 1.0f - ((float)areaCamp.NumInteractions / GetMaxInteractions(areaCamp.CampId));
+                    areaRecovery = TimeSpan.FromSeconds(((GetMaxInteractions(areaCamp.CampId) - (GetMaxInteractions(areaCamp.CampId) - areaCamp.NumInteractions)) * DecayRate) + DelayBeforeDecayStart);
                 }
             }
 
@@ -351,6 +364,7 @@ namespace ACE.Server.Managers
             {
                 CheckDecay(restCamp, false);
                 restCampBonus = 1.0f - ((float)restCamp.NumInteractions / GetMaxInteractions(restCamp.CampId));
+                restRecovery = TimeSpan.FromSeconds(((GetMaxInteractions(restCamp.CampId) - (GetMaxInteractions(restCamp.CampId) - restCamp.NumInteractions)) * DecayRateRest) + DelayBeforeDecayStart);
             }
         }
 

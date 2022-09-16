@@ -14,7 +14,7 @@ using ACE.Server.Network;
 using ACE.Server.Network.GameEvent.Events;
 using ACE.Server.Network.GameMessages.Messages;
 using ACE.Server.WorldObjects;
-
+using System.Linq;
 
 namespace ACE.Server.Command.Handlers
 {
@@ -699,7 +699,7 @@ namespace ACE.Server.Command.Handlers
                     var durationTimespan = TimeSpan.FromSeconds(durationSeconds);
                     var xpPerSecond = session.Player.XpTrackerTotalXp.Value / (double)(durationSeconds);
                     var xpPerHour = xpPerSecond * 60 * 60;
-                    var msg = $"You've earned {String.Format("{0:0,0}", session.Player.XpTrackerTotalXp.Value)} XP in {durationTimespan.TotalHours} hr, {durationTimespan.Minutes} min, {durationTimespan.Seconds} sec \nfor {String.Format("{0:0,0}", xpPerHour)} XP/hr.";
+                    var msg = $"You've earned {session.Player.XpTrackerTotalXp.Value:N0} experience in {FormatTimespan(durationTimespan)} at a rate of {xpPerHour:N0} experience per hour.";
                     session.Network.EnqueueSend(new GameMessageSystemChat(msg, ChatMessageType.Broadcast));
                 }
                 else
@@ -720,14 +720,53 @@ namespace ACE.Server.Command.Handlers
         {
             if (parameters.Length > 0 && Enum.TryParse(parameters[0], true, out CreatureType creatureType))
             {
-                session.Player.CampManager.GetCurrentCampBonus(creatureType, out var typeCampBonus, out var areaCampBonus, out var restCampBonus);
-                CommandHandlerHelper.WriteOutputInfo(session, $"Current T.A.R. experience multipliers:\n   Type({creatureType}): {(typeCampBonus * 100).ToString("0")}%\n   Area: {(areaCampBonus * 100).ToString("0")}%\n   Rest: {(restCampBonus * 100).ToString("0")}%");
+                session.Player.CampManager.GetCurrentCampBonus(creatureType, out var typeCampBonus, out var areaCampBonus, out var restCampBonus, out var typeRecovery, out var areaRecovery, out var restRecovery);
+                CommandHandlerHelper.WriteOutputInfo(session, $"Current T.A.R. experience multipliers:\n   Type({creatureType}): {(typeCampBonus * 100).ToString("0")}%{(typeCampBonus != 1 ? $" - Estimated recovery time: {FormatTimespan(typeRecovery)}" : "")}\n   Area: {(areaCampBonus * 100).ToString("0")}%{(areaCampBonus != 1 ? $" - Estimated recovery time: {FormatTimespan(areaRecovery)}" : "")}\n   Rest: {(restCampBonus * 100).ToString("0")}%{(restCampBonus != 1 ? $" - Estimated recovery time: {FormatTimespan(restRecovery)}" : "")}");
             }
             else
             {
-                session.Player.CampManager.GetCurrentCampBonus(CreatureType.Invalid, out _, out var areaCampBonus, out var restCampBonus);
-                CommandHandlerHelper.WriteOutputInfo(session, $"Current T.A.R. experience multipliers:\n   Area: {(areaCampBonus * 100).ToString("0")}%\n   Rest: {(restCampBonus * 100).ToString("0")}%");
+                session.Player.CampManager.GetCurrentCampBonus(CreatureType.Invalid, out _, out var areaCampBonus, out var restCampBonus, out var typeRecovery, out var areaRecovery, out var restRecovery);
+                CommandHandlerHelper.WriteOutputInfo(session, $"Current T.A.R. experience multipliers:\n   Area: {(areaCampBonus * 100).ToString("0")}%{(areaCampBonus != 1 ? $" - Estimated recovery time: {FormatTimespan(areaRecovery)}" : "")}\n   Rest: {(restCampBonus * 100).ToString("0")}%{(restCampBonus != 1 ? $" - Estimated recovery time: {FormatTimespan(restRecovery)}" : "")}");
             }
+        }
+
+        public static string FormatTimespan(TimeSpan timespan)
+        {
+            string returnText = "";
+            if (timespan.TotalMinutes < 2)
+            {
+                if (timespan.Seconds > 1)
+                    returnText = $"{timespan.Seconds} seconds";
+                else if (timespan.Seconds == 1)
+                    returnText = $"{timespan.Seconds} second";
+
+                if (timespan.Minutes > 0)
+                    returnText = $"{timespan.Minutes} minute" + (returnText.Length > 0 ? $" {returnText}" : "");
+            }
+            else
+            {
+                if (timespan.Minutes > 1)
+                    returnText = $"{timespan.Minutes} minutes";
+                else if (timespan.Minutes == 1)
+                    returnText = $"{timespan.Minutes} minute";
+
+                int totalHours = (int)Math.Floor(timespan.TotalHours);
+                if (totalHours > 0)
+                {
+                    if (timespan.Hours > 1)
+                        returnText = $"{timespan.Hours} hours" + (returnText.Length > 0 ? $" {returnText}" : "");
+                    else if (timespan.Hours == 1)
+                        returnText = $"{timespan.Hours} hour" + (returnText.Length > 0 ? $" {returnText}" : "");
+                }
+
+                int totalDays = (int)Math.Floor(timespan.TotalDays);
+                if (totalDays > 1)
+                    returnText = $"{totalDays} days " + (returnText.Length > 0 ? $" {returnText}" : "");
+                else if(totalDays > 0)
+                    returnText = $"{totalDays} day " + (returnText.Length > 0 ? $" {returnText}" : "");
+            }
+
+            return returnText;
         }
 
         public class ActivityRecommendation
