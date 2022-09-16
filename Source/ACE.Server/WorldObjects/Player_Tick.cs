@@ -152,9 +152,10 @@ namespace ACE.Server.WorldObjects
                     LogOut();
             }
 
-            bool wasAlreadyEnforcing = EnforceMovement;
+            bool wasAlreadyEnforcing = EnforceMovement || EnforceMovementSpeed;
             EnforceMovement = PropertyManager.GetBool("enforce_player_movement").Item;
-            if (EnforceMovement && !Teleporting)
+            EnforceMovementSpeed = PropertyManager.GetBool("enforce_player_movement_speed").Item;
+            if ((EnforceMovement || EnforceMovementSpeed) && !Teleporting)
             {
                 if (!wasAlreadyEnforcing)
                 {
@@ -192,6 +193,7 @@ namespace ACE.Server.WorldObjects
         public bool FastTick => true;
 
         public bool EnforceMovement { get; set; } = false;
+        public bool EnforceMovementSpeed { get; set; } = false;
 
         /// <summary>
         /// For advanced spellcasting / players glitching around during powersliding,
@@ -683,7 +685,7 @@ namespace ACE.Server.WorldObjects
                     else
                         PhysicsObj.Position.Frame.Orientation = newPosition.Rotation;
 
-                    if (EnforceMovement && success && !Teleporting && GodState == null)
+                    if (EnforceMovementSpeed && success && !Teleporting && GodState == null)
                     {
                         if (currentTime - MovementEnforcementTimer > 60)
                             MovementEnforcementTimer = currentTime;
@@ -706,9 +708,9 @@ namespace ACE.Server.WorldObjects
                             LastPlayerInitiatedActionTime = currentTime;
 
                         timeSinceLastAction = (float)(currentTime - LastPlayerInitiatedActionTime);
-                        if (timeSinceLastAction > 3.0f) // Give it a few seconds to resolve any inertia.
-                            isMovingOrAnimating = false;
-                        else
+                        //if (timeSinceLastAction > 3.0f) // Give it a few seconds to resolve any inertia.
+                        //    isMovingOrAnimating = false;
+                        //else
                             isMovingOrAnimating = true;
 
                         if (dist > PhysicsGlobals.EPSILON)
