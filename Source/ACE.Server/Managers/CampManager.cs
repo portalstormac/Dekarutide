@@ -260,7 +260,7 @@ namespace ACE.Server.Managers
 
         public static float DelayBeforeDecayStart = 120.0f;
         public static float DecayRate = 300.0f;
-        public static float DecayRateRest = 30.0f;
+        public static float DecayRateRest = 3.0f;
 
         /// <summary>
         /// Returns the maximum # of interactions for this camp
