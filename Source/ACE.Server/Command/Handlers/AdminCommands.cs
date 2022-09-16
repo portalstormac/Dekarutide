@@ -4764,6 +4764,19 @@ namespace ACE.Server.Command.Handlers
             LootSwap.UpdateTables(folder);
         }
 
+        [CommandHandler("setmotd", AccessLevel.Admin, CommandHandlerFlag.None, 1, "Set the server's message of the day", "(string)")]
+        public static void HandleModifySetMotD(Session session, params string[] parameters)
+        {
+            var newMotD = parameters[0].Replace("\\n", "\n"); // We need this so the MoTD can have line breaks.
+            if (PropertyManager.ModifyString("server_motd", newMotD))
+            {
+                CommandHandlerHelper.WriteOutputInfo(session, "Message of the day successfully updated!");
+                PlayerManager.BroadcastToAuditChannel(session?.Player, $"Successfully changed server message of the day to {parameters[0]}");
+            }
+            else
+                CommandHandlerHelper.WriteOutputInfo(session, "Failed to update the meessage of the day.");
+        }
+
         [CommandHandler("clearvpnblocklist", AccessLevel.Sentinel, CommandHandlerFlag.None,
             "Clears the list of IPs that are blocked due to VPN/proxy check")]
         public static void HandleClearVpnBlockList(Session session, params string[] parameters)
