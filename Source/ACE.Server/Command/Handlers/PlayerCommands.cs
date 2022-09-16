@@ -761,9 +761,9 @@ namespace ACE.Server.Command.Handlers
 
                 int totalDays = (int)Math.Floor(timespan.TotalDays);
                 if (totalDays > 1)
-                    returnText = $"{totalDays} days " + (returnText.Length > 0 ? $" {returnText}" : "");
+                    returnText = $"{totalDays} days" + (returnText.Length > 0 ? $" {returnText}" : "");
                 else if(totalDays > 0)
-                    returnText = $"{totalDays} day " + (returnText.Length > 0 ? $" {returnText}" : "");
+                    returnText = $"{totalDays} day" + (returnText.Length > 0 ? $" {returnText}" : "");
             }
 
             return returnText;
