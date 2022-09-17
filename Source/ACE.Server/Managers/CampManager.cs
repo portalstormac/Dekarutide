@@ -258,9 +258,10 @@ namespace ACE.Server.Managers
         public static uint MaxInteractionsAreaCamp = 500;
         public static uint MaxInteractionsTypeCamp = 2000;
 
+        // When changing these values remember to also update the values in ShardDatabaseOfflineTools.cs
         public static float DelayBeforeDecayStart = 120.0f;
         public static float DecayRate = 300.0f;
-        public static float DecayRateRest = 12.0f;
+        public static float DecayRateRest = 3.0f;
 
         /// <summary>
         /// Returns the maximum # of interactions for this camp
@@ -302,7 +303,7 @@ namespace ACE.Server.Managers
             if (camp.CampId == 0)
                 decayRate = DecayRateRest; // Rest camp decays at a higher rate
 
-            uint amountToDecay = (uint)Math.Max(Math.Floor(secondsSinceLastCheck / decayRate), 0);
+            uint amountToDecay = (uint)Math.Max(Math.Floor((secondsSinceLastCheck - DelayBeforeDecayStart) / decayRate), 0);
 
             if (amountToDecay > 0)
             {

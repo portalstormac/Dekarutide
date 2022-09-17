@@ -163,7 +163,6 @@ namespace ACE.Server.WorldObjects
                     Location = PhysicsObj.Position.ACEPosition();
                     SnapPos = Location;
                     PrevMovementUpdateMaxSpeed = 0.0f;
-                    LastPlayerInitiatedActionTime = currentUnixTime;
                     LastPlayerMovementCheckTime = currentUnixTime;
                     HasPerformedActionsSinceLastMovementUpdate = false;
                 }
@@ -189,7 +188,7 @@ namespace ACE.Server.WorldObjects
         /// <summary>
         /// Flag indicates if player is doing full physics simulation
         /// </summary>
-        //public bool FastTick => IsPKType || EnforceMovement;
+        //public bool FastTick => IsPKType;
         public bool FastTick => true;
 
         public bool EnforceMovement { get; set; } = false;
@@ -687,9 +686,6 @@ namespace ACE.Server.WorldObjects
 
                     if (EnforceMovementSpeed && success && !Teleporting && GodState == null)
                     {
-                        if (currentTime - MovementEnforcementTimer > 60)
-                            MovementEnforcementTimer = currentTime;
-
                         float enforcementDeltaTime = (float)(currentTime - LastPlayerMovementCheckTime);
                         LastPlayerMovementCheckTime = currentTime;
 
@@ -701,17 +697,6 @@ namespace ACE.Server.WorldObjects
                         var dist = Location.DistanceTo(newPosition);
                         float velocity = PhysicsObj.CachedVelocity.Length();
                         float currentMaxSpeed;
-                        float timeSinceLastAction;
-                        bool isMovingOrAnimating;
-
-                        if (HasAnyMovement())
-                            LastPlayerInitiatedActionTime = currentTime;
-
-                        timeSinceLastAction = (float)(currentTime - LastPlayerInitiatedActionTime);
-                        //if (timeSinceLastAction > 3.0f) // Give it a few seconds to resolve any inertia.
-                        //    isMovingOrAnimating = false;
-                        //else
-                            isMovingOrAnimating = true;
 
                         if (dist > PhysicsGlobals.EPSILON)
                         {
@@ -724,16 +709,14 @@ namespace ACE.Server.WorldObjects
                             }
                             else
                             {
-                                // This is no longer used because EnforceMovement also forces FastTick but leaving it here for now.
+                                // This is no longer used because FastTick is set to be always on but leaving it here for now.
                                 currentMaxSpeed = (5.5f * GetRunRate() * enforcementDeltaTime * (1.0f + velocity / 5.0f)) + 2.0f;
 
                                 if (HasPerformedActionsSinceLastMovementUpdate)
                                     currentMaxSpeed *= 1.8f;
                             }
 
-                            if (!isMovingOrAnimating)
-                                currentMaxSpeed = 0.0f;
-                            else if (currentMaxSpeed < PrevMovementUpdateMaxSpeed && PrevMovementUpdateMaxSpeed > 25.0f)
+                            if (currentMaxSpeed < PrevMovementUpdateMaxSpeed && PrevMovementUpdateMaxSpeed > 25.0f)
                             {
                                 // We were going really fast and now we are slowing down but we might still have some inertia.
                                 loggingInertia = true;
@@ -759,7 +742,7 @@ namespace ACE.Server.WorldObjects
 
                                         Session.Network.EnqueueSend(new GameMessageSystemChat("Invalid movement detected. Rolling back to last known good location.", ChatMessageType.Help));
 
-                                        log.Warn($"{Name} - INVALID MOVEMENT DETECTED - Speed: {dist.ToString("0.00")}/{currentMaxSpeed.ToString("0.00")} PrevMaxSpeed: {loggingPrevMaxMovementSpeed.ToString("0.00")}({loggingInertia}) FastTick: {FastTick} TimeSpam: {enforcementDeltaTime.ToString("0.00")} Velocity: {velocity.ToString("0.00")} timeSinceLastAction: {timeSinceLastAction.ToString("0.00")} isMovingOrAnimating: {isMovingOrAnimating} actionsSinceLastMovementUpdate: {loggingHasPerformedActionsSinceLastMovementUpdate}");
+                                        log.Warn($"{Name} - INVALID MOVEMENT DETECTED - Speed: {dist.ToString("0.00")}/{currentMaxSpeed.ToString("0.00")} PrevMaxSpeed: {loggingPrevMaxMovementSpeed.ToString("0.00")}({loggingInertia}) FastTick: {FastTick} TimeSpam: {enforcementDeltaTime.ToString("0.00")} Velocity: {velocity.ToString("0.00")} actionsSinceLastMovementUpdate: {loggingHasPerformedActionsSinceLastMovementUpdate}");
                                         //Session.Network.EnqueueSend(new GameMessageSystemChat($"Speed: {dist.ToString("0.00")}/{currentMaxSpeed.ToString("0.00")} PrevMaxSpeed: {loggingPrevMaxMovementSpeed.ToString("0.00")}({loggingInertia}) FastTick: {FastTick} TimeSpam: {deltaTime.ToString("0.00")} Velocity: {velocity.ToString("0.00")} timeSinceLastAction: {timeSinceLastAction.ToString("0.00")} isMovingOrAnimating: {isMovingOrAnimating} actionsSinceLastMovementUpdate: {loggingHasPerformedActionsSinceLastMovementUpdate}", ChatMessageType.Help));
                                         return false;
                                     }
@@ -768,7 +751,7 @@ namespace ACE.Server.WorldObjects
                                 {
                                     // Kick players when they go over 10 enforcements in a minute.
                                     Session.Terminate(SessionTerminationReason.MovementEnforcementFailure, new GameMessageBootAccount(" because there is a divergence between your server and client locations"));
-                                    log.Warn($"{Name} - INVALID MOVEMENT DETECTED - Speed: {dist.ToString("0.00")}/{currentMaxSpeed.ToString("0.00")} PrevMaxSpeed: {loggingPrevMaxMovementSpeed.ToString("0.00")}({loggingInertia}) FastTick: {FastTick} TimeSpam: {enforcementDeltaTime.ToString("0.00")} Velocity: {velocity.ToString("0.00")} timeSinceLastAction: {timeSinceLastAction.ToString("0.00")} isMovingOrAnimating: {isMovingOrAnimating} actionsSinceLastMovementUpdate: {loggingHasPerformedActionsSinceLastMovementUpdate}");
+                                    log.Warn($"{Name} - INVALID MOVEMENT DETECTED - Speed: {dist.ToString("0.00")}/{currentMaxSpeed.ToString("0.00")} PrevMaxSpeed: {loggingPrevMaxMovementSpeed.ToString("0.00")}({loggingInertia}) FastTick: {FastTick} TimeSpam: {enforcementDeltaTime.ToString("0.00")} Velocity: {velocity.ToString("0.00")} actionsSinceLastMovementUpdate: {loggingHasPerformedActionsSinceLastMovementUpdate}");
                                     return false;
                                 }
                             }

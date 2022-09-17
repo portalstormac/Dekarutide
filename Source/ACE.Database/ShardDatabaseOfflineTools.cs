@@ -272,15 +272,20 @@ namespace ACE.Database
 
             var currentTime = (uint)Time.GetUnixTime();
 
+            // Make sure these match the values used in CampManager.cs
+            float DelayBeforeDecayStart = 120.0f;
+            float DecayRate = 300.0f;
+            float DecayRateRest = 3;
+
             var camps = context.CharacterPropertiesCampRegistry.ToList();
             foreach (var camp in camps)
             {
-                float decayRate = 300.0f; // The amount of seconds it takes for an interaction to decay. Make sure this matches the value used in CampManager
+                float decayRate = DecayRate;
                 if (camp.CampId == 0)
-                    decayRate = 30.0f; // Rest camp decays at a higher rate
+                    decayRate = DecayRateRest;
 
                 double secondsSinceLastCheck = currentTime - camp.LastDecayTime;
-                uint amountToDecay = (uint)Math.Max(Math.Floor(secondsSinceLastCheck / decayRate), 0);
+                uint amountToDecay = (uint)Math.Max(Math.Floor((secondsSinceLastCheck - DelayBeforeDecayStart) / decayRate), 0);
                 if (camp.NumInteractions < amountToDecay)
                 {
                     context.CharacterPropertiesCampRegistry.Remove(camp);
