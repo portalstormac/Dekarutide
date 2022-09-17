@@ -260,7 +260,7 @@ namespace ACE.Server.Managers
 
         public static float DelayBeforeDecayStart = 120.0f;
         public static float DecayRate = 300.0f;
-        public static float DecayRateRest = 3.0f;
+        public static float DecayRateRest = 12.0f;
 
         /// <summary>
         /// Returns the maximum # of interactions for this camp
@@ -291,9 +291,10 @@ namespace ACE.Server.Managers
             var currentTime = (uint)Time.GetUnixTime();
 
             double secondsSinceLastCheck = Time.GetUnixTime() - camp.LastDecayTime;
-            if (isInteraction && secondsSinceLastCheck < DelayBeforeDecayStart) // Time after an interaction before we start decaying.
+            if (secondsSinceLastCheck < DelayBeforeDecayStart) // Time after an interaction before we start decaying.
             {
-                camp.LastDecayTime = currentTime;
+                if(isInteraction)
+                    camp.LastDecayTime = currentTime;
                 return;
             }
 
