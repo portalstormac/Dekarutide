@@ -564,7 +564,7 @@ namespace ACE.Server.Command.Handlers
                 if (objectId.IsPlayer())
                     return;
 
-                if (wo != null & wo.IsGenerator)
+                if (wo != null && wo.IsGenerator)
                 {
                     wo.ResetGenerator();
                     wo.GeneratorEnteredWorld = false;
@@ -4765,7 +4765,7 @@ namespace ACE.Server.Command.Handlers
         }
 
         [CommandHandler("setmotd", AccessLevel.Admin, CommandHandlerFlag.None, 1, "Set the server's message of the day", "(string)")]
-        public static void HandleModifySetMotD(Session session, params string[] parameters)
+        public static void HandleSetMotD(Session session, params string[] parameters)
         {
             var newMotD = parameters[0].Replace("\\n", "\n"); // We need this so the MoTD can have line breaks.
             if (PropertyManager.ModifyString("server_motd", newMotD))
