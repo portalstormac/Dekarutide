@@ -254,8 +254,8 @@ namespace ACE.Server.Managers
             }
         }
 
-        public static uint MaxInteractionsRestCamp = 1000;
-        public static uint MaxInteractionsAreaCamp = 500;
+        public static uint MaxInteractionsRestCamp = 500;
+        public static uint MaxInteractionsAreaCamp = 750;
         public static uint MaxInteractionsTypeCamp = 2000;
 
         // When changing these values remember to also update the values in ShardDatabaseOfflineTools.cs
