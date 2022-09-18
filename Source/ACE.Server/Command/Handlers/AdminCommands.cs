@@ -566,6 +566,8 @@ namespace ACE.Server.Command.Handlers
 
                 if (wo != null && wo.IsGenerator)
                 {
+                    if(wo is Container container)
+                        container.Reset();
                     wo.ResetGenerator();
                     wo.GeneratorEnteredWorld = false;
                     wo.GeneratorRegeneration(Time.GetUnixTime());

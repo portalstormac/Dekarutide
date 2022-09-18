@@ -567,6 +567,9 @@ namespace ACE.Server.WorldObjects
             var generator = Generator.GeneratorProfiles.FirstOrDefault(g => g.Spawned.ContainsKey(Guid.Full));
             generator?.NotifyGenerator(Guid, regenerationType);
 
+            if (generator?.GeneratorResetInProgress == true)
+                return;
+
             if (Generator.GeneratorId > 0) // Generator is controlled by another generator.
             {
                 if ((!(Generator is Container) || Generator.GeneratorAutomaticDestruction) && Generator.InitCreate > 0) // Parent generator is non-container (Container, Corpse, Chest, Slumlord, Storage, Hook, Creature) generator

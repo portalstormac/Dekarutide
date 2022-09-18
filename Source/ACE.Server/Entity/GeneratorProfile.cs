@@ -582,8 +582,10 @@ namespace ACE.Server.Entity
             NextAvailable = DateTime.UtcNow.AddSeconds(Delay);
         }
 
+        public bool GeneratorResetInProgress = false;
         public void Reset()
         {
+            GeneratorResetInProgress = true;
             foreach (var rNode in Spawned.Values)
             {
                 var wo = rNode.TryGetWorldObject();
@@ -603,6 +605,7 @@ namespace ACE.Server.Entity
                     wo.Destroy();
                 }
             }
+            GeneratorResetInProgress = false;
 
             CleanupProfile();
         }
