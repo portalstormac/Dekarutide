@@ -164,7 +164,10 @@ namespace ACE.Server.Entity
         /// </summary>
         public DateTime GetSpawnTime()
         {
+            if (Generator.CurrentlyPoweringUp || Generator.CachedRegenerationInterval >= Delay)
                 return DateTime.UtcNow;
+            else
+                return DateTime.UtcNow.AddSeconds(Delay);
         }
 
         /// <summary>
