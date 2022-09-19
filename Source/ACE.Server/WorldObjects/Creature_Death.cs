@@ -31,8 +31,10 @@ namespace ACE.Server.WorldObjects
         /// <param name="criticalHit">True if the death blow was a critical hit, generates a critical death message</param>
         public virtual DeathMessage OnDeath(DamageHistoryInfo lastDamager, DamageType damageType, bool criticalHit = false)
         {
+            var deathMessage = GetDeathMessage(lastDamager, damageType, criticalHit);
+
             if (onDeathEntered)
-                return GetDeathMessage(lastDamager, damageType, criticalHit);
+                return deathMessage;
 
             onDeathEntered = true;
 
@@ -51,7 +53,7 @@ namespace ACE.Server.WorldObjects
             if (!IsOnNoDeathXPLandblock)
                 OnDeath_GrantXP();
 
-            return GetDeathMessage(lastDamager, damageType, criticalHit);
+            return deathMessage;
         }
 
 
@@ -72,7 +74,7 @@ namespace ACE.Server.WorldObjects
 
                 var killerMsg = string.Format(deathMessage.Killer, Name);
 
-                if (lastDamager is Player playerKiller)
+                if (lastDamager is Player playerKiller && !onDeathEntered)
                     playerKiller.Session.Network.EnqueueSend(new GameEventKillerNotification(playerKiller.Session, killerMsg));
             }
             return deathMessage;
@@ -203,24 +205,13 @@ namespace ACE.Server.WorldObjects
                     float restCampBonus;
                     playerDamager.CampManager.HandleCampInteraction(this, out typeCampBonus, out areaCampBonus, out restCampBonus);
 
-                    //float halfXP = totalXP / 2.0f;
-                    //totalXP = halfXP + (halfXP / 3.0f * creatureTypeCampBonus) + (halfXP / 3.0f * areaCampBonus) + (halfXP / 3.0f * restCampBonus);
-
                     float thirdXP = totalXP / 3.0f;
                     totalXP = (thirdXP * typeCampBonus) + (thirdXP * areaCampBonus) + (thirdXP * restCampBonus);
 
                     if (!CurrentLandblock.IsDungeon)
                         totalXP *= 1.25f; // Surface provides 25% xp bonus to account for lower creature density.
 
-                    // Delay sending this message for one tick to make it appear after the kill message.
-                    var sendRestMessageChain = new ActionChain();
-                    sendRestMessageChain.AddDelayForOneTick();
-                    sendRestMessageChain.AddAction(this, () =>
-                    {
-                        playerDamager.Session.Network.EnqueueSend(new GameEventKillerNotification(playerDamager.Session, $"You've earned {((long)Math.Round(totalXP)):N0} experience! T: {(typeCampBonus * 100).ToString("0")}% A: {(areaCampBonus * 100).ToString("0")}% R: {(restCampBonus * 100).ToString("0")}%"));
-                    });
-
-                    sendRestMessageChain.EnqueueChain();
+                    playerDamager.Session.Network.EnqueueSend(new GameEventKillerNotification(playerDamager.Session, $"You've earned {((long)Math.Round(totalXP)):N0} experience! T: {(typeCampBonus * 100).ToString("0")}% A: {(areaCampBonus * 100).ToString("0")}% R: {(restCampBonus * 100).ToString("0")}%"));
                 }
 
                 playerDamager.EarnXP((long)Math.Round(totalXP), XpType.Kill, Level);
