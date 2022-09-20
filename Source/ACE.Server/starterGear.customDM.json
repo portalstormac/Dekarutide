@@ -606,24 +606,24 @@
             "name": "Alchemy",
             "gear": [
                 {
-                    "weenieId": "4751",
-                    "name": "Mortar and Pestle",
+                    "weenieId": "4747",
+                    "name": "Alembic",
                     "stacksize": "1"
                 },
                 {
-                    "weenieId": "2414",
-                    "name": "Azurite",
-                    "stacksize": "1"
+                    "weenieId": "5338",
+                    "name": "Neutral Balm",
+                    "stacksize": "10"
                 },
                 {
-                    "weenieId": "2414",
-                    "name": "Azurite",
-                    "stacksize": "1"
+                    "weenieId": "764",
+                    "name": "Vitriol",
+                    "stacksize": "5"
                 },
                 {
-                    "weenieId": "2414",
-                    "name": "Azurite",
-                    "stacksize": "1"
+                    "weenieId": "758",
+                    "name": "Gypsum",
+                    "stacksize": "5"
                 }
             ]
         },

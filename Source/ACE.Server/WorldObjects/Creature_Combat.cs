@@ -1201,24 +1201,21 @@ namespace ACE.Server.WorldObjects
             if (NextAssessDebuffActivationTime > currentTime)
                 return;
 
-            Player sourceAsPlayer = this as Player;
-            Player targetAsPlayer = target as Player;
+            var skill = GetCreatureSkill(Skill.AssessCreature);
+            if (skill.AdvancementClass == SkillAdvancementClass.Untrained || skill.AdvancementClass == SkillAdvancementClass.Inactive)
+                return;
 
-            Entity.CreatureSkill skill = GetCreatureSkill(Skill.AssessCreature);
             var activationChance = ThreadSafeRandom.Next(0.0f, 1.0f);
-            if (skill.AdvancementClass == SkillAdvancementClass.Specialized && activationChance > 0.50)
+            if (activationChance > 0.25)
                 return;
-            else if (skill.AdvancementClass == SkillAdvancementClass.Trained && activationChance > 0.25)
-                return;
-            else if (skill.AdvancementClass == SkillAdvancementClass.Untrained || skill.AdvancementClass == SkillAdvancementClass.Inactive)
-                return;
-
             NextAssessDebuffActivationTime = currentTime + AssessDebuffActivationInterval;
 
-            Entity.CreatureSkill defenseSkill = target.GetCreatureSkill(Skill.Deception);
+            var defenseSkill = target.GetCreatureSkill(Skill.Deception);
+
+            var sourceAsPlayer = this as Player;
+            var targetAsPlayer = target as Player;
 
             var avoidChance = 1.0f - SkillCheck.GetSkillChance(skill.Current, defenseSkill.Current);
-
             if (avoidChance > ThreadSafeRandom.Next(0.0f, 1.0f))
             {
                 if (sourceAsPlayer != null)
