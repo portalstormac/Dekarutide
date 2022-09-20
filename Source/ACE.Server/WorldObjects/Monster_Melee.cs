@@ -504,12 +504,17 @@ namespace ACE.Server.WorldObjects
             if (player != null) // Creatures always have full shield level.
             {
                 // SL cap:
+                // EoR:
                 // Trained / untrained: 1/2 shield skill
                 // Spec: shield skill
+                // CustomDM:
+                // SL cap:
+                // Spec / Trained / untrained: shield skill
+
                 // SL cap is applied *after* item enchantments
                 var shieldSkill = GetCreatureSkill(Skill.Shield);
                 var shieldCap = shieldSkill.Current;
-                if (shieldSkill.AdvancementClass != SkillAdvancementClass.Specialized)
+                if (shieldSkill.AdvancementClass != SkillAdvancementClass.Specialized && Common.ConfigManager.Config.Server.WorldRuleset != Common.Ruleset.CustomDM)
                     shieldCap = (uint)Math.Round(shieldCap / 2.0f);
 
                 return Math.Min(armor, shieldCap);
@@ -527,13 +532,11 @@ namespace ACE.Server.WorldObjects
             if (player != null) // Creatures always have full armor level.
             {
                 // AL cap:
-                // Trained / untrained: 80% armor skill
-                // Spec: armor skill
+                // Spec / Trained / untrained: armor skill
+
                 // AL cap is applied *after* item enchantments
                 var armorSkill = GetCreatureSkill(Skill.Armor);
                 var armorCap = armorSkill.Current;
-                if (armorSkill.AdvancementClass != SkillAdvancementClass.Specialized)
-                    armorCap = (uint)Math.Round(armorCap * 0.8f);
 
                 return Math.Min(armor, armorCap);
             }
