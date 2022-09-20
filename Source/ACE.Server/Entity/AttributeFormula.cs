@@ -67,10 +67,10 @@ namespace ACE.Server.Entity
             if (attr2 != PropertyAttribute.Undef)
                 total += (current ? creature.Attributes[attr2].Current : creature.Attributes[attr2].Base) * attr2Multiplier;
 
+            total += addition;
+
             if (divisor != 1)
                 total = (uint)((float)total / divisor).Round();
-
-            total += addition;
 
             return total;
         }
@@ -90,10 +90,10 @@ namespace ACE.Server.Entity
             if (attr2 != PropertyAttribute.Undef)
                 total += currentOrBaseAttr2 * attr2Multiplier;
 
+            total += addition;
+
             if (divisor != 1)
                 total = (uint)((float)total / divisor).Round();
-
-            total += addition;
 
             return total;
         }
