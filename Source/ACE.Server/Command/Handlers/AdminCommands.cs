@@ -4769,14 +4769,53 @@ namespace ACE.Server.Command.Handlers
         [CommandHandler("setmotd", AccessLevel.Admin, CommandHandlerFlag.None, 1, "Set the server's message of the day", "(string)")]
         public static void HandleSetMotD(Session session, params string[] parameters)
         {
-            var newMotD = parameters[0].Replace("\\n", "\n"); // We need this so the MoTD can have line breaks.
+            var newMotD = String.Join(" ",parameters).Replace("\\n", "\n"); // We need this so the MoTD can have line breaks.
             if (PropertyManager.ModifyString("server_motd", newMotD))
             {
                 CommandHandlerHelper.WriteOutputInfo(session, "Message of the day successfully updated!");
-                PlayerManager.BroadcastToAuditChannel(session?.Player, $"Successfully changed server message of the day to {parameters[0]}");
+                PlayerManager.BroadcastToAuditChannel(session?.Player, $"Successfully changed server message of the day to \"{newMotD}\"");
             }
             else
                 CommandHandlerHelper.WriteOutputInfo(session, "Failed to update the meessage of the day.");
+        }
+
+        [CommandHandler("setmotd2", AccessLevel.Admin, CommandHandlerFlag.None, 1, "Set the server's message of the day 2", "(string)")]
+        public static void HandleSetMotD2(Session session, params string[] parameters)
+        {
+            var newMotD = String.Join(" ", parameters).Replace("\\n", "\n"); // We need this so the MoTD can have line breaks.
+            if (PropertyManager.ModifyString("server_motd2", newMotD))
+            {
+                CommandHandlerHelper.WriteOutputInfo(session, "Message of the day 2 successfully updated!");
+                PlayerManager.BroadcastToAuditChannel(session?.Player, $"Successfully changed server message of the day 2 to \"{newMotD}\"");
+            }
+            else
+                CommandHandlerHelper.WriteOutputInfo(session, "Failed to update the meessage of the day 2.");
+        }
+
+        [CommandHandler("setmotd3", AccessLevel.Admin, CommandHandlerFlag.None, 1, "Set the server's message of the day 3", "(string)")]
+        public static void HandleSetMotD3(Session session, params string[] parameters)
+        {
+            var newMotD = String.Join(" ", parameters).Replace("\\n", "\n"); // We need this so the MoTD can have line breaks.
+            if (PropertyManager.ModifyString("server_motd3", newMotD))
+            {
+                CommandHandlerHelper.WriteOutputInfo(session, "Message of the day 3 successfully updated!");
+                PlayerManager.BroadcastToAuditChannel(session?.Player, $"Successfully changed server message of the day 3 to \"{newMotD}\"");
+            }
+            else
+                CommandHandlerHelper.WriteOutputInfo(session, "Failed to update the meessage of the day 3.");
+        }
+
+        [CommandHandler("setmotd4", AccessLevel.Admin, CommandHandlerFlag.None, 1, "Set the server's message of the day 4", "(string)")]
+        public static void HandleSetMotD4(Session session, params string[] parameters)
+        {
+            var newMotD = String.Join(" ", parameters).Replace("\\n", "\n"); // We need this so the MoTD can have line breaks.
+            if (PropertyManager.ModifyString("server_motd4", newMotD))
+            {
+                CommandHandlerHelper.WriteOutputInfo(session, "Message of the day 4 successfully updated!");
+                PlayerManager.BroadcastToAuditChannel(session?.Player, $"Successfully changed server message of the day 4 to \"{newMotD}\"");
+            }
+            else
+                CommandHandlerHelper.WriteOutputInfo(session, "Failed to update the meessage of the day 4.");
         }
 
         [CommandHandler("clearvpnblocklist", AccessLevel.Sentinel, CommandHandlerFlag.None,

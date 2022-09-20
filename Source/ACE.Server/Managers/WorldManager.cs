@@ -277,14 +277,24 @@ namespace ACE.Server.Managers
             session.Network.EnqueueSend(new GameMessageSystemChat(info, ChatMessageType.Broadcast));
 
             var server_motd = PropertyManager.GetString("server_motd").Item;
-            if (!string.IsNullOrEmpty(server_motd))
+            var server_motd2 = PropertyManager.GetString("server_motd2").Item;
+            var server_motd3 = PropertyManager.GetString("server_motd3").Item;
+            var server_motd4 = PropertyManager.GetString("server_motd4").Item;
+            if (!string.IsNullOrEmpty(server_motd) || !string.IsNullOrEmpty(server_motd2) || !string.IsNullOrEmpty(server_motd3) || !string.IsNullOrEmpty(server_motd4))
             {
                 // Delay sending the MotD so it doesn't get lost in the login spam.
                 var motdChain = new ActionChain();
                 motdChain.AddDelaySeconds(15.0f);
                 motdChain.AddAction(player, () =>
                 {
-                    session.Network.EnqueueSend(new GameMessageSystemChat($"{server_motd}\n", ChatMessageType.Broadcast));
+                    if (!string.IsNullOrEmpty(server_motd))
+                        session.Network.EnqueueSend(new GameMessageSystemChat(server_motd, ChatMessageType.Broadcast));
+                    if (!string.IsNullOrEmpty(server_motd2))
+                        session.Network.EnqueueSend(new GameMessageSystemChat(server_motd2, ChatMessageType.Broadcast));
+                    if (!string.IsNullOrEmpty(server_motd3))
+                        session.Network.EnqueueSend(new GameMessageSystemChat(server_motd3, ChatMessageType.Broadcast));
+                    if (!string.IsNullOrEmpty(server_motd4))
+                        session.Network.EnqueueSend(new GameMessageSystemChat(server_motd4, ChatMessageType.Broadcast));
                 });
                 motdChain.EnqueueChain();
             }
