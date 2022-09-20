@@ -300,7 +300,7 @@ namespace ACE.Server.Factories
                             if (loot != null)
                             {
                                 bool added = false;
-                                if (container != null && loot.WeenieType == WeenieType.SpellComponent) // try to stash spell components on a secondary pack
+                                if (container != null && (loot.WeenieType == WeenieType.SpellComponent || (loot.WeenieType == WeenieType.CraftTool && loot.WeenieClassId != (uint)Enum.WeenieClassName.flask))) // try to stash spell components and craft tools on a secondary pack
                                     if (container.TryAddToInventory(loot))
                                         added = true;
 
