@@ -606,13 +606,23 @@
             "name": "Alchemy",
             "gear": [
                 {
+                    "weenieId": "4751",
+                    "name": "Mortar and Pestle",
+                    "stacksize": "1"
+                },
+                {
                     "weenieId": "4747",
                     "name": "Alembic",
                     "stacksize": "1"
                 },
                 {
-                    "weenieId": "5338",
-                    "name": "Neutral Balm",
+                    "weenieId": "766",
+                    "name": "Bistort",
+                    "stacksize": "10"
+                },
+                {
+                    "weenieId": "151",
+                    "name": "Empty Flask",
                     "stacksize": "10"
                 },
                 {
