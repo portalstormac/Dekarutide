@@ -138,9 +138,33 @@ namespace ACE.Server.WorldObjects
                 player.EnqueueBroadcast(new GameMessageSystemChat($"{player.Name} used the rare item {Name}", ChatMessageType.Broadcast));
             }
 
+            bool usesMana = false;
             if (SpellDID.HasValue)
             {
                 var spell = new Spell((uint)SpellDID);
+
+                usesMana = Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.CustomDM && (ItemManaCost ?? 0) != 0;
+                if (usesMana)
+                {
+                    int manaCost;
+
+                    var manaConversion = player.GetCreatureSkill(Skill.ManaConversion);
+                    if (manaConversion.AdvancementClass < SkillAdvancementClass.Trained)
+                        manaCost = (int)ItemManaCost;
+                    else
+                        manaCost = (int)Player.GetManaCost((uint)ItemSpellcraft, (uint)ItemManaCost, manaConversion.Current);
+
+                    if (ItemCurMana >= manaCost)
+                    {
+                        ItemCurMana -= manaCost;
+                        player.Session.Network.EnqueueSend(new GameMessagePublicUpdatePropertyInt(this, PropertyInt.ItemCurMana, (int)ItemCurMana));
+                    }
+                    else
+                    {
+                        player.Session.Network.EnqueueSend(new GameEventCommunicationTransientString(player.Session, $"The {Name} doesn't have enough mana!"));
+                        return;
+                    }
+                }
 
                 // should be 'You cast', instead of 'Item cast'
                 // omitting the item caster here, so player is also used for enchantment registry caster,
@@ -197,27 +221,7 @@ namespace ACE.Server.WorldObjects
             if (UseSound > 0)
                 player.Session.Network.EnqueueSend(new GameMessageSound(player.Guid, UseSound));
 
-            if (Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.CustomDM && (ItemManaCost ?? 0) != 0)
-            {
-                if (GetProperty(PropertyBool.UnlimitedUse) ?? false)
-                    return;
-
-                int manaCost;
-
-                var manaConversion = player.GetCreatureSkill(Skill.ManaConversion);
-                if (manaConversion.AdvancementClass < SkillAdvancementClass.Trained)
-                    manaCost = (int)ItemManaCost;
-                else
-                    manaCost = (int)Player.GetManaCost((uint)ItemSpellcraft, (uint)ItemManaCost, manaConversion.Current);
-
-                ItemCurMana -= manaCost;
-
-                if (ItemCurMana <= 0)
-                    player.TryConsumeFromInventoryWithNetworking(this, 1);
-                else
-                    player.Session.Network.EnqueueSend(new GameMessagePublicUpdatePropertyInt(this, PropertyInt.ItemCurMana, (int)ItemCurMana));
-            }
-            else if ((GetProperty(PropertyBool.UnlimitedUse) ?? false) == false)
+            if (!usesMana && (GetProperty(PropertyBool.UnlimitedUse) ?? false) == false)
                 player.TryConsumeFromInventoryWithNetworking(this, 1);
         }
 

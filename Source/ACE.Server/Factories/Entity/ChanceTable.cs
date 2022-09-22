@@ -26,8 +26,15 @@ namespace ACE.Server.Factories.Entity
         {
             TableType = tableType;
         }
+        private static int CompareByInverseChance((T result, float chance) x, (T result, float chance) y)
+        {
+            return -x.chance.CompareTo(y.chance);
+        }
+
         private void VerifyTable()
         {
+            Sort(CompareByInverseChance); // Sort this list to make sure the smallest chances are at the end of the list so qualityMod can work properly.
+
             if (TableType == ChanceTableType.Weight)
             {
                 TotalWeight = 0.0f;
