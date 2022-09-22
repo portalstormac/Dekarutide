@@ -1519,7 +1519,7 @@ namespace ACE.Server.Factories
                     return null;
                 }
 
-                if ((treasureRoll.ItemType == TreasureItemType_Orig.ArtObject || treasureRoll.WeaponType == TreasureWeaponType.Thrown) && wo.WeenieType == WeenieType.Missile && wo.MaxStackSize > 1) // thrown weapons(not dinnerware!)
+                if ((treasureRoll.ItemType == TreasureItemType_Orig.ArtObject || treasureRoll.WeaponType == TreasureWeaponType.Thrown) && wo.MaxStackSize > 1)
                     wo.SetStackSize(Math.Min(30, (int)(wo.MaxStackSize ?? 1)));
                 else if (treasureRoll.ItemType == TreasureItemType_Orig.Consumable && wo.MaxStackSize > 1)
                     wo.SetStackSize(Math.Min(5, (int)(wo.MaxStackSize ?? 1)));

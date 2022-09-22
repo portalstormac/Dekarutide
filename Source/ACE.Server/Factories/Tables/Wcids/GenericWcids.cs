@@ -95,6 +95,7 @@ namespace ACE.Server.Factories.Tables.Wcids
 
                     ( WeenieClassName.tinkeringtool,       5.0f ),
                     ( WeenieClassName.toolsplitting,       5.0f ),
+                    ( WeenieClassName.toolpyramidquest,    5.0f ),
 
                     ( WeenieClassName.bakingpan,           5.0f ),
                     ( WeenieClassName.cookingpot,          5.0f ),
@@ -152,6 +153,7 @@ namespace ACE.Server.Factories.Tables.Wcids
 
                     ( WeenieClassName.tinkeringtool,       5.0f ),
                     ( WeenieClassName.toolsplitting,       5.0f ),
+                    ( WeenieClassName.toolpyramidquest,    5.0f ),
 
                     ( WeenieClassName.bakingpan,           5.0f ),
                     ( WeenieClassName.cookingpot,          5.0f ),
@@ -203,6 +205,7 @@ namespace ACE.Server.Factories.Tables.Wcids
 
                     ( WeenieClassName.tinkeringtool,       5.0f ),
                     ( WeenieClassName.toolsplitting,       5.0f ),
+                    ( WeenieClassName.toolpyramidquest,    5.0f ),
 
                     ( WeenieClassName.bakingpan,           5.0f ),
                     ( WeenieClassName.cookingpot,          5.0f ),
