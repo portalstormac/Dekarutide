@@ -450,9 +450,8 @@ namespace ACE.Server.Factories.Tables
                     ( SpellId.JumpingMasterySelf1,         2.0f ),
                     ( SpellId.SprintSelf1,                 2.0f ),
                     ( SpellId.HealingMasterySelf1,         2.0f ),
-
-                    ( SpellId.LeadershipMasterySelf1,      1.0f ),
-                    ( SpellId.FealtySelf1,                 1.0f ),
+                    ( SpellId.LeadershipMasterySelf1,      2.0f ),
+                    ( SpellId.FealtySelf1,                 2.0f ),
 
                     ( SpellId.AlchemyMasterySelf1,         1.0f ),
                     ( SpellId.CookingMasterySelf1,         1.0f ),
@@ -464,20 +463,20 @@ namespace ACE.Server.Factories.Tables
                     ( SpellId.WeaponExpertiseSelf1,        1.0f ),
                     ( SpellId.ArcanumSalvagingSelf1,       1.0f ),
 
-                    ( SpellId.LightWeaponsMasterySelf1,    1.0f ), // AxeMasterySelf1
-                    ( SpellId.FinesseWeaponsMasterySelf1,  1.0f ), // DaggerMasterySelf1
-                    ( SpellId.MaceMasterySelf1,            1.0f ),
-                    ( SpellId.SpearMasterySelf1,           1.0f ),
-                    ( SpellId.StaffMasterySelf1,           1.0f ),
-                    ( SpellId.HeavyWeaponsMasterySelf1,    1.0f ), // SwordMasterySelf1
-                    ( SpellId.UnarmedCombatMasterySelf1,   1.0f ),
-                    ( SpellId.MissileWeaponsMasterySelf1,  1.0f ), // BowMasterySelf1
-                    ( SpellId.CrossbowMasterySelf1,        1.0f ),
-                    ( SpellId.ThrownWeaponMasterySelf1,    1.0f ),
-                    ( SpellId.ShieldMasterySelf1,          1.0f ),
-                    ( SpellId.DualWieldMasterySelf1,       1.0f ),
-                    ( SpellId.WarMagicMasterySelf1,        1.0f ),
-                    ( SpellId.LifeMagicMasterySelf1,       1.0f ),
+                    ( SpellId.LightWeaponsMasterySelf1,    0.5f ), // AxeMasterySelf1
+                    ( SpellId.FinesseWeaponsMasterySelf1,  0.5f ), // DaggerMasterySelf1
+                    ( SpellId.MaceMasterySelf1,            0.5f ),
+                    ( SpellId.SpearMasterySelf1,           0.5f ),
+                    ( SpellId.StaffMasterySelf1,           0.5f ),
+                    ( SpellId.HeavyWeaponsMasterySelf1,    0.5f ), // SwordMasterySelf1
+                    ( SpellId.UnarmedCombatMasterySelf1,   0.5f ),
+                    ( SpellId.MissileWeaponsMasterySelf1,  0.5f ), // BowMasterySelf1
+                    ( SpellId.CrossbowMasterySelf1,        0.5f ),
+                    ( SpellId.ThrownWeaponMasterySelf1,    0.5f ),
+                    ( SpellId.ShieldMasterySelf1,          0.5f ),
+                    ( SpellId.DualWieldMasterySelf1,       0.5f ),
+                    ( SpellId.WarMagicMasterySelf1,        0.5f ),
+                    ( SpellId.LifeMagicMasterySelf1,       0.5f ),
                 };
 
                 // jewelry
