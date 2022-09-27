@@ -344,8 +344,8 @@ namespace ACE.Server.WorldObjects
 
         public void UpdateHappyVendor()
         {
-            int vendorHappyMean = (VendorHappyMean ?? 0) * (MerchandiseMaxValue ?? 3000) / 3;
-            int vendorHappyVariance = (VendorHappyVariance ?? 0) * (MerchandiseMaxValue ?? 3000) / 3;
+            int vendorHappyMean = (VendorHappyMean ?? 0) * Math.Min(MerchandiseMaxValue ?? 3000, 50000) / 3;
+            int vendorHappyVariance = (VendorHappyVariance ?? 0) * Math.Min(MerchandiseMaxValue ?? 3000, 50000) / 3;
             if (vendorHappyMean == 0)
             {
                 BuyPriceMod = 0.0f;
