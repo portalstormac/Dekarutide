@@ -49,6 +49,7 @@ namespace ACE.Server.Network.Structure
         public ArmorLevel ArmorLevels;
 
         public bool IsArmorCapped = false;
+        public bool IsArmorBuffed = false;
 
         // This helps ensure the item will identify properly. Some "items" are technically "Creatures".
         private bool NPCLooksLikeObject;
@@ -421,14 +422,20 @@ namespace ACE.Server.Network.Structure
                     {
                         int armor;
                         if (wo.IsShield)
-                            armor = (int)wielder.CapShield(PropertiesInt[PropertyInt.ArmorLevel]);
+                            armor = (int)wielder.GetSkillModifiedShieldLevel(PropertiesInt[PropertyInt.ArmorLevel]);
                         else
-                            armor = (int)wielder.CapArmor(PropertiesInt[PropertyInt.ArmorLevel]);
+                            armor = (int)wielder.GetSkillModifiedArmorLevel(PropertiesInt[PropertyInt.ArmorLevel]);
 
-                        if (armor != PropertiesInt[PropertyInt.ArmorLevel])
+                        var baseArmor = PropertiesInt[PropertyInt.ArmorLevel];
+                        if (armor < baseArmor)
                         {
                             PropertiesInt[PropertyInt.ArmorLevel] = armor;
                             IsArmorCapped = true;
+                        }
+                        else if (armor > baseArmor)
+                        {
+                            PropertiesInt[PropertyInt.ArmorLevel] = armor;
+                            IsArmorBuffed = true;
                         }
                     }
                 }
@@ -584,8 +591,8 @@ namespace ACE.Server.Network.Structure
                 return;
 
             ArmorProfile = new ArmorProfile(wo);
-            ArmorHighlight = ArmorMaskHelper.GetHighlightMask(wo, IsArmorCapped);
-            ArmorColor = ArmorMaskHelper.GetColorMask(wo);
+            ArmorHighlight = ArmorMaskHelper.GetHighlightMask(wo, IsArmorCapped || IsArmorBuffed);
+            ArmorColor = ArmorMaskHelper.GetColorMask(wo, IsArmorBuffed);
 
             AddEnchantments(wo);
         }

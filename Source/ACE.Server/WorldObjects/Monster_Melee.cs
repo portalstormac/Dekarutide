@@ -495,10 +495,13 @@ namespace ACE.Server.WorldObjects
                 return 0;
         }
 
-        public float CapShield(float armor)
+        public float GetSkillModifiedShieldLevel(float shieldLevel)
         {
             if (Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.Infiltration)
-                return armor;
+                return shieldLevel;
+
+            if (shieldLevel == 0)
+                return 0;
 
             var player = this as Player;
             if (player != null) // Creatures always have full shield level.
@@ -514,19 +517,30 @@ namespace ACE.Server.WorldObjects
                 // SL cap is applied *after* item enchantments
                 var shieldSkill = GetCreatureSkill(Skill.Shield);
                 var shieldCap = shieldSkill.Current;
-                if (shieldSkill.AdvancementClass != SkillAdvancementClass.Specialized && Common.ConfigManager.Config.Server.WorldRuleset != Common.Ruleset.CustomDM)
-                    shieldCap = (uint)Math.Round(shieldCap / 2.0f);
+                if (Common.ConfigManager.Config.Server.WorldRuleset != Common.Ruleset.CustomDM)
+                {
+                    if (shieldSkill.AdvancementClass != SkillAdvancementClass.Specialized)
+                        shieldCap = (uint)Math.Round(shieldCap / 2.0f);
+                }
+                else
+                {
+                    if (shieldSkill.Current > shieldLevel)
+                        shieldLevel += (shieldSkill.Current - shieldLevel) / 10;
+                }
 
-                return Math.Min(armor, shieldCap);
+                return Math.Min(shieldLevel, shieldCap);
             }
             else
-                return armor;
+                return shieldLevel;
         }
 
-        public float CapArmor(float armor)
+        public float GetSkillModifiedArmorLevel(float armorLevel)
         {
             if (Common.ConfigManager.Config.Server.WorldRuleset != Common.Ruleset.CustomDM)
-                return armor;
+                return armorLevel;
+
+            if (armorLevel == 0)
+                return 0;
 
             var player = this as Player;
             if (player != null) // Creatures always have full armor level.
@@ -538,10 +552,13 @@ namespace ACE.Server.WorldObjects
                 var armorSkill = GetCreatureSkill(Skill.Armor);
                 var armorCap = armorSkill.Current;
 
-                return Math.Min(armor, armorCap);
+                if (armorSkill.Current > armorLevel)
+                    armorLevel += (armorSkill.Current - armorLevel) / 10;
+
+                return Math.Min(armorLevel, armorCap);
             }
             else
-                return armor;
+                return armorLevel;
         }
 
         /// <summary>
@@ -589,7 +606,7 @@ namespace ACE.Server.WorldObjects
             Console.WriteLine("Effective RL: " + effectiveRL);
             Console.WriteLine();*/
 
-            return CapArmor(effectiveAL * effectiveRL);
+            return GetSkillModifiedArmorLevel(effectiveAL * effectiveRL);
         }
 
         /// <summary>

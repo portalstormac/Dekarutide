@@ -846,7 +846,7 @@ namespace ACE.Server.WorldObjects
 
             var effectiveLevel = effectiveSL * effectiveRL;
 
-            effectiveLevel = CapShield(effectiveLevel);
+            effectiveLevel = GetSkillModifiedShieldLevel(effectiveLevel);
 
             var ignoreShieldMod = attacker.GetIgnoreShieldMod(weapon);
             //Console.WriteLine($"IgnoreShieldMod: {ignoreShieldMod}");
