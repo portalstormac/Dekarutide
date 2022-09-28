@@ -50,7 +50,7 @@ namespace ACE.Server.Managers
         {
             BuildHouseIdToGuid();
 
-            BuildRentQueue();
+            //BuildRentQueue(); // Moved to HouseManager.Tick() to fix a race condition? causing the server to crash on startup.
         }
 
         /// <summary>
@@ -326,6 +326,8 @@ namespace ACE.Server.Managers
 
             //log.Info($"HouseManager.Tick({RentQueue.Count})");
 
+            if(RentQueue == null)
+                BuildRentQueue();
             var nextEntry = RentQueue.FirstOrDefault();
 
             if (nextEntry == null)
