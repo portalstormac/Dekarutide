@@ -267,7 +267,6 @@ namespace ACE.Server.Entity
                         CreatureSkill defenderMeleeDef = defender.GetCreatureSkill(Skill.MeleeDefense);
 
                         var activationChance = SkillCheck.GetSkillChance(attackerMeleeDef.Current, defenderMeleeDef.Current);
-                        activationChance += playerAttacker.ScaleWithPowerAccuracyBar((float)activationChance);
                         if (activationChance > ThreadSafeRandom.Next(0.0f, 1.0f))
                             RecklessnessMod = 1.20f; // Extra damage dealt while attacking with the Reckless technique.
                     }
