@@ -298,6 +298,12 @@ namespace ACE.Server.Entity
                 {
                     if (playerAttacker != null)
                     {
+                        if (CombatType != CombatType.Magic)
+                        {
+                            // critical chance scales with power/accuracy bar
+                            CriticalChance += playerAttacker.ScaleWithPowerAccuracyBar(CriticalChance);
+                        }
+
                         if (isAttackFromSneaking)
                             CriticalChance = 1.0f;
                         else if (attackerTechniqueId == TacticAndTechniqueType.Opportunist)
@@ -313,12 +319,6 @@ namespace ACE.Server.Entity
                                 playerAttacker.NextTechniqueNegativeActivationTime = currentTime + Player.TechniqueNegativeActivationInterval;
                                 playerAttacker.DamageTarget(playerAttacker, damageSource);
                             }
-                        }
-
-                        if (CombatType != CombatType.Magic)
-                        {
-                            // A full power/accuracy bar doubles critical chance
-                            CriticalChance += playerAttacker.ScaleWithPowerAccuracyBar(CriticalChance);
                         }
                     }
 
