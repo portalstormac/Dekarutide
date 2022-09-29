@@ -14,6 +14,7 @@ using ACE.Entity.Enum;
 using ACE.Server.Entity;
 using ACE.Server.WorldObjects;
 using ACE.Database;
+using ACE.Server.Entity.Actions;
 
 namespace ACE.Server.Managers
 {
@@ -81,16 +82,6 @@ namespace ACE.Server.Managers
 
             log.InfoFormat("Found {0} landblock entries in PreloadedLandblocks configuration, {1} are set to preload.", ConfigManager.Config.Server.PreloadedLandblocks.Count, ConfigManager.Config.Server.PreloadedLandblocks.Count(x => x.Enabled == true));
 
-            // Workaround for apartment chest contents not showing up on first landblock load.
-            // TODO: find the issue and fix it.
-            foreach (var apt in apartmentLandblocks)
-            {
-                var aptLandblockId = new LandblockId(apt);
-                var aptLandblock = GetLandblock(aptLandblockId, false, false);
-                aptLandblock.DestroyAllNonPlayerObjects();
-                DatabaseManager.World.ClearCachedInstancesByLandblock(aptLandblock.Id.Landblock);
-                aptLandblock.Init(true);
-            }
 
             foreach (var preloadLandblock in ConfigManager.Config.Server.PreloadedLandblocks)
             {
@@ -433,6 +424,22 @@ namespace ACE.Server.Managers
                     landblockGroupPendingAdditions.Add(landblock);
 
                     landblock.Init();
+
+                    // Workaround for apartment chest contents not showing up on first landblock load.
+                    // TODO: find the issue and fix it.
+                    var id = landblockId.Raw | 0x0000FFFF;
+                    if (Array.Exists(apartmentLandblocks, e => e == id))
+                    {
+                        var actionChain = new ActionChain();
+                        actionChain.AddDelaySeconds(1);
+                        actionChain.AddAction(landblock, () =>
+                        {
+                            landblock.DestroyAllNonPlayerObjects();
+                            DatabaseManager.World.ClearCachedInstancesByLandblock(landblock.Id.Landblock);
+                            landblock.Init(true);
+                        });
+                        actionChain.EnqueueChain();
+                    }
 
                     setAdjacents = true;
                 }
