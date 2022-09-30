@@ -7,7 +7,7 @@
 - *EoR Ruleset:* End of Release - replicates the gameplay as it was at the time Asheron's Call was sunsetted. This is ACEmulator's default behavior and is included here for completeness and code compatibility.
 
 **Required Data Files:**
-- [Infiltration 1.8](https://mega.nz/file/EywGSJYZ#ryYTpCyq8iy21-1cye313ZG2SDyWQyXojc5HD7hC5ro)
+- [Infiltration 1.8](https://mega.nz/file/Jyo0lJJS#lq4NSQ5VpZ3y7iW6NzmevaNgq0qxCrgsQD4jHVqr-As)
 - [CustomDM 1.17](https://mega.nz/file/lrgjFKjb#q8RQARJLFCB6iMdMfSYKg52NECPbOxFkP-eHi9YLxJg)
 
 ## Disclaimer
