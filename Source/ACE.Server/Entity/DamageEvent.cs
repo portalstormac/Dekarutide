@@ -309,7 +309,7 @@ namespace ACE.Server.Entity
                         else if (attackerTechniqueId == TacticAndTechniqueType.Opportunist)
                         {
                             if (attacker != defender)
-                                CriticalChance += 0.10f; // Extra critical chance while using the Opportunist technique.
+                                CriticalChance += 0.10f + playerAttacker.ScaleWithPowerAccuracyBar(0.10f); // Extra critical chance while using the Opportunist technique.
                             else
                                 CriticalChance = 1.0f; // All self attacks are critical hits!
 
