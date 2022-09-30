@@ -308,11 +308,13 @@ namespace ACE.Server.Entity
                             CriticalChance = 1.0f;
                         else if (attackerTechniqueId == TacticAndTechniqueType.Opportunist)
                         {
-                            if(attacker != defender)
-                                CriticalChance += 0.10f + playerAttacker.ScaleWithPowerAccuracyBar(0.10f); // Extra critical chance while using the Opportunist technique.
+                            if (attacker != defender)
+                                CriticalChance += 0.10f; // Extra critical chance while using the Opportunist technique.
+                            else
+                                CriticalChance = 1.0f; // All self attacks are critical hits!
 
                             var currentTime = Time.GetUnixTime();
-                            var chance = 0.15f + playerAttacker.ScaleWithPowerAccuracyBar(0.15f);
+                            var chance = 0.2f + playerAttacker.ScaleWithPowerAccuracyBar(0.2f);
                             if (attacker != defender && playerAttacker.NextTechniqueNegativeActivationTime <= currentTime && chance > ThreadSafeRandom.Next(0.0f, 1.0f))
                             {
                                 // Chance of inflicting self damage while using the Opportunist technique.

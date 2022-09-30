@@ -329,7 +329,7 @@ namespace ACE.Server.WorldObjects
                             var techniqueTrinket = player.GetEquippedTrinket();
                             if (techniqueTrinket != null && techniqueTrinket.TacticAndTechniqueId == (int)TacticAndTechniqueType.Opportunist)
                             {
-                                var chance = 0.225f;
+                                var chance = 0.3f;
                                 if (chance > ThreadSafeRandom.Next(0.0f, 1.0f))
                                 {
                                     // Chance of inflicting self damage while using the Opportunist technique.
@@ -462,6 +462,8 @@ namespace ACE.Server.WorldObjects
                 if (techniqueTrinket != null && techniqueTrinket.TacticAndTechniqueId == (int)TacticAndTechniqueType.Opportunist)
                     criticalChance += 0.10f;
             }
+            else if(source == target)
+                criticalChance = 1.0f; // All self attacks are critical hits!
 
             if (ThreadSafeRandom.Next(0.0f, 1.0f) < criticalChance)
             {

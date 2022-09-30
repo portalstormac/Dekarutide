@@ -109,7 +109,7 @@ namespace ACE.Server.WorldObjects
                         Creature creatureAttacker = attacker as Creature;
                         if (creatureAttacker != null)
                         {
-                            var chance = 0.3f;
+                            var chance = 0.4f;
                             if (chance > ThreadSafeRandom.Next(0.0f, 1.0f))
                             {
                                 // Chance of striking back at the target when successfully evading an attack while using the Riposte technique.
