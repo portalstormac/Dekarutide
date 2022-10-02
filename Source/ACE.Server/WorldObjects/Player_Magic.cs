@@ -89,7 +89,6 @@ namespace ACE.Server.WorldObjects
         {
             //Console.WriteLine($"{Name}.HandleActionCastTargetedSpell({targetGuid:X8}, {spellId}, {builtInSpell})");
 
-            SpellConduit spellConduit = null;
             if (!isCombatCasting)
             {
                 if (CombatMode != CombatMode.Magic)
@@ -136,15 +135,9 @@ namespace ACE.Server.WorldObjects
             if (!VerifyBusy())
                 return;
 
-            if (isCombatCasting)
-            {
-                spellConduit = casterItem as SpellConduit;
-                casterItem = null;
-            }
-
             // verify spell is contained in player's spellbook,
             // or in the weapon's spellbook in the case of built-in spells
-            if (!VerifySpell(spellId, casterItem))
+            if (!VerifySpell(spellId, isCombatCasting ? null : casterItem))
             {
                 SendSpellCastingDoneEvent(WeenieError.YouDontKnowThatSpell, isCombatCasting);
                 return;
@@ -160,11 +153,9 @@ namespace ACE.Server.WorldObjects
 
             if (!isCombatCasting)
                 LastAttackTarget = target;
-            else if (spellConduit != null)
-                spellConduit.StartCooldown(this);
 
             MagicState.OnCastStart(isCombatCasting);
-            MagicState.SetWindupParams(targetGuid, spellId, casterItem);
+            MagicState.SetWindupParams(targetGuid, spellId, isCombatCasting ? null : casterItem);
 
             StartPos = new Physics.Common.Position(PhysicsObj.Position);
 
@@ -295,7 +286,6 @@ namespace ACE.Server.WorldObjects
         {
             //Console.WriteLine($"{Name}.HandleActionCastUnTargetedSpell({spellId})");
 
-            SpellConduit spellConduit = null;
             if (!isCombatCasting)
             {
                 if (CombatMode != CombatMode.Magic)
@@ -342,19 +332,10 @@ namespace ACE.Server.WorldObjects
             if (!VerifyBusy())
                 return;
 
-            if (isCombatCasting)
-            {
-                spellConduit = casterItem as SpellConduit;
-                casterItem = null;
-            }
-
             // verify spell is contained in player's spellbook,
             // or in the weapon's spellbook in the case of built-in spells
-            if (!VerifySpell(spellId, casterItem))
+            if (!VerifySpell(spellId, isCombatCasting ? null : casterItem))
                 return;
-
-            if (isCombatCasting && spellConduit != null)
-                spellConduit.StartCooldown(this);
 
             if (RecordCast.Enabled)
                 RecordCast.OnCastUntargetedSpell(new Spell(spellId));
@@ -1122,6 +1103,13 @@ namespace ACE.Server.WorldObjects
         /// <param name="builtInSpell">If TRUE, casting a built-in spell from a weapon</param>
         public bool CreatePlayerSpell(WorldObject target, TargetCategory targetCategory, uint spellId, WorldObject casterItem)
         {
+            SpellConduit spellConduit = null;
+            if (MagicState.IsCombatCasting)
+            {
+                spellConduit = casterItem as SpellConduit;
+                casterItem = null;
+            }
+
             var creatureTarget = target as Creature;
 
             var spell = ValidateSpell(spellId, casterItem != null);
@@ -1151,6 +1139,9 @@ namespace ACE.Server.WorldObjects
             // calculate mana usage
             if (!CalculateManaUsage(castingPreCheckStatus, spell, target, casterItem, out var manaUsed))
                 return false;
+
+            if (spellConduit != null)
+                spellConduit.StartCooldown(this); // We're past all the basic checks, start conduit cooldown.
 
             // spell words
             DoSpellWords(spell, isWeaponSpell);
@@ -1267,18 +1258,35 @@ namespace ACE.Server.WorldObjects
         /// </summary>
         public bool CreatePlayerSpell(uint spellId, WorldObject casterItem = null)
         {
-            var spell = ValidateSpell(spellId);
+            SpellConduit spellConduit = null;
+            if (MagicState.IsCombatCasting)
+            {
+                spellConduit = casterItem as SpellConduit;
+                casterItem = null;
+            }
+
+            var spell = ValidateSpell(spellId, casterItem != null);
             if (spell == null)
                 return false;
 
+            // if casting implement has spell built in,
+            // use spellcraft from the item, instead of player's magic skill?
+            var caster = casterItem ?? GetEquippedWand();
+            var isWeaponSpell = casterItem != null && IsWeaponSpell(spell.Id, casterItem);
+
             // get player's current magic skill
             var magicSkill = GetCreatureSkill(spell.School).Current;
+            if (isWeaponSpell && caster.ItemSpellcraft != null)
+                magicSkill = (uint)caster.ItemSpellcraft;
 
             var castingPreCheckStatus = GetCastingPreCheckStatus(spell, magicSkill, false);
 
             // calculate mana usage
-            if (!CalculateManaUsage(castingPreCheckStatus, spell, null, null, out var manaUsed))
+            if (!CalculateManaUsage(castingPreCheckStatus, spell, null, casterItem, out var manaUsed))
                 return false;
+
+            if (spellConduit != null)
+                spellConduit.StartCooldown(this); // We're past all the basic checks, start conduit cooldown.
 
             // begin spellcasting
             DoSpellWords(spell, false);
@@ -1294,7 +1302,7 @@ namespace ACE.Server.WorldObjects
             DoCastGesture(spell, casterItem, spellChain);
 
             // cast untargeted spell
-            MagicState.SetCastParams(spell, null, magicSkill, manaUsed, null, castingPreCheckStatus);
+            MagicState.SetCastParams(spell, casterItem, magicSkill, manaUsed, null, castingPreCheckStatus);
 
             if (!FastTick)
                 spellChain.AddAction(this, () => DoCastSpell(MagicState));
