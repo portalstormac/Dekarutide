@@ -1283,10 +1283,18 @@ namespace ACE.Server.WorldObjects
             set { if (value == 0) RemoveProperty(PropertyInt.SquelchGlobal); else SetProperty(PropertyInt.SquelchGlobal, (int)value); }
         }
 
+        public uint PreviousRequestedAppraisalTarget = 0;
         public uint? RequestedAppraisalTarget
         {
             get => GetProperty(PropertyInstanceId.RequestedAppraisalTarget);
-            set { if (!value.HasValue) RemoveProperty(PropertyInstanceId.RequestedAppraisalTarget); else SetProperty(PropertyInstanceId.RequestedAppraisalTarget, value.Value); }
+            set
+            {
+                PreviousRequestedAppraisalTarget = GetProperty(PropertyInstanceId.RequestedAppraisalTarget) ?? 0;
+                if (!value.HasValue)
+                    RemoveProperty(PropertyInstanceId.RequestedAppraisalTarget);
+                else
+                    SetProperty(PropertyInstanceId.RequestedAppraisalTarget, value.Value);
+            }
         }
 
         public double? AppraisalRequestedTimestamp
@@ -1388,5 +1396,7 @@ namespace ACE.Server.WorldObjects
             get => GetProperty(PropertyInt.LeyLineSeed);
             set { if (!value.HasValue) RemoveProperty(PropertyInt.LeyLineSeed); else SetProperty(PropertyInt.LeyLineSeed, value.Value); }
         }
+
+        public SpellConduit SpellConduitToAttune = null;
     }
 }

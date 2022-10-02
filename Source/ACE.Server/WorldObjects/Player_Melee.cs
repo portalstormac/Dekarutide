@@ -134,6 +134,7 @@ namespace ACE.Server.WorldObjects
 
             MeleeTarget = creatureTarget;
             AttackTarget = MeleeTarget;
+            LastAttackTarget = MeleeTarget;
 
             // reset PrevMotionCommand / DualWieldAlternate each time button is clicked
             PrevMotionCommand = MotionCommand.Invalid;

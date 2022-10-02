@@ -139,6 +139,8 @@ namespace ACE.Server.Factories
                     return new LightSource(weenie, guid);
                 case WeenieType.LeyLineAmulet:
                     return new LeyLineAmulet(weenie, guid);
+                case WeenieType.SpellConduit:
+                    return new SpellConduit(weenie, guid);
                 default:
                     return new GenericObject(weenie, guid);
             }
@@ -256,6 +258,8 @@ namespace ACE.Server.Factories
                     return new LightSource(biota);
                 case WeenieType.LeyLineAmulet:
                     return new LeyLineAmulet(biota);
+                case WeenieType.SpellConduit:
+                    return new SpellConduit(biota);
                 default:
                     return new GenericObject(biota);
             }
