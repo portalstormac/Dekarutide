@@ -100,7 +100,7 @@ namespace ACE.Server.WorldObjects
             if (ResistAwareness.HasValue)
                 AwarenessHeartbeat(currentUnixTime);
 
-            if (EnchantmentManager.HasEnchantments)
+            if (EnchantmentManager.HasEnchantments && !(this is Player)) // Player enchantments heartbeat moved to Player_Tick() to improve precision.
                 EnchantmentManager.HeartBeat(CachedHeartbeatInterval);
 
             if (IsLifespanSpent)
