@@ -1124,8 +1124,16 @@ namespace ACE.Server.WorldObjects
             var caster = casterItem ?? GetEquippedWand();
             var isWeaponSpell = casterItem != null && IsWeaponSpell(spell.Id, casterItem);
 
+            var magicSchool = spell.School;
+            if (Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.CustomDM)
+            {
+                var amulet = GetEquippedLeyLineAmulet();
+                if (amulet != null && amulet.LeyLineEffectId == (uint)LeyLineEffect.GrantCastableSpell && LeyLineAmulet.PossibleAcquireSpells.Contains((SpellId)spell.Id))
+                    magicSchool = (MagicSchool)amulet.LeyLineSchool;
+            }
+
             // Grab player's skill level in the spell's Magic School
-            var magicSkill = GetCreatureSkill(spell.School).Current;
+            var magicSkill = GetCreatureSkill(magicSchool).Current;
             if (isWeaponSpell && caster.ItemSpellcraft != null)
                 magicSkill = (uint)caster.ItemSpellcraft;
 
@@ -1274,8 +1282,16 @@ namespace ACE.Server.WorldObjects
             var caster = casterItem ?? GetEquippedWand();
             var isWeaponSpell = casterItem != null && IsWeaponSpell(spell.Id, casterItem);
 
+            var magicSchool = spell.School;
+            if (Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.CustomDM)
+            {
+                var amulet = GetEquippedLeyLineAmulet();
+                if (amulet != null && amulet.LeyLineEffectId == (uint)LeyLineEffect.GrantCastableSpell && LeyLineAmulet.PossibleAcquireSpells.Contains((SpellId)spell.Id))
+                    magicSchool = (MagicSchool)amulet.LeyLineSchool;
+            }
+
             // get player's current magic skill
-            var magicSkill = GetCreatureSkill(spell.School).Current;
+            var magicSkill = GetCreatureSkill(magicSchool).Current;
             if (isWeaponSpell && caster.ItemSpellcraft != null)
                 magicSkill = (uint)caster.ItemSpellcraft;
 

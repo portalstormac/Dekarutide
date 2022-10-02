@@ -233,7 +233,7 @@ namespace ACE.Server.WorldObjects
             SpellId.CANTRIPPIERCINGWARD1,
         };
 
-        private static readonly List<SpellId> PossibleAcquireSpells = new List<SpellId>()
+        public static readonly List<SpellId> PossibleAcquireSpells = new List<SpellId>()
         {
             SpellId.ArmorSelf1,
             SpellId.ArmorOther1,
