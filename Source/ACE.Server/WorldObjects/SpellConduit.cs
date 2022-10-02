@@ -1,13 +1,7 @@
-using System;
-
-using ACE.Common;
 using ACE.Entity;
 using ACE.Entity.Enum;
-using ACE.Entity.Enum.Properties;
 using ACE.Entity.Models;
 using ACE.Server.Entity;
-using ACE.Server.Factories;
-using ACE.Server.Managers;
 using ACE.Server.Network.GameEvent.Events;
 using ACE.Server.Network.GameMessages.Messages;
 
@@ -44,9 +38,9 @@ namespace ACE.Server.WorldObjects
             {
                 var spell = new Spell((uint)SpellDID);
                 if (spell.IsSelfTargeted)
-                    player.HandleActionCastTargetedSpell(player.Guid.Full, spell.Id, null, true);
+                    player.HandleActionCastTargetedSpell(player.Guid.Full, spell.Id, this, true);
                 else if (spell.NonComponentTargetType == ItemType.None)
-                    player.HandleActionMagicCastUnTargetedSpell(spell.Id, true);
+                    player.HandleActionMagicCastUnTargetedSpell(spell.Id, this, true);
                 else
                 {
                     uint targetId = 0;
@@ -137,32 +131,9 @@ namespace ACE.Server.WorldObjects
             player.Session.Network.EnqueueSend(new GameMessageUpdateObject(this));
         }
 
-        public override void OnActivate(WorldObject activator)
+        public void StartCooldown(Player player)
         {
-            if (ItemUseable == Usable.Contained && activator is Player player)
-            {               
-                var containedItem = player.FindObject(Guid.Full, Player.SearchLocations.MyInventory | Player.SearchLocations.MyEquippedItems);
-                if (containedItem != null) // item is contained by player
-                {
-                    if (player.IsBusy || player.Teleporting || player.suicideInProgress)
-                    {
-                        player.Session.Network.EnqueueSend(new GameEventWeenieError(player.Session, WeenieError.YoureTooBusy));
-                        player.EnchantmentManager.StartCooldown(this);
-                        return;
-                    }
-
-                    if (player.IsDead)
-                    {
-                        player.Session.Network.EnqueueSend(new GameEventWeenieError(player.Session, WeenieError.Dead));
-                        player.EnchantmentManager.StartCooldown(this);
-                        return;
-                    }
-                }
-                else
-                    return;
-            }
-
-            base.OnActivate(activator);
+            player.EnchantmentManager.StartCooldown(this);
         }
     }
 }

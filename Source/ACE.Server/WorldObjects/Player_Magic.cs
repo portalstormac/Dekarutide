@@ -89,6 +89,7 @@ namespace ACE.Server.WorldObjects
         {
             //Console.WriteLine($"{Name}.HandleActionCastTargetedSpell({targetGuid:X8}, {spellId}, {builtInSpell})");
 
+            SpellConduit spellConduit = null;
             if (!isCombatCasting)
             {
                 if (CombatMode != CombatMode.Magic)
@@ -135,6 +136,12 @@ namespace ACE.Server.WorldObjects
             if (!VerifyBusy())
                 return;
 
+            if (isCombatCasting)
+            {
+                spellConduit = casterItem as SpellConduit;
+                casterItem = null;
+            }
+
             // verify spell is contained in player's spellbook,
             // or in the weapon's spellbook in the case of built-in spells
             if (!VerifySpell(spellId, casterItem))
@@ -153,6 +160,8 @@ namespace ACE.Server.WorldObjects
 
             if (!isCombatCasting)
                 LastAttackTarget = target;
+            else if (spellConduit != null)
+                spellConduit.StartCooldown(this);
 
             MagicState.OnCastStart(isCombatCasting);
             MagicState.SetWindupParams(targetGuid, spellId, casterItem);
@@ -282,15 +291,16 @@ namespace ACE.Server.WorldObjects
         /// <summary>
         /// Handles player untargeted casting message
         /// </summary>
-        public void HandleActionMagicCastUnTargetedSpell(uint spellId, bool isCombatCasting = false)
+        public void HandleActionMagicCastUnTargetedSpell(uint spellId, WorldObject casterItem = null, bool isCombatCasting = false)
         {
             //Console.WriteLine($"{Name}.HandleActionCastUnTargetedSpell({spellId})");
 
+            SpellConduit spellConduit = null;
             if (!isCombatCasting)
             {
                 if (CombatMode != CombatMode.Magic)
                 {
-                    log.Error($"{Name}.HandleActionMagicCastUnTargetedSpell({spellId}) - CombatMode mismatch {CombatMode}, LastCombatMode {LastCombatMode}");
+                    log.Error($"{Name}.HandleActionMagicCastUnTargetedSpell({spellId}, {casterItem?.Name}) - CombatMode mismatch {CombatMode}, LastCombatMode: {LastCombatMode}");
 
                     if (LastCombatMode == CombatMode.Magic)
                         CombatMode = CombatMode.Magic;
@@ -324,7 +334,7 @@ namespace ACE.Server.WorldObjects
 
             if (IsBusy && MagicState.CanQueue)
             {
-                MagicState.CastQueue = new CastQueue(CastQueueType.Untargeted, 0, spellId, null, isCombatCasting);
+                MagicState.CastQueue = new CastQueue(CastQueueType.Untargeted, 0, spellId, casterItem, isCombatCasting);
                 MagicState.CanQueue = false;
                 return;
             }
@@ -332,10 +342,19 @@ namespace ACE.Server.WorldObjects
             if (!VerifyBusy())
                 return;
 
+            if (isCombatCasting)
+            {
+                spellConduit = casterItem as SpellConduit;
+                casterItem = null;
+            }
+
             // verify spell is contained in player's spellbook,
             // or in the weapon's spellbook in the case of built-in spells
-            if (!VerifySpell(spellId))
+            if (!VerifySpell(spellId, casterItem))
                 return;
+
+            if (isCombatCasting && spellConduit != null)
+                spellConduit.StartCooldown(this);
 
             if (RecordCast.Enabled)
                 RecordCast.OnCastUntargetedSpell(new Spell(spellId));
@@ -344,7 +363,7 @@ namespace ACE.Server.WorldObjects
 
             StartPos = new Physics.Common.Position(PhysicsObj.Position);
 
-            if (!CreatePlayerSpell(spellId))
+            if (!CreatePlayerSpell(spellId, casterItem))
                 MagicState.OnCastDone();
         }
 
@@ -1479,7 +1498,7 @@ namespace ACE.Server.WorldObjects
                 if (MagicState.CastQueue.Type == CastQueueType.Targeted)
                     HandleActionCastTargetedSpell(MagicState.CastQueue.TargetGuid, MagicState.CastQueue.SpellId, MagicState.CastQueue.CasterItem, MagicState.CastQueue.IsCombatCasting);
                 else
-                    HandleActionMagicCastUnTargetedSpell(MagicState.CastQueue.SpellId, MagicState.CastQueue.IsCombatCasting);
+                    HandleActionMagicCastUnTargetedSpell(MagicState.CastQueue.SpellId, MagicState.CastQueue.CasterItem, MagicState.CastQueue.IsCombatCasting);
             }
         }
 
