@@ -45,7 +45,7 @@ namespace ACE.Server.WorldObjects
                 var spell = new Spell((uint)SpellDID);
                 if (spell.IsSelfTargeted)
                     player.HandleActionCastTargetedSpell(player.Guid.Full, spell.Id, null, true);
-                if (spell.NonComponentTargetType == ItemType.None)
+                else if (spell.NonComponentTargetType == ItemType.None)
                     player.HandleActionMagicCastUnTargetedSpell(spell.Id, true);
                 else
                 {
