@@ -845,5 +845,15 @@ namespace ACE.Server.Command.Handlers
                 return false;
             }
         }
+
+        [CommandHandler("fixinvisible", AccessLevel.Player, CommandHandlerFlag.RequiresWorld, "Resends all visible items and creatures to the client")]
+        public static void HandleFixInvisible(Session session, params string[] parameters)
+        {
+            var knownObjects = session.Player.GetKnownObjects();
+            foreach (var entry in knownObjects)
+            {
+                session.Player.TrackObject(entry, true);
+            }
+        }
     }
 }
