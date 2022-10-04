@@ -780,13 +780,18 @@ namespace ACE.Server.WorldObjects
 
             // does the player have a shield equipped?
             var shield = GetEquippedShield();
-            if (shield == null) return 1.0f;
+            if (shield == null)
+                return 1.0f;
 
             var player = this as Player;
             if (Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.CustomDM)
             {
                 if (player != null && GetCreatureSkill(Skill.Shield).AdvancementClass < SkillAdvancementClass.Trained)
-                    return 0.0f;
+                    return 1.0f;
+
+                // we cant block our own attacks
+                if (attacker == this)
+                    return 1.0f;
             }
 
             // phantom weapons ignore all armor and shields
