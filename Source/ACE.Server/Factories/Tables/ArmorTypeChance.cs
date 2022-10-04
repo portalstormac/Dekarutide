@@ -179,7 +179,7 @@ namespace ACE.Server.Factories.Tables
                     ( TreasureArmorType.HeritageHigh,   1.0f ),
                 };
 
-                T7_Chances = new ChanceTable<TreasureArmorType>()
+                T7_Chances = new ChanceTable<TreasureArmorType>(ChanceTableType.Weight)
                 {
                     ( TreasureArmorType.Chainmail,      4.0f ),
                     ( TreasureArmorType.Platemail,      4.0f ),
@@ -191,7 +191,7 @@ namespace ACE.Server.Factories.Tables
                     ( TreasureArmorType.StuddedLeather, 1.0f ),
                 };
 
-                T8_Chances = new ChanceTable<TreasureArmorType>()
+                T8_Chances = new ChanceTable<TreasureArmorType>(ChanceTableType.Weight)
                 {
                     ( TreasureArmorType.Chainmail,      4.0f ),
                     ( TreasureArmorType.Platemail,      4.0f ),
