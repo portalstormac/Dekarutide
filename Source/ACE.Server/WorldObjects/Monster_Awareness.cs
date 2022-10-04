@@ -334,7 +334,7 @@ namespace ACE.Server.WorldObjects
                 //Console.WriteLine($"{Name}.FindNextTarget = {AttackTarget.Name}");
 
                 Player player = AttackTarget as Player;
-                if (player != null && player.AddTrackedObject(this))
+                if (player != null && !Visibility && player.AddTrackedObject(this))
                     log.Error($"Fixed invisible attacker on player {player.Name}. (Landblock:{CurrentLandblock.Id} - {Name} ({Guid})");
 
                 if (AttackTarget != null && AttackTarget != prevAttackTarget)
