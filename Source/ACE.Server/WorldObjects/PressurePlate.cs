@@ -170,13 +170,11 @@ namespace ACE.Server.WorldObjects
                 }
             }
 
-            if (Tier.HasValue)
-            {
-                ResistLockpick = Tier * 75;
-                ResistAwareness = Tier * 50;
-            }
-            else
+            if (!Tier.HasValue)
                 Tier = 3;
+
+            ResistLockpick = Tier * 75;
+            ResistAwareness = Tier * 75;
         }
 
         private bool DefaultActive;
