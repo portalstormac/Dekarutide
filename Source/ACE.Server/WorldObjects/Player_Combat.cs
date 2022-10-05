@@ -459,13 +459,32 @@ namespace ACE.Server.WorldObjects
             if (weapon == null || !weapon.IsRanged)
                 return PowerLevel + 0.5f;
             else
+            {
+                if (Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.CustomDM)
+                {
+                    if (weapon != null && weapon.IsRanged)
+                    {
+                        var techniqueTrinket = GetEquippedTrinket();
+                        if (techniqueTrinket != null && techniqueTrinket.TacticAndTechniqueId == (int)TacticAndTechniqueType.PowerShot)
+                            return 1.0f + (AccuracyLevel * 0.5f);
+                    }
+                }
                 return 1.0f;
+            }
         }
 
         public override float GetAccuracyMod(WorldObject weapon)
         {
             if (weapon != null && weapon.IsRanged)
+            {
+                if (Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.CustomDM)
+                {
+                    var techniqueTrinket = GetEquippedTrinket();
+                    if (techniqueTrinket != null && techniqueTrinket.TacticAndTechniqueId == (int)TacticAndTechniqueType.PowerShot)
+                        return 0.6f;
+                }
                 return AccuracyLevel + 0.6f;
+            }
             else
                 return 1.0f;
         }

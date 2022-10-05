@@ -85,7 +85,7 @@ namespace ACE.Server.WorldObjects
         public double NextTechniqueActivationTime = 0;
         public double NextTechniqueNegativeActivationTime = 0;
 
-        public static double TechniqueActivationInterval = 5;
+        public static double TechniqueActivationInterval = 2.5;
         public static double TechniqueNegativeActivationInterval = 10;
 
         private bool? CachedAttemptToTaunt = null;
