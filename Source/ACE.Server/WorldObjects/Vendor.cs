@@ -852,7 +852,7 @@ namespace ACE.Server.WorldObjects
                 case "Linvak Tukal":
                 case "MacNiall's Freehold":
                 case "Neydisa Castle":
-                case "Plateau Village":
+                case "Plateau":
                 case "Qalaba'r":
                 case "Timaru":
                     ShopTier = 3;
