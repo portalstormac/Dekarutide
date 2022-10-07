@@ -865,7 +865,7 @@ namespace ACE.Server.WorldObjects
                     ShopQualityMod = 0.0f;
                     break;
                 case "Ayan Baqur":
-                case "Wai Jhou":
+                case "WaiJhou":
                     ShopTier = 5;
                     ShopQualityMod = 0.0f;
                     break;
