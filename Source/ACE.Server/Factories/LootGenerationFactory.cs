@@ -47,6 +47,18 @@ namespace ACE.Server.Factories
                     (2000, 5000), // T7
                     (2000, 5000), // T8
                 };
+
+                ItemValue_TierMod = new List<int>()
+                {
+                    25,     // T1
+                    50,     // T2
+                    100,    // T3
+                    250,    // T4
+                    500,    // T5
+                    1000,   // T6
+                    2000,   // T7
+                    3000,   // T8
+                };
             }
             else if (Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.CustomDM)
             {
@@ -54,12 +66,24 @@ namespace ACE.Server.Factories
                 {
                     ( 300,  600), // T1
                     ( 800, 2000), // T2
-                    (1200, 4000), // T3
-                    (2000, 5000), // T4
-                    (2000, 5000), // T5
-                    (2000, 5000), // T6
-                    (2000, 5000), // T7
-                    (2000, 5000), // T8
+                    (1000, 2200), // T3
+                    (1200, 2400), // T4
+                    (1400, 2600), // T5
+                    (1600, 2800), // T6
+                    (1800, 3000), // T7
+                    (2000, 3200), // T8
+                };
+
+                ItemValue_TierMod = new List<int>()
+                {
+                    25,    // T1
+                    50,    // T2
+                    65,    // T3
+                    80,    // T4
+                    95,    // T5
+                    110,   // T6
+                    125,   // T7
+                    140,   // T8
                 };
             }
         }
