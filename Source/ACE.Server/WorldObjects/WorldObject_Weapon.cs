@@ -982,7 +982,7 @@ namespace ACE.Server.WorldObjects
             if (Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.CustomDM)
             {
                 Player playerWielder = Wielder as Player;
-                if(playerWielder != null)
+                if (playerWielder != null)
                     chance += playerWielder.ScaleWithPowerAccuracyBar((float)chance);
             }
 

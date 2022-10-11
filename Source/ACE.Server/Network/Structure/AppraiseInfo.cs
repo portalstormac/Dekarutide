@@ -417,8 +417,10 @@ namespace ACE.Server.Network.Structure
 
                 if (Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.CustomDM)
                 {
+                    var baseArmor = PropertiesInt[PropertyInt.ArmorLevel];
+
                     var wielder = wo.Wielder as Player;
-                    if (wielder != null)
+                    if (wielder != null && ((wo.ClothingPriority ?? 0) & (CoverageMask)CoverageMaskHelper.Underwear) == 0)
                     {
                         int armor;
                         if (wo.IsShield)
@@ -426,16 +428,24 @@ namespace ACE.Server.Network.Structure
                         else
                             armor = (int)wielder.GetSkillModifiedArmorLevel(PropertiesInt[PropertyInt.ArmorLevel]);
 
-                        var baseArmor = PropertiesInt[PropertyInt.ArmorLevel];
-                        if (armor < baseArmor)
+                        var bodyArmor = wielder.EnchantmentManager.GetBodyArmorMod();
+                        if (bodyArmor > armor)
                         {
-                            PropertiesInt[PropertyInt.ArmorLevel] = armor;
-                            IsArmorCapped = true;
-                        }
-                        else if (armor > baseArmor)
-                        {
-                            PropertiesInt[PropertyInt.ArmorLevel] = armor;
+                            PropertiesInt[PropertyInt.ArmorLevel] = bodyArmor;
                             IsArmorBuffed = true;
+                        }
+                        else
+                        {
+                            if (armor < baseArmor)
+                            {
+                                PropertiesInt[PropertyInt.ArmorLevel] = armor;
+                                IsArmorCapped = true;
+                            }
+                            else if (armor > baseArmor)
+                            {
+                                PropertiesInt[PropertyInt.ArmorLevel] = armor;
+                                IsArmorBuffed = true;
+                            }
                         }
                     }
                 }

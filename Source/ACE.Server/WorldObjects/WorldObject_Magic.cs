@@ -148,6 +148,13 @@ namespace ACE.Server.WorldObjects
             {
                 // Retrieve casting item's spellcraft
                 magicSkill = (uint)caster.ItemSpellcraft;
+
+                if (Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.CustomDM && caster.Wielder is Creature wielder)
+                {
+                    var arcaneLore = wielder.GetCreatureSkill(Skill.ArcaneLore).Current;
+                    var arcaneLoreMod = Math.Max(1.0f + (arcaneLore - 55) * 0.002f, 1.0f);
+                    magicSkill = (uint)(magicSkill * arcaneLoreMod);
+                }
             }
             else if (caster.Wielder is Creature wielder)
             {

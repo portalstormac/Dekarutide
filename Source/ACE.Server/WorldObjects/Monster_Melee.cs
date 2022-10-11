@@ -451,11 +451,18 @@ namespace ACE.Server.WorldObjects
 
             // handle armor rending mod here?
             //if (bodyArmorMod > 0)
-                //bodyArmorMod *= armorRendingMod;
+            //bodyArmorMod *= armorRendingMod;
 
             //Console.WriteLine("==");
             //Console.WriteLine("Armor Self: " + bodyArmorMod);
-            effectiveAL += bodyArmorMod;
+
+            if (Common.ConfigManager.Config.Server.WorldRuleset != Common.Ruleset.CustomDM)
+                effectiveAL += bodyArmorMod;
+            else
+            {
+                if (bodyArmorMod > effectiveAL)
+                    effectiveAL = bodyArmorMod; // Body armor doesn't stack with equipment armor, use whichever is highest.
+            }
 
             // Armor Rending reduces physical armor too?
             if (effectiveAL > 0)
