@@ -470,11 +470,11 @@ namespace ACE.Server.WorldObjects
 
             var armorMod = SkillFormula.CalcArmorMod(effectiveAL);
 
-            //Console.WriteLine("Total AL: " + effectiveAL);
-            //Console.WriteLine("Armor mod: " + armorMod);
+            Console.WriteLine("Total AL: " + effectiveAL);
+            Console.WriteLine("Armor mod: " + armorMod);
 
-            if (Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.CustomDM)
-                return Math.Max(armorMod, 0.25f);
+            //if (Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.CustomDM)
+            //    return Math.Max(armorMod, 0.25f);
 
             return armorMod;
         }
