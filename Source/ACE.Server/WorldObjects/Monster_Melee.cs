@@ -474,7 +474,7 @@ namespace ACE.Server.WorldObjects
             //Console.WriteLine("Armor mod: " + armorMod);
 
             if (Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.CustomDM)
-                return Math.Min(armorMod, 0.75f);
+                return Math.Max(armorMod, 0.25f);
 
             return armorMod;
         }
