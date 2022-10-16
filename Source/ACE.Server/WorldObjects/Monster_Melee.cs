@@ -473,6 +473,9 @@ namespace ACE.Server.WorldObjects
             //Console.WriteLine("Total AL: " + effectiveAL);
             //Console.WriteLine("Armor mod: " + armorMod);
 
+            if (Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.CustomDM)
+                return Math.Min(armorMod, 0.75f);
+
             return armorMod;
         }
 

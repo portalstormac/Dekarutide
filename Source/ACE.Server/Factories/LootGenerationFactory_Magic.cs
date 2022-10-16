@@ -666,7 +666,7 @@ namespace ACE.Server.Factories
 
         public static int GetSpellPower(Server.Entity.Spell spell)
         {
-            if (Common.ConfigManager.Config.Server.WorldRuleset <= Common.Ruleset.Infiltration)
+            if (Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.Infiltration)
             {
                 switch (spell.Formula.Level)
                 {
@@ -685,13 +685,13 @@ namespace ACE.Server.Factories
                 switch (spell.Formula.Level)
                 {
                     case 1: return 20; // EoR is 1
-                    case 2: return 40; // EoR is 50
-                    case 3: return 100; // EoR is 100
+                    case 2: return 75; // EoR is 50
+                    case 3: return 125; // EoR is 100
                     case 4: return 150; // EoR is 150
-                    case 5: return 200; // EoR is 200
-                    case 6: return 250; // EoR is 250
+                    case 5: return 180; // EoR is 200
+                    case 6: return 200; // EoR is 250
                     default:
-                    case 7: return 300; // EoR is 300
+                    case 7: return 220; // EoR is 300
                 }
             }
             else
@@ -903,7 +903,7 @@ namespace ACE.Server.Factories
             if (Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.CustomDM)
             {
                 if (wo.ItemSkillLevelLimit > 0)
-                    itemSkillLevelFactor = wo.ItemSkillLevelLimit.Value / 3.0f;
+                    itemSkillLevelFactor = wo.ItemSkillLevelLimit.Value / 10.0f;
             }
             else
             {
