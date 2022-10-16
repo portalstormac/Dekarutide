@@ -613,7 +613,7 @@ namespace ACE.Server.WorldObjects
             //Console.WriteLine($"StanceMod: {stanceMod}");
 
             uint effectiveDefense;
-            if (ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.CustomDM)
+            if (ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.CustomDM && this is Player)
                 effectiveDefense = (uint)Math.Round(GetCreatureSkill(defenseSkill).Current * 1.25f * defenseMod * burdenMod * stanceMod + defenseImbues);
             else
                 effectiveDefense = (uint)Math.Round(GetCreatureSkill(defenseSkill).Current * defenseMod * burdenMod * stanceMod + defenseImbues);
