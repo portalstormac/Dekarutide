@@ -321,11 +321,6 @@
                     "specializedOnly": "false"
                 },
                 {
-                    "spellId": "1664",
-                    "name": "Stamina to Health I",
-                    "specializedOnly": "false"
-                },
-                {
                     "spellId": "1676",
                     "name": "Stamina to Mana I",
                     "specializedOnly": "false"
