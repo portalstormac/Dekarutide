@@ -178,7 +178,8 @@
                 {
                     "weenieId": "627",
                     "name": "Alder Talisman",
-                    "stacksize": "3"
+                    "stacksize": "3",
+                    "specializedOnly": "true"
                 },
                 {
                     "weenieId": "743",
@@ -327,11 +328,6 @@
                 {
                     "spellId": "1676",
                     "name": "Stamina to Mana I",
-                    "specializedOnly": "false"
-                },
-                {
-                    "spellId": "1243",
-                    "name": "Infuse Stamina I",
                     "specializedOnly": "false"
                 },
                 {
