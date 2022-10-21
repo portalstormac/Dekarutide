@@ -383,7 +383,7 @@ namespace ACE.Server.Factories
                         {
                             bool spellAdded = false;
                             if (charSkill.AdvancementClass == SkillAdvancementClass.Trained && spell.SpecializedOnly == false)
-                                player.AddKnownSpell(spell.SpellId);
+                                spellAdded = player.AddKnownSpell(spell.SpellId);
                             else if (charSkill.AdvancementClass == SkillAdvancementClass.Specialized)
                                 spellAdded = player.AddKnownSpell(spell.SpellId);
 
