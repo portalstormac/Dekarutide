@@ -601,13 +601,25 @@ namespace ACE.Server.WorldObjects
                             // All we have left are stuck items, let's destroy the generator and schedule the rot of all remaining items.
                             foreach (var entry in stuckList)
                             {
-                                // Stop generating new items and do not relock ourselves, in 5 minutes we decay.
+                                // Enable decay.
+                                entry.TimeToRot = entry.DefaultTimeToRot.TotalSeconds;
                                 entry.Generator = null;
                                 entry.GeneratorId = null;
-                                entry.GeneratorProfiles.Clear();
-                                entry.TimeToRot = 300;
-                                if(entry.GetProperty(PropertyBool.DefaultLocked).HasValue)
-                                    entry.DefaultLocked = false;
+
+                                if (entry is Container)
+                                {
+                                    if (Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.CustomDM)
+                                    {
+                                        // Also stop relocking and generating container contents.
+                                        entry.GeneratorProfiles.Clear();
+                                        if (entry.GetProperty(PropertyBool.DefaultLocked).HasValue)
+                                            entry.DefaultLocked = false;
+                                    }
+                                    else if (entry.GeneratorProfiles.Count > 0)
+                                        entry.RotProof = false; // Set this so we decay but meanwhile we keep relocking/generating contents.
+                                }
+                                else
+                                    entry.GeneratorProfiles.Clear();
                             }
                             Generator.Destroy();
                         }
@@ -643,13 +655,25 @@ namespace ACE.Server.WorldObjects
                         // All we have left are stuck items, let's destroy the generator and schedule the rot of all remaining items.
                         foreach (var entry in stuckList)
                         {
-                            // Stop generating new items and do not relock ourselves, in 5 minutes we decay.
+                            // Enable decay.
+                            entry.TimeToRot = entry.DefaultTimeToRot.TotalSeconds;
                             entry.Generator = null;
                             entry.GeneratorId = null;
-                            entry.GeneratorProfiles.Clear();
-                            entry.TimeToRot = 300;
-                            if (entry.GetProperty(PropertyBool.DefaultLocked).HasValue)
-                                entry.DefaultLocked = false;
+
+                            if (entry is Container)
+                            {
+                                if (Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.CustomDM)
+                                {
+                                    // Also stop relocking and generating container contents.
+                                    entry.GeneratorProfiles.Clear();
+                                    if (entry.GetProperty(PropertyBool.DefaultLocked).HasValue)
+                                        entry.DefaultLocked = false;
+                                }
+                                else if (entry.GeneratorProfiles.Count > 0)
+                                    entry.RotProof = false; // Set this so we decay but meanwhile we keep relocking/generating contents.
+                            }
+                            else
+                                entry.GeneratorProfiles.Clear();
                         }
                         Generator.Destroy();
                     }

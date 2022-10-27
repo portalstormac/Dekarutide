@@ -95,6 +95,9 @@ namespace ACE.Server.WorldObjects
 
         public override ActivationResult CheckUseRequirements(WorldObject activator)
         {
+            if (TimeToRot > 0)
+                TimeToRot = DefaultTimeToRot.TotalSeconds; // Reset our decay timer.
+
             var baseRequirements = base.CheckUseRequirements(activator);
             if (!baseRequirements.Success)
                 return baseRequirements;
@@ -219,6 +222,24 @@ namespace ACE.Server.WorldObjects
         public override void FinishClose(Player player)
         {
             base.FinishClose(player);
+
+            //If we're a generated container start our decay time once we've been opened and closed.
+            if (Generator != null)
+            {
+                TimeToRot = DefaultTimeToRot.TotalSeconds;
+                Generator = null;
+                GeneratorId = null;
+
+                if (Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.CustomDM)
+                {
+                    // Also stop relocking and generating container contents.
+                    GeneratorProfiles.Clear();
+                    if (GetProperty(PropertyBool.DefaultLocked).HasValue)
+                        DefaultLocked = false;
+                }
+                else
+                    RotProof = false;
+            }
 
             if (ChestClearedWhenClosed && InitCreate > 0)
             {

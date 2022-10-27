@@ -2539,6 +2539,15 @@ namespace ACE.Server.WorldObjects
             set { if (!value.HasValue) RemoveProperty(PropertyFloat.TimeToRot); else SetProperty(PropertyFloat.TimeToRot, value.Value); }
         }
 
+        /// <summary>
+        /// If set to true will prevent an object from being able to rot even if it otherwise would. If set to false will force an object to be rottable.
+        /// </summary>
+        public bool? RotProof
+        {
+            get => GetProperty(PropertyBool.RotProof);
+            set { if (!value.HasValue) RemoveProperty(PropertyBool.RotProof); else SetProperty(PropertyBool.RotProof, value.Value); }
+        }
+
         public uint? AllowedActivator
         {
             get => GetProperty(PropertyInstanceId.AllowedActivator);
