@@ -574,20 +574,10 @@ namespace ACE.Server.WorldObjects
                 }
                 baseDamage = ThreadSafeRandom.Next(Spell.MinDamage, Spell.MaxDamage);
                 
-                if (Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.Infiltration)
+                if (Common.ConfigManager.Config.Server.WorldRuleset <= Common.Ruleset.Infiltration)
                 {
                     if (sourcePlayer == null)
                         baseDamage /= 2; // Monsters do half projectile spell damage.
-                }
-                else if (Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.CustomDM)
-                {
-                    if (sourcePlayer == null)
-                    {
-                        if (Spell.Level > 3)
-                            baseDamage = (int)(baseDamage * 0.5f);
-                        else if (Spell.Level == 3)
-                            baseDamage = (int)(baseDamage * 0.67f);
-                    }
                 }
 
                 weaponResistanceMod = GetWeaponResistanceModifier(weapon, sourceCreature, attackSkill, Spell.DamageType);
