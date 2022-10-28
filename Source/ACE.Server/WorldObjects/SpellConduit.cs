@@ -55,7 +55,7 @@ namespace ACE.Server.WorldObjects
                         targetId = player.PreviousRequestedAppraisalTarget;
 
                     if (targetId != 0 && targetId != player.Guid.Full)
-                        player.HandleActionCastTargetedSpell(targetId, spell.Id, null, true);
+                        player.HandleActionCastTargetedSpell(targetId, spell.Id, this, true);
                     else
                         player.Session.Network.EnqueueSend(new GameEventCommunicationTransientString(player.Session, $"You cannot cast this spell upon yourself"));
                 }

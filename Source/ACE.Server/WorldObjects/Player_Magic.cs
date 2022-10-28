@@ -155,7 +155,7 @@ namespace ACE.Server.WorldObjects
                 LastAttackTarget = target;
 
             MagicState.OnCastStart(isCombatCasting);
-            MagicState.SetWindupParams(targetGuid, spellId, isCombatCasting ? null : casterItem);
+            MagicState.SetWindupParams(targetGuid, spellId, casterItem);
 
             StartPos = new Physics.Common.Position(PhysicsObj.Position);
 

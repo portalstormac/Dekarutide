@@ -223,7 +223,7 @@ namespace ACE.Server.WorldObjects
         {
             base.FinishClose(player);
 
-            //If we're a generated container start our decay time once we've been opened and closed.
+            //If we're a generated container start our decay timer once we've been opened and closed.
             if (Generator != null)
             {
                 TimeToRot = DefaultTimeToRot.TotalSeconds;
