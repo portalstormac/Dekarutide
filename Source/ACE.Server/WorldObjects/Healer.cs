@@ -178,7 +178,7 @@ namespace ACE.Server.WorldObjects
                 var s = UsesLeft == 1 ? "" : "s";
                 remainingMsg = UsesLeft > 0 ? $" Your {Name} has {UsesLeft} use{s} left." : $" Your {Name} is used up.";
 
-                Value -= StructureUnitValue;
+                Value = Math.Max(Value.Value - StructureUnitValue, 0);
             }
 
             var stackSize = new GameMessagePublicUpdatePropertyInt(this, PropertyInt.Structure, UsesLeft.Value);
