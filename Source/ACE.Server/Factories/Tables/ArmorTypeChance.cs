@@ -128,6 +128,7 @@ namespace ACE.Server.Factories.Tables
                 {
                     ( TreasureArmorType.Leather,        4.0f ),
                     ( TreasureArmorType.StuddedLeather, 1.0f ),
+                    ( TreasureArmorType.Cloth,          1.0f ),
                 };
 
                 T2_Chances = new ChanceTable<TreasureArmorType>(ChanceTableType.Weight)
@@ -135,11 +136,13 @@ namespace ACE.Server.Factories.Tables
                     ( TreasureArmorType.Leather,        1.0f ),
                     ( TreasureArmorType.StuddedLeather, 2.0f ),
                     ( TreasureArmorType.Chainmail,      1.0f ),
+                    ( TreasureArmorType.Cloth,          1.0f ),
                 };
 
                 T3_Chances = new ChanceTable<TreasureArmorType>(ChanceTableType.Weight)
                 {
                     ( TreasureArmorType.Chainmail,      4.0f ),
+                    ( TreasureArmorType.Cloth,          2.0f ),
                     ( TreasureArmorType.Leather,        1.0f ),
                     ( TreasureArmorType.StuddedLeather, 1.0f ),
                 };
@@ -147,6 +150,7 @@ namespace ACE.Server.Factories.Tables
                 T4_Chances = new ChanceTable<TreasureArmorType>(ChanceTableType.Weight)
                 {
                     ( TreasureArmorType.Chainmail,      4.0f ),
+                    ( TreasureArmorType.Cloth,          2.0f ),
 
                     ( TreasureArmorType.Leather,        1.0f ),
                     ( TreasureArmorType.StuddedLeather, 1.0f ),
@@ -161,6 +165,7 @@ namespace ACE.Server.Factories.Tables
                     ( TreasureArmorType.Platemail,      4.0f ),
                     ( TreasureArmorType.HeritageLow,    4.0f ),
                     ( TreasureArmorType.Covenant,       4.0f ),
+                    ( TreasureArmorType.Cloth,          2.0f ),
 
                     ( TreasureArmorType.Leather,        1.0f ),
                     ( TreasureArmorType.StuddedLeather, 1.0f ),
@@ -173,6 +178,7 @@ namespace ACE.Server.Factories.Tables
                     ( TreasureArmorType.Platemail,      4.0f ),
                     ( TreasureArmorType.HeritageLow,    4.0f ),
                     ( TreasureArmorType.Covenant,       4.0f ),
+                    ( TreasureArmorType.Cloth,          2.0f ),
 
                     ( TreasureArmorType.Leather,        1.0f ),
                     ( TreasureArmorType.StuddedLeather, 1.0f ),
@@ -186,6 +192,7 @@ namespace ACE.Server.Factories.Tables
                     ( TreasureArmorType.HeritageLow,    4.0f ),
                     ( TreasureArmorType.Covenant,       4.0f ),
                     ( TreasureArmorType.HeritageHigh,   2.0f ),
+                    ( TreasureArmorType.Cloth,          2.0f ),
 
                     ( TreasureArmorType.Leather,        1.0f ),
                     ( TreasureArmorType.StuddedLeather, 1.0f ),
@@ -198,6 +205,7 @@ namespace ACE.Server.Factories.Tables
                     ( TreasureArmorType.HeritageLow,    4.0f ),
                     ( TreasureArmorType.Covenant,       4.0f ),
                     ( TreasureArmorType.HeritageHigh,   2.0f ),
+                    ( TreasureArmorType.Cloth,          2.0f ),
 
                     ( TreasureArmorType.Leather,        1.0f ),
                     ( TreasureArmorType.StuddedLeather, 1.0f ),

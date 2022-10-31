@@ -405,6 +405,24 @@ namespace ACE.Server.Factories.Tables.Wcids
             ( WeenieClassName.ace44803_empyreanoverrobe,   0.20f ),     // empyrean? t6+?
         };
 
+        private static ChanceTable<WeenieClassName> ClothAluvianWcids = new ChanceTable<WeenieClassName>(ChanceTableType.Weight)
+        {
+            ( WeenieClassName.robealuvianhood,      1.0f ),
+            ( WeenieClassName.robealuviannohood,    1.0f ),
+        };
+
+        private static ChanceTable<WeenieClassName> ClothGharuWcids = new ChanceTable<WeenieClassName>(ChanceTableType.Weight)
+        {
+            ( WeenieClassName.robegharundimhood,    1.0f ),
+            ( WeenieClassName.robegharundimnohood,  1.0f ),
+        };
+
+        private static ChanceTable<WeenieClassName> ClothShoWcids = new ChanceTable<WeenieClassName>(ChanceTableType.Weight)
+        {
+            ( WeenieClassName.robeshohood,      1.0f ),
+            ( WeenieClassName.robeshonohood,    1.0f ),
+        };
+
         public static WeenieClassName Roll(TreasureDeath treasureDeath, TreasureRoll treasureRoll)
         {
             switch (treasureRoll.ArmorType)
@@ -450,6 +468,9 @@ namespace ACE.Server.Factories.Tables.Wcids
 
                 case TreasureArmorType.Overrobe:
                     return RollOverRobeWcid(treasureDeath);
+
+                case TreasureArmorType.Cloth:
+                    return RollClothWcid(treasureDeath, treasureRoll);
             }
             return WeenieClassName.undef;
         }
@@ -585,6 +606,24 @@ namespace ACE.Server.Factories.Tables.Wcids
                 return OverRobe_T3_T5_Wcids.Roll();
             else
                 return OverRobe_T6_T8_Wcids.Roll();
+        }
+
+        public static WeenieClassName RollClothWcid(TreasureDeath treasureDeath, TreasureRoll treasureRoll)
+        {
+            var heritage = RollHeritage(treasureDeath, treasureRoll);
+
+            switch (heritage)
+            {
+                case TreasureHeritageGroup.Aluvian:
+                    return ClothAluvianWcids.Roll();
+
+                case TreasureHeritageGroup.Gharundim:
+                    return ClothGharuWcids.Roll();
+
+                case TreasureHeritageGroup.Sho:
+                    return ClothShoWcids.Roll();
+            }
+            return WeenieClassName.undef;
         }
 
         private static readonly Dictionary<WeenieClassName, TreasureArmorType> _combined = new Dictionary<WeenieClassName, TreasureArmorType>();
@@ -1166,6 +1205,9 @@ namespace ACE.Server.Factories.Tables.Wcids
             BuildCombined(SedgemailLeatherWcids, TreasureArmorType.Sedgemail);
             BuildCombined(OverRobe_T3_T5_Wcids, TreasureArmorType.Overrobe);
             BuildCombined(OverRobe_T6_T8_Wcids, TreasureArmorType.Overrobe);
+            BuildCombined(ClothAluvianWcids, TreasureArmorType.Cloth);
+            BuildCombined(ClothGharuWcids, TreasureArmorType.Cloth);
+            BuildCombined(ClothShoWcids, TreasureArmorType.Cloth);
         }
 
         private static void BuildCombined(ChanceTable<WeenieClassName> wcids, TreasureArmorType armorType)

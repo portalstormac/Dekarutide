@@ -845,7 +845,7 @@ namespace ACE.Server.Factories
             {
                 return true;
             }
-            else if (roll.IsArmor)
+            else if (roll.IsArmor && !roll.IsClothArmor)
             {
                 var rng = ThreadSafeRandom.Next(0.0f, 1.0f);
 

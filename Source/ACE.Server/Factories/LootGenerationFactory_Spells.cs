@@ -615,6 +615,9 @@ namespace ACE.Server.Factories
                     return 20;
             }
 
+            if (roll.IsClothArmor)
+                return 21;
+
             var coverageMask = wo.ClothingPriority ?? 0;
             var isArmor = roll.IsArmor;
 

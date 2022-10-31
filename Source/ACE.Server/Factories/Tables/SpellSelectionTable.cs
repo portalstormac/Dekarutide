@@ -400,6 +400,10 @@ namespace ACE.Server.Factories.Tables
             ( SpellId.LifeMagicMasterySelf1,           0.01f ),
         };
 
+        private static ChanceTable<SpellId> spellSelectionGroup21 = new ChanceTable<SpellId>()
+        {
+        };
+
         /// <summary>
         /// Key is (PropertyInt.TsysMutationData >> 24) - 1
         /// </summary>
@@ -797,6 +801,17 @@ namespace ACE.Server.Factories.Tables
                     ( SpellId.RejuvenationSelf1,               0.4f ),
                 };
 
+                // robes
+                spellSelectionGroup21 = new ChanceTable<SpellId>(ChanceTableType.Weight)
+                {
+                    ( SpellId.ArmorOther1,                     4.0f ),
+                    ( SpellId.WillpowerSelf1,                  2.0f ),
+                    ( SpellId.FocusSelf1,                      2.0f ),
+                    ( SpellId.ManaMasterySelf1,                1.5f ),
+                    ( SpellId.WarMagicMasterySelf1,            1.0f ),
+                    ( SpellId.LifeMagicMasterySelf1,           1.0f ),
+                };
+
                 spellSelectionGroup = new List<ChanceTable<SpellId>>()
                 {
                     spellSelectionGroup1,
@@ -819,6 +834,7 @@ namespace ACE.Server.Factories.Tables
                     spellSelectionGroup18,
                     spellSelectionGroup19,
                     spellSelectionGroup20,
+                    spellSelectionGroup21,
                 };
             }
             else if (Common.ConfigManager.Config.Server.WorldRuleset <= Common.Ruleset.Infiltration)
