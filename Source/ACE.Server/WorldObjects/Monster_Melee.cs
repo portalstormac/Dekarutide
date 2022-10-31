@@ -440,14 +440,17 @@ namespace ACE.Server.WorldObjects
 
             var effectiveAL = 0.0f;
 
-            foreach (var armor in armors)
-                effectiveAL += defender.GetArmorMod(armor, damageType, ignoreMagicArmor);
-
             // life spells
             // additive: armor/imperil
             var bodyArmorMod = defender.EnchantmentManager.GetBodyArmorMod();
             if (ignoreMagicResist)
                 bodyArmorMod = IgnoreMagicResistScaled(bodyArmorMod);
+
+            if (armors.Count == 0)
+                effectiveAL = bodyArmorMod;
+
+            foreach (var armor in armors)
+                effectiveAL += defender.GetArmorMod(armor, damageType, ignoreMagicArmor, bodyArmorMod);
 
             // handle armor rending mod here?
             //if (bodyArmorMod > 0)
@@ -455,14 +458,6 @@ namespace ACE.Server.WorldObjects
 
             //Console.WriteLine("==");
             //Console.WriteLine("Armor Self: " + bodyArmorMod);
-
-            if (Common.ConfigManager.Config.Server.WorldRuleset != Common.Ruleset.CustomDM)
-                effectiveAL += bodyArmorMod;
-            else
-            {
-                if (bodyArmorMod > effectiveAL)
-                    effectiveAL = bodyArmorMod; // Body armor doesn't stack with equipment armor, use whichever is highest.
-            }
 
             // Armor Rending reduces physical armor too?
             if (effectiveAL > 0)
@@ -572,7 +567,7 @@ namespace ACE.Server.WorldObjects
         /// Returns the effective AL for 1 piece of armor/clothing
         /// </summary>
         /// <param name="armor">A piece of armor or clothing</param>
-        public float GetArmorMod(WorldObject armor, DamageType damageType, bool ignoreMagicArmor)
+        public float GetArmorMod(WorldObject armor, DamageType damageType, bool ignoreMagicArmor, int bodyArmor = 0)
         {
             // get base armor/resistance level
             var baseArmor = armor.GetProperty(PropertyInt.ArmorLevel) ?? 0;
@@ -583,6 +578,16 @@ namespace ACE.Server.WorldObjects
             Console.WriteLine("--");
             Console.WriteLine("Base AL: " + baseArmor);
             Console.WriteLine("Base RL: " + resistance);*/
+
+            bool useSkillMod = true;
+            if (Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.CustomDM)
+            {
+                if (bodyArmor > baseArmor)
+                {
+                    baseArmor = bodyArmor; // Body armor doesn't stack with equipment armor, use whichever is highest.
+                    useSkillMod = false;
+                }
+            }
 
             // armor level additives
             var armorMod = armor.EnchantmentManager.GetArmorMod();
@@ -613,7 +618,11 @@ namespace ACE.Server.WorldObjects
             Console.WriteLine("Effective RL: " + effectiveRL);
             Console.WriteLine();*/
 
-            return GetSkillModifiedArmorLevel(effectiveAL * effectiveRL);
+            var armorLevel = effectiveAL * effectiveRL;
+            if (useSkillMod)
+                return GetSkillModifiedArmorLevel(armorLevel);
+            else
+                return armorLevel;
         }
 
         /// <summary>
