@@ -804,7 +804,6 @@ namespace ACE.Server.Factories.Tables
                 // robes
                 spellSelectionGroup21 = new ChanceTable<SpellId>(ChanceTableType.Weight)
                 {
-                    ( SpellId.ArmorOther1,                      4.0f ),
                     ( SpellId.WillpowerOther1,                  2.0f ),
                     ( SpellId.FocusOther1,                      2.0f ),
                     ( SpellId.ManaMasteryOther1,                2.0f ),

@@ -48,9 +48,7 @@ namespace ACE.Server.Factories
             var spells = new List<SpellId>();
 
             // crowns, which are classified as TreasureItemType.Jewelry, should also be getting item spells
-            // perhaps replace this with wo.ArmorLevel check?
-            //if (roll.IsArmor || roll.IsArmorClothing(wo) || roll.IsWeapon)
-            if (roll.HasArmorLevel(wo) || roll.IsWeapon)
+            if (roll.HasArmorLevel(wo) || roll.IsClothArmor || roll.IsWeapon)
             {
                 var itemSpells = RollItemSpells(wo, profile, roll);
 
@@ -124,8 +122,12 @@ namespace ACE.Server.Factories
         {
             List<SpellId> spells = null;
 
-            //if (roll.IsArmor || roll.IsArmorClothing(wo))
-            if (roll.HasArmorLevel(wo))
+
+            if (roll.IsClothArmor)
+            {
+                spells = ClothArmorSpells.Roll(profile);
+            }
+            else if (roll.HasArmorLevel(wo))
             {
                 spells = ArmorSpells.Roll(profile);
             }
@@ -389,13 +391,18 @@ namespace ACE.Server.Factories
 
         private static SpellId RollCantrip(WorldObject wo, TreasureDeath profile, TreasureRoll roll)
         {
-            if (roll.HasArmorLevel(wo) || roll.IsClothing)
+            if (roll.IsClothArmor)
+            {
+                // robes
+                return ClothArmorCantrips.Roll();
+            }
+            else if (roll.HasArmorLevel(wo) || roll.IsClothing)
             {
                 // armor / clothing cantrip
                 // this table also applies to crowns (treasureitemtype.jewelry w/ al)
                 return ArmorCantrips.Roll();
             }
-            if (roll.IsMeleeWeapon)
+            else if (roll.IsMeleeWeapon)
             {
                 // melee cantrip
                 var meleeCantrip = MeleeCantrips.Roll();

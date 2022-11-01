@@ -423,32 +423,20 @@ namespace ACE.Server.Network.Structure
                     if (wielder != null && ((wo.ClothingPriority ?? 0) & (CoverageMask)CoverageMaskHelper.Underwear) == 0)
                     {
                         int armor;
-                        int bodyArmor = 0;
                         if (wo.IsShield)
                             armor = (int)wielder.GetSkillModifiedShieldLevel(baseArmor);
                         else
-                        {
                             armor = (int)wielder.GetSkillModifiedArmorLevel(baseArmor);
-                            bodyArmor = wielder.EnchantmentManager.GetBodyArmorMod();
-                        }
 
-                        if (bodyArmor > armor)
+                        if (armor < baseArmor)
                         {
-                            PropertiesInt[PropertyInt.ArmorLevel] = bodyArmor;
-                            IsArmorBuffed = true;
+                            PropertiesInt[PropertyInt.ArmorLevel] = armor;
+                            IsArmorCapped = true;
                         }
-                        else
+                        else if (armor > baseArmor)
                         {
-                            if (armor < baseArmor)
-                            {
-                                PropertiesInt[PropertyInt.ArmorLevel] = armor;
-                                IsArmorCapped = true;
-                            }
-                            else if (armor > baseArmor)
-                            {
-                                PropertiesInt[PropertyInt.ArmorLevel] = armor;
-                                IsArmorBuffed = true;
-                            }
+                            PropertiesInt[PropertyInt.ArmorLevel] = armor;
+                            IsArmorBuffed = true;
                         }
                     }
                 }
