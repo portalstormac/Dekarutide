@@ -1016,6 +1016,11 @@ namespace ACE.Server.WorldObjects
                 {
                     AddRandomItem(TreasureItemType_Orig.Clothing, TreasureArmorType.Undef, TreasureWeaponType.Undef);
                     added++;
+                    if (added < itemsToGenerate)
+                    {
+                        AddRandomItem(TreasureItemType_Orig.Armor, TreasureArmorType.Cloth, TreasureWeaponType.Undef);
+                        added++;
+                    }
                 }
                 if (sellsRandomJewelry && added < itemsToGenerate)
                 {
