@@ -181,16 +181,16 @@
                     "stacksize": "3",
                     "specializedOnly": "true"
                 },
-                {
-                    "weenieId": "743",
-                    "name": "Cedar Talisman",
-                    "stacksize": "3"
-                },
-                {
-                    "weenieId": "744",
-                    "name": "Ebony Talisman",
-                    "stacksize": "3"
-                },
+                //{
+                //    "weenieId": "743",
+                //    "name": "Cedar Talisman",
+                //    "stacksize": "3"
+                //},
+                //{
+                //    "weenieId": "744",
+                //    "name": "Ebony Talisman",
+                //    "stacksize": "3"
+                //},
                 {
                     "weenieId": "759",
                     "name": "Quicksilver",
@@ -201,11 +201,11 @@
                     "name": "Colcothar",
                     "stacksize": "10"
                 },
-                {
-                    "weenieId": "756",
-                    "name": "Cobalt",
-                    "stacksize": "10"
-                },
+                //{
+                //    "weenieId": "756",
+                //    "name": "Cobalt",
+                //    "stacksize": "10"
+                //},
                 {
                     "weenieId": "755",
                     "name": "Cinnabar",
@@ -216,11 +216,11 @@
                     "name": "Powdered Amber",
                     "stacksize": "10"
                 },
-                {
-                    "weenieId": "790",
-                    "name": "Powdered Onyx",
-                    "stacksize": "10"
-                },
+                //{
+                //    "weenieId": "790",
+                //    "name": "Powdered Onyx",
+                //    "stacksize": "10"
+                //},
                 {
                     "weenieId": "778",
                     "name": "Saffron",
@@ -243,11 +243,11 @@
                     "stacksize": "10",
                     "specializedOnly": "true"
                 },
-                {
-                    "weenieId": "780",
-                    "name": "Wormwood",
-                    "stacksize": "10"
-                },
+                //{
+                //    "weenieId": "780",
+                //    "name": "Wormwood",
+                //    "stacksize": "10"
+                //},
                 {
                     "weenieId": "691",
                     "name": "Lead Scarab",
@@ -290,16 +290,16 @@
                 }
             ],
             "spells": [
-                {
-                    "spellId": "23",
-                    "name": "Armor Other I",
-                    "specializedOnly": "false"
-                },
-                {
-                    "spellId": "24",
-                    "name": "Armor Self I",
-                    "specializedOnly": "false"
-                },
+                //{
+                //    "spellId": "23",
+                //    "name": "Armor Other I",
+                //    "specializedOnly": "false"
+                //},
+                //{
+                //    "spellId": "24",
+                //    "name": "Armor Self I",
+                //    "specializedOnly": "false"
+                //},
                 {
                     "spellId": "5",
                     "name": "Heal Other I",

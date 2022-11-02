@@ -235,6 +235,8 @@ namespace ACE.Server.WorldObjects
 
         public static readonly List<SpellId> PossibleAcquireSpells = new List<SpellId>()
         {
+            SpellId.ArmorSelf1,
+            SpellId.ArmorOther1,
             SpellId.ImperilOther1,
 
             SpellId.BladeProtectionSelf1,
