@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <atlas xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <location>
     <id>1</id>
@@ -6524,7 +6524,7 @@
   </location>
   <location>
     <id>409</id>
-    <latitude>34.4</latitude>
+    <latitude>33.9</latitude>
     <longitude>64.9</longitude>
     <name>Mountaintop Lifestone</name>
     <type>Lifestone</type>
