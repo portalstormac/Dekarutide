@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+﻿<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <atlas xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <location>
     <id>1</id>
@@ -17113,22 +17113,6 @@
     <arrival_longitude>0</arrival_longitude>
     <description>Small temple structure in the swamp, inhabited by a shaman and some mudlurks.  If you fight inside the temple expect lots of helpers to come in from the surrounding mire. &lt;I&gt; -- Doc Feelgood&lt;/i&gt;</description>
     <date_added>2000-10-07T00:00:00.0000000-07:00</date_added>
-    <last_update>2005-02-16T17:14:19.0970000-08:00</last_update>
-    <dungeon_id>
-    </dungeon_id>
-    <retired>N</retired>
-    <tod_req>0</tod_req>
-  </location>
-  <location>
-    <id>1073</id>
-    <latitude>34.4</latitude>
-    <longitude>64.9</longitude>
-    <name>Lifestone at Fycheck</name>
-    <type>Landmark</type>
-    <arrival_latitude>0</arrival_latitude>
-    <arrival_longitude>0</arrival_longitude>
-    <description>I have seen two rumors regarding Fycheck (one was handed to me by someone in Holtburg...didnt get his name... and the other I found on the ground near the West Shoushi Lifestone). Both rumors were entitled The Fycheck Outpost. Here are the two rumors, as written on the parchments. Fycheck was a Noble Sho warrior, known for his skill with the blade and for his being prone to wanderlust as no other Sho ever has. Indeed a great warrior, it is rumored he met his demise on a mountain plateau west of Shoushi. Hidetaki, his faithful Sifu heard of his students death and summoned warriors throughout the land to extract revenge on the creatures that caused the demise of his friend and student. Hidetakis forces were never seen alive again. As Hidetaki and his band of loyal warriors were extracting revenge on the creatures that killed the noble Fyckeck, four of the warriors panicked and fled the battlefield. After discovering a safe haven in an abandoned tower far to the south, the dishonored warriors were grief stricken that they had dishonored themselves by fleeing. Before they could commit Sepuku, to regain their honor, they were killed by a nearby wisp. Since they died with dishonor, they now haunt that tower as undead, hating the living with great passion. &lt;I&gt; -- Grundak&lt;/i&gt;</description>
-    <date_added>2000-10-08T00:00:00.0000000-07:00</date_added>
     <last_update>2005-02-16T17:14:19.0970000-08:00</last_update>
     <dungeon_id>
     </dungeon_id>
