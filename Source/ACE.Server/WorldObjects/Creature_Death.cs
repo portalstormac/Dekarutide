@@ -194,15 +194,17 @@ namespace ACE.Server.WorldObjects
 
                 float totalXP;
 
+                string xpMessage = "";
+
                 if (Common.ConfigManager.Config.Server.WorldRuleset != Common.Ruleset.CustomDM)
                     totalXP = (XpOverride ?? 0) * damagePercent;
                 else
                 {
-                    totalXP = GetCreatureDeathXP(Level ?? 0, (int)Health.MaxValue, Biota.PropertiesSpellBook?.Count ?? 0) * damagePercent;
-
                     float typeCampBonus;
                     float areaCampBonus;
                     float restCampBonus;
+
+                    totalXP = GetCreatureDeathXP(Level ?? 0, (int)Health.MaxValue, Biota.PropertiesSpellBook?.Count ?? 0) * damagePercent;
                     playerDamager.CampManager.HandleCampInteraction(this, out typeCampBonus, out areaCampBonus, out restCampBonus);
 
                     float thirdXP = totalXP / 3.0f;
@@ -211,10 +213,10 @@ namespace ACE.Server.WorldObjects
                     if (!CurrentLandblock.IsDungeon)
                         totalXP *= 1.25f; // Surface provides 25% xp bonus to account for lower creature density.
 
-                    playerDamager.Session.Network.EnqueueSend(new GameEventKillerNotification(playerDamager.Session, $"You've earned {((long)Math.Round(totalXP)):N0} experience! T: {(typeCampBonus * 100).ToString("0")}% A: {(areaCampBonus * 100).ToString("0")}% R: {(restCampBonus * 100).ToString("0")}%"));
+                    xpMessage = $"T: {(typeCampBonus * 100).ToString("0")}% A: {(areaCampBonus * 100).ToString("0")}% R: {(restCampBonus * 100).ToString("0")}%";
                 }
 
-                playerDamager.EarnXP((long)Math.Round(totalXP), XpType.Kill, Level);
+                playerDamager.EarnXP((long)Math.Round(totalXP), XpType.Kill, Level, ShareType.All, xpMessage);
 
                 // handle luminance
                 if (LuminanceAward != null)
