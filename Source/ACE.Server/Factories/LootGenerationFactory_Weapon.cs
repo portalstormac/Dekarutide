@@ -1,5 +1,6 @@
 using ACE.Common;
 using ACE.Database.Models.World;
+using ACE.Entity.Enum;
 using ACE.Server.Factories.Tables;
 using ACE.Server.WorldObjects;
 
@@ -39,6 +40,51 @@ namespace ACE.Server.Factories
             //Console.WriteLine($"WeaponSpeedMod: {weaponSpeedMod}");
 
             return weaponSpeedMod;
+        }
+
+        private static float RollCrushingBlow(TreasureDeath treasureDeath, bool isCaster)
+        {
+            if (Common.ConfigManager.Config.Server.WorldRuleset != Common.Ruleset.CustomDM)
+                return 0.0f;
+
+            var chance = ExtraWeaponEffects.GetCrushingBlowChanceForTier(treasureDeath.Tier);
+            if (chance > ThreadSafeRandom.Next(0.0f, 1.0f))
+            {
+                if (isCaster)
+                    return 0.5f;
+                else
+                    return 2.0f;
+            }
+            return 0.0f;
+        }
+
+        private static float RollBitingStrike(TreasureDeath treasureDeath)
+        {
+            if (Common.ConfigManager.Config.Server.WorldRuleset != Common.Ruleset.CustomDM)
+                return 0.0f;
+
+            var chance = ExtraWeaponEffects.GetBitingStrikeChanceForTier(treasureDeath.Tier);
+            if (chance > ThreadSafeRandom.Next(0.0f, 1.0f))
+                return 0.15f;
+            return 0.0f;
+        }
+
+        private static CreatureType RollSlayerType(TreasureDeath treasureDeath)
+        {
+            if (Common.ConfigManager.Config.Server.WorldRuleset != Common.Ruleset.CustomDM)
+                return CreatureType.Invalid;
+
+            var chance = SlayerTypeChance.GetSlayerChanceForTier(treasureDeath.Tier);
+            if (chance > ThreadSafeRandom.Next(0.0f, 1.0f))
+                return SlayerTypeChance.Roll(treasureDeath);
+            return CreatureType.Invalid;
+        }
+
+        private static float RollSlayerAmount(TreasureDeath treasureDeath)
+        {
+            if (Common.ConfigManager.Config.Server.WorldRuleset != Common.Ruleset.CustomDM)
+                return 0.0f;
+            return 1.5f;
         }
     }
 }

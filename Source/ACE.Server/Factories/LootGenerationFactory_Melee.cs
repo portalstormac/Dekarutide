@@ -4,6 +4,7 @@ using System.Linq;
 using ACE.Common;
 using ACE.Database.Models.World;
 using ACE.Entity.Enum;
+using ACE.Entity.Enum.Properties;
 using ACE.Server.Entity.Mutations;
 using ACE.Server.Factories.Entity;
 using ACE.Server.Factories.Enum;
@@ -165,6 +166,21 @@ namespace ACE.Server.Factories
             {
                 var weaponSpeedMod = RollWeaponSpeedMod(profile);
                 wo.WeaponTime = (int)(wo.WeaponTime * weaponSpeedMod);
+            }
+
+            var crushingBlow = RollCrushingBlow(profile, false);
+            if(crushingBlow != 0.0f)
+                wo.SetProperty(PropertyFloat.CriticalMultiplier, crushingBlow);
+
+            var bitingStrike = RollBitingStrike(profile);
+            if (bitingStrike != 0.0f)
+                wo.CriticalFrequency = bitingStrike;
+
+            var slayerType = RollSlayerType(profile);
+            if (slayerType != CreatureType.Invalid)
+            {
+                wo.SlayerCreatureType = slayerType;
+                wo.SlayerDamageBonus = RollSlayerAmount(profile);
             }
 
             // material type

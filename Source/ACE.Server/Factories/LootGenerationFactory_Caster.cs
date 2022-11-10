@@ -1,6 +1,7 @@
 using ACE.Common;
 using ACE.Database.Models.World;
 using ACE.Entity.Enum;
+using ACE.Entity.Enum.Properties;
 using ACE.Server.Entity.Mutations;
 using ACE.Server.Factories.Entity;
 using ACE.Server.Factories.Enum;
@@ -141,6 +142,21 @@ namespace ACE.Server.Factories
                 // mutate WeaponDefense
                 mutationFilter = MutationCache.GetMutation("Casters.weapon_defense.txt");
                 mutationFilter.TryMutate(wo, profile.Tier, profile.LootQualityMod);
+            }
+
+            var crushingBlow = RollCrushingBlow(profile, true);
+            if (crushingBlow != 0.0f)
+                wo.SetProperty(PropertyFloat.CriticalMultiplier, crushingBlow);
+
+            var bitingStrike = RollBitingStrike(profile);
+            if (bitingStrike != 0.0f)
+                wo.CriticalFrequency = bitingStrike;
+
+            var slayerType = RollSlayerType(profile);
+            if (slayerType != CreatureType.Invalid)
+            {
+                wo.SlayerCreatureType = slayerType;
+                wo.SlayerDamageBonus = RollSlayerAmount(profile);
             }
 
             // material type
