@@ -556,7 +556,7 @@ namespace ACE.Server.Command.Handlers
 
             new ActivityRecommendation(2, 8, "HeaToneawaCompleted", "XP: Deliver a love letter for Hea Toneawa at 43.7N 66.9W near Greenspire."),
 
-            new ActivityRecommendation(5, 10, "OlthoiHunting1", "XP: Kill Olthois in the Abandoned Tumerok Site near Redspire at 42.0N, 82.2W and bring a Harvester Pincer to Behdo Yii in Redspire."),
+            new ActivityRecommendation(8, 15, "OlthoiHunting1", "XP: Kill Olthois in the Abandoned Tumerok Site near Redspire at 42.0N, 82.2W and bring a Harvester Pincer to Behdo Yii in Redspire."),
             new ActivityRecommendation(12, 20, "OlthoiHunting2", "XP: Kill Olthois in the Dark Lair near Greenspire at 43.8N, 68.4W and bring a Gardener Pincer to Behdo Yii in Redspire."),
 
             new ActivityRecommendation(5, 10, Skill.Lockpick, "Equipment: Explore Eastham Sewer near Eastham at 18.7N, 63.4E for the Metal Round Shield. Bring lockpicks!"),
@@ -572,7 +572,7 @@ namespace ACE.Server.Command.Handlers
 
             new ActivityRecommendation(5, 20, "IceTachiTurnedIn", "XP/Equipment: Retrieve the fabled Ice Tachi from the mosswart camp at 27.5S, 71.0E near Shoushi, keep it or deliver it to an Ivory Crafter for an experience reward."),
             new ActivityRecommendation(10, 20, "AcidAxeTurnedIn", "XP/Equipment: Explore Suntik Village near Zaikhal at 16.2N 4.3E for the Acid Axe, keep it or deliver it to an Ivory Crafter for an experience reward."),
-            new ActivityRecommendation(10, 20, "GivenTibriSpear", "XP/Equipment: Explore a Cave near Cragstone at 23.2N, 44.0E for Tibri's Fire Spear, keep it or deliver it to Tibri also in the cave for an experience reward."),
+            new ActivityRecommendation(10, 20, "GivenTibriSpear", "XP/Equipment: Explore a Cave near Cragstone at 24.2N, 43.2E for Tibri's Fire Spear, keep it or deliver it to Tibri also in the cave for an experience reward."),
             new ActivityRecommendation(10, 20, "LilithasBowGiven", "XP/Equipment: Explore Hunter's Leap near Holtburg at 35.7N, 32.6E for Lilitha's Bow, keep it or deliver it to Eldrista at 35.7N, 33.4E for an experience reward."),
 
             new ActivityRecommendation(10, 20, Skill.Armor, "Equipment: Explore the Glenden Wood Dungeon near Glenden Wood at 29.9N, 26.4E for the Platemail Hauberk of the Ogre."),
