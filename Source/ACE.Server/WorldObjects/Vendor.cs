@@ -855,18 +855,15 @@ namespace ACE.Server.WorldObjects
                 case "Plateau":
                 case "Qalaba'r":
                 case "Timaru":
+                case "Stonehold":
                     ShopTier = 3;
                     ShopQualityMod = 0.0f;
                     break;
                 case "Candeth Keep":
                 case "Fort Tethana":
-                case "Stonehold":
-                    ShopTier = 4;
-                    ShopQualityMod = 0.0f;
-                    break;
                 case "Ayan Baqur":
                 case "WaiJhou":
-                    ShopTier = 5;
+                    ShopTier = 4;
                     ShopQualityMod = 0.0f;
                     break;
             }
