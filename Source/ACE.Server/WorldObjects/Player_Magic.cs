@@ -1131,7 +1131,7 @@ namespace ACE.Server.WorldObjects
             if (Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.CustomDM)
             {
                 var amulet = GetEquippedLeyLineAmulet();
-                if (amulet != null && amulet.LeyLineEffectId == (uint)LeyLineEffect.GrantCastableSpell && LeyLineAmulet.PossibleAcquireSpells.Contains((SpellId)spell.Id))
+                if (amulet != null && amulet.LeyLineEffectId == (uint)LeyLineEffect.GrantCastableSpell && LeyLineAmulet.PossibleAcquireSpells.Contains(SpellLevelProgression.GetLevel1SpellId((SpellId)spell.Id)))
                     magicSchool = (MagicSchool)amulet.LeyLineSchool;
             }
 
@@ -1289,7 +1289,7 @@ namespace ACE.Server.WorldObjects
             if (Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.CustomDM)
             {
                 var amulet = GetEquippedLeyLineAmulet();
-                if (amulet != null && amulet.LeyLineEffectId == (uint)LeyLineEffect.GrantCastableSpell && LeyLineAmulet.PossibleAcquireSpells.Contains((SpellId)spell.Id))
+                if (amulet != null && amulet.LeyLineEffectId == (uint)LeyLineEffect.GrantCastableSpell && LeyLineAmulet.PossibleAcquireSpells.Contains(SpellLevelProgression.GetLevel1SpellId((SpellId)spell.Id)))
                     magicSchool = (MagicSchool)amulet.LeyLineSchool;
             }
 

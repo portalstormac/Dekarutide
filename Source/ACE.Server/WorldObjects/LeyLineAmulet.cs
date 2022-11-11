@@ -576,7 +576,12 @@ namespace ACE.Server.WorldObjects
             spellId = possibleSpells[pseudoRandom.Next(0, possibleSpells.Count - 1)];
             Spell spell = new Spell(spellId);
             isBeneficial = spell.IsBeneficial;
-            spellName = spell.Name.Replace(" III", "").Replace(" I", "");
+            if (spell.Name.EndsWith(" I"))
+                spellName = spell.Name.Substring(0, spell.Name.Length - 2);
+            else if (spell.Name.EndsWith(" III"))
+                spellName = spell.Name.Substring(0, spell.Name.Length - 4);
+            else
+                spellName = spell.Name;
         }
 
         private void ResetAmulet()
