@@ -686,12 +686,12 @@ namespace ACE.Server.Factories
                 {
                     case 1: return 20; // EoR is 1
                     case 2: return 75; // EoR is 50
-                    case 3: return 125; // EoR is 100
-                    case 4: return 150; // EoR is 150
-                    case 5: return 200; // EoR is 200
+                    case 3: return 130; // EoR is 100
+                    case 4: return 160; // EoR is 150
+                    case 5: return 190; // EoR is 200
                     case 6: return 220; // EoR is 250
                     default:
-                    case 7: return 240; // EoR is 300
+                    case 7: return 250; // EoR is 300
                 }
             }
             else

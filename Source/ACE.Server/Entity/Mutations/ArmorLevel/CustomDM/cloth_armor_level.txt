@@ -1,0 +1,45 @@
+Armor Mutation #2:
+
+Tier chances: 0, 1, 0, 0, 0, 0
+
+    - Chance 100%:
+        WieldRequirements = Level
+        WieldSkillType = 1
+        WieldDifficulty = 5
+
+Armor Mutation #3:
+
+Tier chances: 0, 0, 1, 0, 0, 0
+
+    - Chance 100%:
+        WieldRequirements = Level
+        WieldSkillType = 1
+        WieldDifficulty = 20
+
+Armor Mutation #4:
+
+Tier chances: 0, 0, 0, 1, 0, 0
+
+    - Chance 100%:
+        WieldRequirements = Level
+        WieldSkillType = 1
+        WieldDifficulty = 40
+
+Armor Mutation #5:
+
+Tier chances: 0, 0, 0, 0, 1, 0
+
+    - Chance 100%:
+        WieldRequirements = Level
+        WieldSkillType = 1
+        WieldDifficulty = 60
+
+Armor Mutation #6:
+
+Tier chances: 0, 0, 0, 0, 0, 1
+
+    - Chance 100%:
+        WieldRequirements = Level
+        WieldSkillType = 1
+        WieldDifficulty = 80
+

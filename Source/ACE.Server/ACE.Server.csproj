@@ -45,6 +45,7 @@
     <None Remove="Entity\Mutations\ArmorLevel\Infiltration\covenant_shield_level.txt" />
     <None Remove="Entity\Mutations\ArmorLevel\Infiltration\shield_level.txt" />
     <None Remove="Entity\Mutations\ArmorLevel\CustomDM\armor_level.txt" />
+    <None Remove="Entity\Mutations\ArmorLevel\CustomDM\cloth_armor_level.txt" />
     <None Remove="Entity\Mutations\ArmorLevel\CustomDM\covenant_armor_level.txt" />
     <None Remove="Entity\Mutations\ArmorLevel\CustomDM\covenant_shield_level.txt" />
     <None Remove="Entity\Mutations\ArmorLevel\CustomDM\shield_level.txt" />
@@ -219,6 +220,7 @@
     <EmbeddedResource Include="Entity\Mutations\ArmorLevel\Infiltration\covenant_shield_level.txt" />
     <EmbeddedResource Include="Entity\Mutations\ArmorLevel\Infiltration\shield_level.txt" />
     <EmbeddedResource Include="Entity\Mutations\ArmorLevel\CustomDM\armor_level.txt" />
+    <EmbeddedResource Include="Entity\Mutations\ArmorLevel\CustomDM\cloth_armor_level.txt" />
     <EmbeddedResource Include="Entity\Mutations\ArmorLevel\CustomDM\covenant_armor_level.txt" />
     <EmbeddedResource Include="Entity\Mutations\ArmorLevel\CustomDM\covenant_shield_level.txt" />
     <EmbeddedResource Include="Entity\Mutations\ArmorLevel\CustomDM\shield_level.txt" />

@@ -172,7 +172,7 @@ namespace ACE.Server.Factories
 
             // only exceptions found: covenant armor, olthoi armor, metal cap
 
-            if (!roll.HasArmorLevel(wo) || roll.IsClothArmor)
+            if (!roll.HasArmorLevel(wo) && !roll.IsClothArmor)
                 return false;
 
             var scriptName = GetMutationScript_ArmorLevel(wo, roll);
@@ -219,6 +219,8 @@ namespace ACE.Server.Factories
                 {
                     if (wo.IsShield)
                         return $"ArmorLevel.{ruleset}.shield_level.txt";
+                    else if(roll.IsClothArmor)
+                        return $"ArmorLevel.{ruleset}.cloth_armor_level.txt";
                     return $"ArmorLevel.{ruleset}.armor_level.txt";
                 }
             }

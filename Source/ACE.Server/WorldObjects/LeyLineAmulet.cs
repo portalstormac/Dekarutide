@@ -611,19 +611,16 @@ namespace ACE.Server.WorldObjects
             {
                 uint playerSkillLevel = player.GetCreatureSkill(((LeyLineSchool ?? 0) == (int)MagicSchool.WarMagic) ? Skill.WarMagic : Skill.LifeMagic).Current;
 
-                SpellId grantedSpellId = SpellId.Undef;
                 for (int level = 1; level <= 6; level++)
                 {
                     SpellId grantedSpellIdAttempt = SpellLevelProgression.GetSpellAtLevel((SpellId)level1SpellId, level, true);
                     Spell grantedSpellAttempt = new Spell(grantedSpellIdAttempt);
 
                     if (playerSkillLevel >= (int)grantedSpellAttempt.Power - 50)
-                        grantedSpellId = grantedSpellIdAttempt;
+                        player.LearnSpellWithNetworking((uint)grantedSpellIdAttempt);
                     else
                         break;
                 }
-                if (grantedSpellId != SpellId.Undef)
-                    player.LearnSpellWithNetworking((uint)grantedSpellId);
             }
 
             if (forceAddSpellsToWielder)
