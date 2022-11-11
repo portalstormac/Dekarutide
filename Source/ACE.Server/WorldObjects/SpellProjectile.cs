@@ -462,8 +462,6 @@ namespace ACE.Server.WorldObjects
                 if (techniqueTrinket != null && techniqueTrinket.TacticAndTechniqueId == (int)TacticAndTechniqueType.Opportunist)
                     criticalChance += 0.10f;
             }
-            else if(source == target)
-                criticalChance = 1.0f; // All self attacks are critical hits!
 
             if (ThreadSafeRandom.Next(0.0f, 1.0f) < criticalChance)
             {
