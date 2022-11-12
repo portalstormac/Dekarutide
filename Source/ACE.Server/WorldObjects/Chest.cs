@@ -223,8 +223,20 @@ namespace ACE.Server.WorldObjects
         {
             base.FinishClose(player);
 
-            //If we're a generated container start our decay timer once we've been opened and closed.
-            if (Generator != null)
+            if (ChestClearedWhenClosed && InitCreate > 0)
+            {
+                if (Generator != null && Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.CustomDM)
+                {
+                    var actionChain = new ActionChain();
+                    actionChain.AddDelaySeconds(1.0f);
+                    actionChain.AddAction(this, () => Generator.ResetGenerator());
+                    actionChain.EnqueueChain();                    
+                }
+                else if (CurrentCreate == 0)
+                    FadeOutAndDestroy(); // Chest's complete generated inventory count has been wiped out
+                                         //Destroy(); // Chest's complete generated inventory count has been wiped out
+            }
+            else if (Generator != null) //If we're a generated container start our decay timer once we've been opened and closed.
             {
                 TimeToRot = DefaultTimeToRot.TotalSeconds;
                 Generator = null;
@@ -239,13 +251,6 @@ namespace ACE.Server.WorldObjects
                 }
                 else
                     RotProof = false;
-            }
-
-            if (ChestClearedWhenClosed && InitCreate > 0)
-            {
-                if (CurrentCreate == 0)
-                    FadeOutAndDestroy(); // Chest's complete generated inventory count has been wiped out
-                    //Destroy(); // Chest's complete generated inventory count has been wiped out
             }
         }
 
