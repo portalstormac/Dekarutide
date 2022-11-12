@@ -738,6 +738,8 @@ namespace ACE.Server.WorldObjects
 
                 if (TryDequipObjectWithBroadcasting(item.Guid, out var wo, out var wieldedLocation))
                     EnqueueBroadcast(new GameMessagePublicUpdateInstanceID(item, PropertyInstanceId.Wielder, ObjectGuid.Invalid));
+                else
+                    TryRemoveFromInventory(item.Guid);
 
                 if (corpse != null)
                 {
