@@ -241,6 +241,10 @@ namespace ACE.Server.Factories
             wo.ItemManaCost = (int)(spell.BaseMana * castableMod);
 
             wo.ItemUseable = Usable.SourceWieldedTargetRemoteNeverWalk;
+
+            wo.CooldownId = 1001;
+
+            wo.CooldownDuration = 10;
         }
 
         private static string GetCasterScript(bool isElemental = false)

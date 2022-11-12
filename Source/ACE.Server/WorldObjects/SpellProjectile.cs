@@ -576,6 +576,8 @@ namespace ACE.Server.WorldObjects
                 {
                     if (sourcePlayer == null)
                         baseDamage /= 2; // Monsters do half projectile spell damage.
+                    else if(isPVP && Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.CustomDM)
+                        baseDamage /= 2; // Players in pvp do half projectile spell damage.
                 }
 
                 weaponResistanceMod = GetWeaponResistanceModifier(weapon, sourceCreature, attackSkill, Spell.DamageType);
