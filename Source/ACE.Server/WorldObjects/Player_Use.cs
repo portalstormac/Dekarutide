@@ -88,7 +88,6 @@ namespace ACE.Server.WorldObjects
                 }
                 else
                 {
-                    EnchantmentManager.StartCooldown(sourceItem);
                     HandleActionCastTargetedSpell(targetObjectGuid, sourceItem.SpellDID ?? 0, sourceItem);
                     return;
                 }

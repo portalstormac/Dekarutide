@@ -1151,8 +1151,12 @@ namespace ACE.Server.WorldObjects
             if (!CalculateManaUsage(castingPreCheckStatus, spell, target, casterItem, out var manaUsed))
                 return false;
 
+            // We're past all the basic checks, start cooldowns if present.
             if (spellConduit != null)
-                spellConduit.StartCooldown(this); // We're past all the basic checks, start conduit cooldown.
+                spellConduit.StartCooldown(this);
+            else if(casterItem != null)
+                EnchantmentManager.StartCooldown(casterItem);
+
 
             // spell words
             DoSpellWords(spell, isWeaponSpell);
@@ -1304,8 +1308,11 @@ namespace ACE.Server.WorldObjects
             if (!CalculateManaUsage(castingPreCheckStatus, spell, null, casterItem, out var manaUsed))
                 return false;
 
+            // We're past all the basic checks, start cooldowns if present.
             if (spellConduit != null)
-                spellConduit.StartCooldown(this); // We're past all the basic checks, start conduit cooldown.
+                spellConduit.StartCooldown(this);
+            else if (casterItem != null)
+                EnchantmentManager.StartCooldown(casterItem);
 
             // begin spellcasting
             DoSpellWords(spell, false);
