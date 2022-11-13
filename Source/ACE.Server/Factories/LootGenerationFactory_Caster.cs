@@ -242,9 +242,11 @@ namespace ACE.Server.Factories
 
             wo.ItemUseable = Usable.SourceWieldedTargetRemoteNeverWalk;
 
-            wo.CooldownId = 1001;
-
-            wo.CooldownDuration = 10;
+            if (Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.CustomDM)
+            {
+                wo.CooldownId = 1001;
+                wo.CooldownDuration = 10;
+            }
         }
 
         private static string GetCasterScript(bool isElemental = false)
