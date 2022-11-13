@@ -349,7 +349,11 @@ namespace ACE.Server.Managers
             if (Player.CurrentLandblock.IsDungeon)
                 areaCampId = Player.CurrentLandblock.Id.Raw & 0xFFFF0000;
             else
+            {
                 areaCampId = Player.CurrentLandblock.Id.Raw & 0xF0F00000;
+                if (areaCampId == 0) // Fix conflict with restCamp for the lower left area of the map(Caul)
+                    areaCampId = 0x0F0F0000;
+            }
             if (areaCampId != 0)
             {
                 var areaCamp = GetOrCreateCamp(areaCampId, out _);
@@ -398,7 +402,11 @@ namespace ACE.Server.Managers
             if (creature.CurrentLandblock.IsDungeon)
                 areaCampId = creature.CurrentLandblock.Id.Raw & 0xFFFF0000;
             else
+            {
                 areaCampId = creature.CurrentLandblock.Id.Raw & 0xF0F00000;
+                if (areaCampId == 0) // Fix conflict with restCamp for the lower left area of the map(Caul)
+                    areaCampId = 0x0F0F0000;
+            }
             if (areaCampId != 0)
             {
                 var areaCamp = GetOrCreateCamp(areaCampId, out _);
