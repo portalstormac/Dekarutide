@@ -446,7 +446,7 @@ namespace ACE.Server.WorldObjects
             // life spells
             // additive: armor/imperil
             var bodyArmorMod = defender.EnchantmentManager.GetBodyArmorMod();
-            if (ignoreMagicResist)
+            if (ignoreMagicResist && Common.ConfigManager.Config.Server.WorldRuleset != Common.Ruleset.CustomDM)
                 bodyArmorMod = IgnoreMagicResistScaled(bodyArmorMod);
 
             // handle armor rending mod here?
