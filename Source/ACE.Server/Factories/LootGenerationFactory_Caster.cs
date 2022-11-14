@@ -144,20 +144,11 @@ namespace ACE.Server.Factories
                 mutationFilter.TryMutate(wo, profile.Tier, profile.LootQualityMod);
             }
 
-            var crushingBlow = RollCrushingBlow(profile, true);
-            if (crushingBlow != 0.0f)
-                wo.SetProperty(PropertyFloat.CriticalMultiplier, crushingBlow);
+            RollCrushingBlow(profile, wo);
 
-            var bitingStrike = RollBitingStrike(profile);
-            if (bitingStrike != 0.0f)
-                wo.CriticalFrequency = bitingStrike;
+            RollBitingStrike(profile, wo);
 
-            var slayerType = RollSlayerType(profile);
-            if (slayerType != CreatureType.Invalid)
-            {
-                wo.SlayerCreatureType = slayerType;
-                wo.SlayerDamageBonus = RollSlayerAmount(profile);
-            }
+            RollSlayer(profile, wo);
 
             // material type
             var materialType = GetMaterialType(wo, profile.Tier);

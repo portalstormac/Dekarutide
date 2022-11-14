@@ -99,20 +99,13 @@ namespace ACE.Server.Factories
                 wo.WeaponTime = (int)(wo.WeaponTime * weaponSpeedMod);
             }
 
-            var crushingBlow = RollCrushingBlow(profile, false);
-            if (crushingBlow != 0.0f)
-                wo.SetProperty(PropertyFloat.CriticalMultiplier, crushingBlow);
+            RollCrushingBlow(profile, wo);
 
-            var bitingStrike = RollBitingStrike(profile);
-            if (bitingStrike != 0.0f)
-                wo.CriticalFrequency = bitingStrike;
+            RollBitingStrike(profile, wo);
 
-            var slayerType = RollSlayerType(profile);
-            if (slayerType != CreatureType.Invalid)
-            {
-                wo.SlayerCreatureType = slayerType;
-                wo.SlayerDamageBonus = RollSlayerAmount(profile);
-            }
+            RollHollow(profile, wo);
+
+            RollSlayer(profile, wo);
 
             // material type
             var materialType = GetMaterialType(wo, profile.Tier);

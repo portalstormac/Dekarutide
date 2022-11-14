@@ -1,6 +1,7 @@
 using ACE.Common;
 using ACE.Database.Models.World;
 using ACE.Entity.Enum;
+using ACE.Entity.Enum.Properties;
 using ACE.Server.Factories.Tables;
 using ACE.Server.WorldObjects;
 
@@ -42,49 +43,76 @@ namespace ACE.Server.Factories
             return weaponSpeedMod;
         }
 
-        private static float RollCrushingBlow(TreasureDeath treasureDeath, bool isCaster)
+        private static bool RollCrushingBlow(TreasureDeath treasureDeath, WorldObject wo)
         {
             if (Common.ConfigManager.Config.Server.WorldRuleset != Common.Ruleset.CustomDM)
-                return 0.0f;
+                return false;
 
             var chance = ExtraWeaponEffects.GetCrushingBlowChanceForTier(treasureDeath.Tier);
             if (chance > ThreadSafeRandom.Next(0.0f, 1.0f))
             {
-                if (isCaster)
-                    return 0.5f;
+                float amount;
+                if (wo.IsCaster)
+                    amount = 0.5f;
                 else
-                    return 2.0f;
+                    amount = 2.0f;
+
+                wo.SetProperty(PropertyFloat.CriticalMultiplier, amount);
+                wo.IconOverlayId = 0x06005EBC;
+                return true;
             }
-            return 0.0f;
+            else
+                return false;
         }
 
-        private static float RollBitingStrike(TreasureDeath treasureDeath)
+        private static bool RollBitingStrike(TreasureDeath treasureDeath, WorldObject wo)
         {
             if (Common.ConfigManager.Config.Server.WorldRuleset != Common.Ruleset.CustomDM)
-                return 0.0f;
+                return false;
 
             var chance = ExtraWeaponEffects.GetBitingStrikeChanceForTier(treasureDeath.Tier);
             if (chance > ThreadSafeRandom.Next(0.0f, 1.0f))
-                return 0.15f;
-            return 0.0f;
+            {
+                wo.CriticalFrequency = 0.15f;
+                wo.IconOverlayId = 0x06005EBD;
+                return true;
+            }
+            else
+                return false;
         }
 
-        private static CreatureType RollSlayerType(TreasureDeath treasureDeath)
+        private static bool RollSlayer(TreasureDeath treasureDeath, WorldObject wo)
         {
             if (Common.ConfigManager.Config.Server.WorldRuleset != Common.Ruleset.CustomDM)
-                return CreatureType.Invalid;
+                return false;
 
             var chance = SlayerTypeChance.GetSlayerChanceForTier(treasureDeath.Tier);
             if (chance > ThreadSafeRandom.Next(0.0f, 1.0f))
-                return SlayerTypeChance.Roll(treasureDeath);
-            return CreatureType.Invalid;
+            {
+                wo.SlayerCreatureType = SlayerTypeChance.Roll(treasureDeath);
+                wo.SlayerDamageBonus = 1.5f;
+                wo.IconOverlayId = 0x06005EC0;
+                return true;
+            }
+            return false;
         }
 
-        private static float RollSlayerAmount(TreasureDeath treasureDeath)
+        private static bool RollHollow(TreasureDeath treasureDeath, WorldObject wo)
         {
             if (Common.ConfigManager.Config.Server.WorldRuleset != Common.Ruleset.CustomDM)
-                return 0.0f;
-            return 1.5f;
+                return false;
+
+            var chance = ExtraWeaponEffects.GetHollowChanceForTier(treasureDeath.Tier);
+            if (chance > ThreadSafeRandom.Next(0.0f, 1.0f))
+            {
+                wo.IgnoreMagicArmor = true;
+                wo.IgnoreMagicResist = true;
+                wo.Translucency = 0.7f;
+                wo.Name = $"Hollow {wo.Name}";
+                wo.IconOverlayId = 0x06005EBE;
+                return true;
+            }
+            return false;
         }
     }
 }
