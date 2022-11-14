@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-
+using System.Linq;
 using ACE.Common;
 using ACE.Entity;
 using ACE.Entity.Enum;
@@ -12,6 +12,7 @@ using ACE.Server.Network.GameMessages.Messages;
 using ACE.Server.WorldObjects;
 using ACE.Server.WorldObjects.Entity;
 using log4net;
+using MySqlX.XDevAPI.Common;
 
 namespace ACE.Server.Entity
 {
@@ -104,7 +105,7 @@ namespace ACE.Server.Entity
             if (player.FindObject(target.Guid.Full, Player.SearchLocations.MyInventory) == null)
                 return WeenieError.YouDoNotPassCraftingRequirements;
 
-            if (source.WeenieClassId != MagnifyingGlassWeenieId || !target.OriginalValue.HasValue || target.OriginalValue == 0)
+            if (source.WeenieClassId != MagnifyingGlassWeenieId)
                 return WeenieError.YouDoNotPassCraftingRequirements;
 
             //player.Session.Network.EnqueueSend(new GameEventCommunicationTransientString(player.Session, $"You can't use the {source.Name} on {target.Name} because the sigil is already visible."));
@@ -114,42 +115,94 @@ namespace ACE.Server.Entity
 
         public static void PerformAppraisal(Player player, WorldObject source, WorldObject target)
         {
-            if(!target.OriginalValue.HasValue)
+            if (target is Container container)
             {
-                player.Session.Network.EnqueueSend(new GameMessageSystemChat("You can't appraise that.", ChatMessageType.Broadcast));
-                player.SendUseDoneEvent();
-                return;
-            }
-
-            CreatureSkill appraisalSkill = player.GetCreatureSkill(Skill.Appraise);
-            if (appraisalSkill.AdvancementClass < SkillAdvancementClass.Trained)
-            {
-                player.Session.Network.EnqueueSend(new GameEventCommunicationTransientString(player.Session, $"You must have {appraisalSkill.Skill.ToSentence()} trained to appraise that."));
-                player.SendUseDoneEvent();
-                return;
-            }
-
-            var currValue = target.Value ?? 0;
-            var trueValue = target.OriginalValue ?? currValue;
-
-            var diff = 25 + (uint)Math.Sqrt(Math.Min(trueValue, 250000));
-            var chance = SkillCheck.GetSkillChance(appraisalSkill.Current, diff);
-
-            if (chance > ThreadSafeRandom.Next(0.0f, 1.0f))
-            {
-                Proficiency.OnSuccessUse(player, appraisalSkill, diff);
-
-                player.Session.Network.EnqueueSend(new GameMessageSystemChat($"You appraise the {target.NameWithMaterial} to be worth {trueValue} Pyreals.", ChatMessageType.Broadcast));
-                if (currValue != trueValue)
+                CreatureSkill appraisalSkill = player.GetCreatureSkill(Skill.Appraise);
+                if (appraisalSkill.AdvancementClass < SkillAdvancementClass.Trained)
                 {
-                    target.SetProperty(PropertyInt.Value, trueValue);
-                    player.Session.Network.EnqueueSend(new GameMessagePrivateUpdatePropertyInt(target, PropertyInt.Value, trueValue));
-
-                    target.SaveBiotaToDatabase();
+                    player.Session.Network.EnqueueSend(new GameEventCommunicationTransientString(player.Session, $"You must have {appraisalSkill.Skill.ToSentence()} trained to appraise that."));
+                    player.SendUseDoneEvent();
+                    return;
                 }
+
+                var itemsNeedingAppraisal = container.Inventory.Values.Where(k => k.OriginalValue.HasValue && k.OriginalValue != k.Value).ToList();
+                if(itemsNeedingAppraisal.Count == 0)
+                {
+                    player.Session.Network.EnqueueSend(new GameMessageSystemChat("There's nothing needing appraisal in this container.", ChatMessageType.Broadcast));
+                    player.SendUseDoneEvent();
+                    return;
+                }
+
+                var successCount = 0;
+                foreach (var item in itemsNeedingAppraisal)
+                {
+                    var currValue = item.Value ?? 0;
+                    var trueValue = item.OriginalValue ?? currValue;
+
+                    var diff = 25 + (uint)Math.Sqrt(Math.Min(trueValue, 250000));
+                    var chance = SkillCheck.GetSkillChance(appraisalSkill.Current, diff);
+
+                    if (chance > ThreadSafeRandom.Next(0.0f, 1.0f))
+                    {
+                        Proficiency.OnSuccessUse(player, appraisalSkill, diff);
+
+                        if (currValue != trueValue)
+                        {
+                            successCount++;
+                            item.SetProperty(PropertyInt.Value, trueValue);
+                            player.Session.Network.EnqueueSend(new GameMessagePrivateUpdatePropertyInt(item, PropertyInt.Value, trueValue));
+
+                            item.SaveBiotaToDatabase();
+                        }
+                    }
+                }
+
+                if(successCount == itemsNeedingAppraisal.Count)
+                    player.Session.Network.EnqueueSend(new GameMessageSystemChat($"You successfully appraise {successCount} items in the container. All contents are now appraised.", ChatMessageType.Broadcast));
+                else if(successCount == 0)
+                    player.Session.Network.EnqueueSend(new GameMessageSystemChat($"You fail to appraise any items in the container. There are still {itemsNeedingAppraisal.Count - successCount} unappraised item(s) in this container.", ChatMessageType.Broadcast));
+                else
+                    player.Session.Network.EnqueueSend(new GameMessageSystemChat($"You successfully appraise {successCount} items in the container. There are still {itemsNeedingAppraisal.Count - successCount} unappraised item(s) in this container.", ChatMessageType.Broadcast));
             }
             else
-                player.Session.Network.EnqueueSend(new GameMessageSystemChat($"You fail to appraise the value of the {target.NameWithMaterial}.", ChatMessageType.Broadcast));
+            {
+                if (!target.OriginalValue.HasValue)
+                {
+                    player.Session.Network.EnqueueSend(new GameMessageSystemChat("You can't appraise that.", ChatMessageType.Broadcast));
+                    player.SendUseDoneEvent();
+                    return;
+                }
+
+                CreatureSkill appraisalSkill = player.GetCreatureSkill(Skill.Appraise);
+                if (appraisalSkill.AdvancementClass < SkillAdvancementClass.Trained)
+                {
+                    player.Session.Network.EnqueueSend(new GameEventCommunicationTransientString(player.Session, $"You must have {appraisalSkill.Skill.ToSentence()} trained to appraise that."));
+                    player.SendUseDoneEvent();
+                    return;
+                }
+
+                var currValue = target.Value ?? 0;
+                var trueValue = target.OriginalValue ?? currValue;
+
+                var diff = 25 + (uint)Math.Sqrt(Math.Min(trueValue, 250000));
+                var chance = SkillCheck.GetSkillChance(appraisalSkill.Current, diff);
+
+                if (chance > ThreadSafeRandom.Next(0.0f, 1.0f))
+                {
+                    Proficiency.OnSuccessUse(player, appraisalSkill, diff);
+
+                    player.Session.Network.EnqueueSend(new GameMessageSystemChat($"You appraise the {target.NameWithMaterial} to be worth {trueValue} Pyreals.", ChatMessageType.Broadcast));
+                    if (currValue != trueValue)
+                    {
+                        target.SetProperty(PropertyInt.Value, trueValue);
+                        player.Session.Network.EnqueueSend(new GameMessagePrivateUpdatePropertyInt(target, PropertyInt.Value, trueValue));
+
+                        target.SaveBiotaToDatabase();
+                    }
+                }
+                else
+                    player.Session.Network.EnqueueSend(new GameMessageSystemChat($"You fail to appraise the value of the {target.NameWithMaterial}.", ChatMessageType.Broadcast));
+            }
 
             player.SendUseDoneEvent();
         }
