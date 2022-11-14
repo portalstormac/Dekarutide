@@ -290,13 +290,13 @@ namespace ACE.Server.Managers
                 motdChain.AddAction(player, () =>
                 {
                     if (!string.IsNullOrEmpty(server_motd))
-                        session.Network.EnqueueSend(new GameMessageSystemChat(server_motd, ChatMessageType.Broadcast));
+                        session.Network.EnqueueSend(new GameMessageSystemChat(server_motd.Replace("\r",""), ChatMessageType.Broadcast));
                     if (!string.IsNullOrEmpty(server_motd2))
-                        session.Network.EnqueueSend(new GameMessageSystemChat(server_motd2, ChatMessageType.Broadcast));
+                        session.Network.EnqueueSend(new GameMessageSystemChat(server_motd2.Replace("\r", ""), ChatMessageType.Broadcast));
                     if (!string.IsNullOrEmpty(server_motd3))
-                        session.Network.EnqueueSend(new GameMessageSystemChat(server_motd3, ChatMessageType.Broadcast));
+                        session.Network.EnqueueSend(new GameMessageSystemChat(server_motd3.Replace("\r", ""), ChatMessageType.Broadcast));
                     if (!string.IsNullOrEmpty(server_motd4))
-                        session.Network.EnqueueSend(new GameMessageSystemChat(server_motd4, ChatMessageType.Broadcast));
+                        session.Network.EnqueueSend(new GameMessageSystemChat(server_motd4.Replace("\r", ""), ChatMessageType.Broadcast));
                 });
                 motdChain.EnqueueChain();
             }
