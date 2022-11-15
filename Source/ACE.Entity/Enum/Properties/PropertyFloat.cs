@@ -220,7 +220,9 @@ namespace ACE.Entity.Enum.Properties
 
         // CustomDM
         [ServerOnly]
-        LeyLineTriggerChance           = 10001
+        LeyLineTriggerChance           = 10001,
+        [ServerOnly]
+        HotspotImmunityTimestamp       = 10002,
     }
 
     public static class PropertyFloatExtensions

@@ -1824,6 +1824,12 @@ namespace ACE.Server.WorldObjects
             set { if (!value.HasValue) RemoveProperty(PropertyFloat.CheckpointTimestamp); else SetProperty(PropertyFloat.CheckpointTimestamp, value.Value); }
         }
 
+        public double HotspotImmunityTimestamp
+        {
+            get => GetProperty(PropertyFloat.HotspotImmunityTimestamp) ?? 0.0;
+            set { if (value == 0.0) RemoveProperty(PropertyFloat.HotspotImmunityTimestamp); else SetProperty(PropertyFloat.HotspotImmunityTimestamp, value); }
+        }
+
         public bool UseBackpackSlot => WeenieType == WeenieType.Container || RequiresPackSlot;
 
         public int? PlacementPosition
