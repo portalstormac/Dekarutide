@@ -320,9 +320,9 @@ namespace ACE.Server.Network.Handlers
 
                     session.Network.EnqueueSend(new GameMessageTurbineChat(ChatNetworkBlobType.NETBLOB_RESPONSE_BINARY, ChatNetworkBlobDispatchType.ASYNCMETHOD_SENDTOROOMBYNAME, contextId, null, null, 0, adjustedchatType));
 
-                    if (chatType == ChatType.General && channelID == TurbineChatChannel.General)
+                    if (adjustedchatType == ChatType.General && adjustedChannelID == TurbineChatChannel.General)
                     {
-                        _ = SendWebhookedChat(gameMessageTurbineChat.SenderName, gameMessageTurbineChat.Message, null, channelID);
+                        _ = SendWebhookedChat(gameMessageTurbineChat.SenderName, gameMessageTurbineChat.Message, null, adjustedChannelID);
                     }
                 }
 
