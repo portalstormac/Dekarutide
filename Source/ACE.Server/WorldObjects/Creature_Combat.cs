@@ -598,7 +598,7 @@ namespace ACE.Server.WorldObjects
         /// Returns the effective defense skill for a player or creature,
         /// ie. with Defender bonus and imbues
         /// </summary>
-        public uint GetEffectiveDefenseSkill(CombatType combatType)
+        public uint GetEffectiveDefenseSkill(CombatType combatType, bool isPvP)
         {
             var defenseSkill = combatType == CombatType.Missile ? Skill.MissileDefense : Skill.MeleeDefense;
             var defenseMod = defenseSkill == Skill.MissileDefense ? GetWeaponMissileDefenseModifier(this) : GetWeaponMeleeDefenseModifier(this);
@@ -613,7 +613,7 @@ namespace ACE.Server.WorldObjects
             //Console.WriteLine($"StanceMod: {stanceMod}");
 
             uint effectiveDefense;
-            if (ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.CustomDM && this is Player)
+            if (!isPvP && ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.CustomDM && this is Player)
                 effectiveDefense = (uint)Math.Round(GetCreatureSkill(defenseSkill).Current * 1.25f * defenseMod * burdenMod * stanceMod + defenseImbues);
             else
                 effectiveDefense = (uint)Math.Round(GetCreatureSkill(defenseSkill).Current * defenseMod * burdenMod * stanceMod + defenseImbues);

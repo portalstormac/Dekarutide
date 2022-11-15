@@ -467,25 +467,26 @@ namespace ACE.Server.Entity
         /// </summary>
         public float GetEvadeChance(Creature attacker, Creature defender)
         {
+            Player playerAttacker = attacker as Player;
+            Player playerDefender = defender as Player;
+            bool isPvP = playerAttacker != null && playerDefender != null;
+
             AccuracyMod = attacker.GetAccuracyMod(Weapon);
 
             EffectiveAttackSkill = attacker.GetEffectiveAttackSkill();
 
             //var attackType = attacker.GetCombatType();
 
-            EffectiveDefenseSkill = defender.GetEffectiveDefenseSkill(CombatType);
+            EffectiveDefenseSkill = defender.GetEffectiveDefenseSkill(CombatType, isPvP);
 
             if (Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.CustomDM)
             {
-                Player playerAttacker = attacker as Player;
-
                 if (playerAttacker != null)
                 {
                     if (playerAttacker.AttackHeight == AttackHeight.Medium) // Medium height attacks gives players 10% extra attack skill.
                         EffectiveAttackSkill = (uint)Math.Round(EffectiveAttackSkill * 1.10f);
                 }
 
-                Player playerDefender = defender as Player;
                 if (playerDefender != null)
                 {
                     var defenderTechnique = playerDefender.GetEquippedTrinket();
