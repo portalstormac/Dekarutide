@@ -26,6 +26,14 @@ namespace ACE.Server.Entity
             if (player.IsOlthoiPlayer)
                 return;
 
+            if (skill.IsSecondary)
+            {
+                if (skill.SecondaryTo != Skill.None)
+                    skill = player.GetCreatureSkill(skill.SecondaryTo);
+                else
+                    return;
+            }
+
             // ensure skill is at least trained
             if (skill.AdvancementClass < SkillAdvancementClass.Trained)
                 return;
