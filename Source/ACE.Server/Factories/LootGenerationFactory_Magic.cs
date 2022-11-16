@@ -835,7 +835,7 @@ namespace ACE.Server.Factories
                 return false;
             }
 
-            wo.ItemSkillLimit = skill;
+            wo.ItemSkillLimit = wo.ConvertToMoASkill(skill);
             return true;
         }
 
