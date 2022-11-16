@@ -72,7 +72,7 @@ namespace ACE.Server.WorldObjects
                 msg = $"The {target.Name} is still locked.\n";
             }
 
-            msg += GetConsumeUnlockerMessage(player, structure, true);
+            msg += GetConsumeUnlockerMessage(player, structure, isLockpick);
 
             player.Session.Network.EnqueueSend(new GameMessageSystemChat(msg, ChatMessageType.Broadcast));
         }
