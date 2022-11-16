@@ -188,6 +188,9 @@ namespace ACE.Server.WorldObjects
                 if (playerDamager == null)
                     continue;
 
+                if (playerDamager == this)
+                    continue;
+
                 var totalDamage = kvp.Value.TotalDamage;
 
                 var damagePercent = totalDamage / totalHealth;
