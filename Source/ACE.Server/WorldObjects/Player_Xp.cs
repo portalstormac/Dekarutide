@@ -69,7 +69,15 @@ namespace ACE.Server.WorldObjects
                     Session.Network.EnqueueSend(new GameMessageSystemChat("Your experience reward has been reduced because your level is not high enough!", ChatMessageType.System));
                 }
 
-                amount = Creature.GetCreatureDeathXP(xpSourceLevel.Value, 0, 0, formulaVersion);
+                float totalXP = Creature.GetCreatureDeathXP(xpSourceLevel.Value, 0, 0, formulaVersion);
+
+                float typeCampBonus;
+                CampManager.HandleCampInteraction((uint)amount, CurrentLandblock, out typeCampBonus, out _, out _);
+
+                totalXP = totalXP * typeCampBonus;
+
+                amount = (long)Math.Round(totalXP);
+                xpMessage = $"T: {(typeCampBonus * 100).ToString("0")}%";
             }
             else if (amount < 0)
             {
@@ -236,7 +244,7 @@ namespace ACE.Server.WorldObjects
             }
 
             if (xpType == XpType.Quest)
-                Session.Network.EnqueueSend(new GameMessageSystemChat($"You've earned {amount:N0} experience.", ChatMessageType.Broadcast));
+                Session.Network.EnqueueSend(new GameMessageSystemChat($"You've earned {amount:N0} experience. {xpMessage}", ChatMessageType.Broadcast));
             else if (Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.CustomDM)
             {
                 if (xpType == XpType.Fellowship)

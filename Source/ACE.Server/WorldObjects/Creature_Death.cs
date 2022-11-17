@@ -208,7 +208,7 @@ namespace ACE.Server.WorldObjects
                     float restCampBonus;
 
                     totalXP = GetCreatureDeathXP(Level ?? 0, (int)Health.MaxValue, Biota.PropertiesSpellBook?.Count ?? 0) * damagePercent;
-                    playerDamager.CampManager.HandleCampInteraction(this, out typeCampBonus, out areaCampBonus, out restCampBonus);
+                    playerDamager.CampManager.HandleCampInteraction((uint)CreatureType, CurrentLandblock, out typeCampBonus, out areaCampBonus, out restCampBonus);
 
                     float thirdXP = totalXP / 3.0f;
                     totalXP = (thirdXP * typeCampBonus) + (thirdXP * areaCampBonus) + (thirdXP * restCampBonus);
