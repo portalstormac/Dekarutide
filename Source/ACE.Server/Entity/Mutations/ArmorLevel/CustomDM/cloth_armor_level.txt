@@ -32,7 +32,7 @@ Tier chances: 0, 0, 0, 0, 1, 0
     - Chance 100%:
         WieldRequirements = Level
         WieldSkillType = 1
-        WieldDifficulty = 60
+        WieldDifficulty = 50
 
 Armor Mutation #6:
 
@@ -41,5 +41,5 @@ Tier chances: 0, 0, 0, 0, 0, 1
     - Chance 100%:
         WieldRequirements = Level
         WieldSkillType = 1
-        WieldDifficulty = 80
+        WieldDifficulty = 60
 
