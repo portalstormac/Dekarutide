@@ -258,7 +258,7 @@ namespace ACE.Server.Managers
         public static uint MaxInteractionsRestCamp = 500;
         public static uint MaxInteractionsAreaCamp = 750;
         public static uint MaxInteractionsTypeCamp = 2000;
-        public static uint MaxInteractionsTurninTypeCamp = 20;
+        public static uint MaxInteractionsTurninTypeCamp = 10;
 
         // When changing these values remember to also update the values in ShardDatabaseOfflineTools.cs
         public static float DelayBeforeDecayStart = 120.0f;
