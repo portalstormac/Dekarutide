@@ -1246,9 +1246,9 @@ namespace ACE.Server.WorldObjects
                 Proficiency.OnSuccessUse(sourceAsPlayer, skill, defenseSkill.Current);
 
             string spellType;
-            // 2/3 chance of the vulnerability being explicity of the type of attack that was used, otherwise random 1/3 for each type
+            // 1/5 chance of the vulnerability being explicity of the type of attack that was used, otherwise random 1/3 for each type
             SpellId spellId;
-            if (ThreadSafeRandom.Next(1, 3) != 3)
+            if (ThreadSafeRandom.Next(1, 5) != 5)
             {
                 switch (combatType)
                 {
