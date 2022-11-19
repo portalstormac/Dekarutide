@@ -910,7 +910,9 @@ namespace ACE.Server.WorldObjects
             var material = RecipeManager.GetMaterialName(MaterialType ?? 0);
 
             if (name.Contains(material))
-                name = name.Replace(material, "");
+            {
+                name = name.Replace(material, "").Trim();
+            }
 
             return $"{material} {name}";
         }
