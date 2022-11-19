@@ -360,14 +360,14 @@ namespace ACE.Server.WorldObjects
             return critRate;
         }
 
-        private const float defaultCritDamageMultiplier = 1.0f;
+        private const float defaultCritDamageMultiplier = 0.0f;
 
         /// <summary>
         /// Returns the critical damage multiplier for the attack weapon
         /// </summary>
         public static float GetWeaponCritDamageMod(WorldObject weapon, Creature wielder, CreatureSkill skill, Creature target)
         {
-            var critDamageMod = (float)(weapon?.GetProperty(PropertyFloat.CriticalMultiplier) ?? defaultCritDamageMultiplier);
+            var critDamageMod = 1.0f + (float)(weapon?.GetProperty(PropertyFloat.CriticalMultiplier) ?? defaultCritDamageMultiplier); // Add 1.0f here as PropertyFloat.CriticalMultiplier is the extra % only(0.5f means 50% higher crit dmg not half crit dmg)
 
             if (weapon != null && weapon.HasImbuedEffect(ImbuedEffectType.CripplingBlow))
             {

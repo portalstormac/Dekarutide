@@ -355,7 +355,7 @@ namespace ACE.Server.Entity
 
                     // verify: CriticalMultiplier only applied to the additional crit damage,
                     // whereas CD/CDR applied to the total damage (base damage + additional crit damage)
-                    CriticalDamageMod = 1.0f + WorldObject.GetWeaponCritDamageMod(Weapon, attacker, attackSkill, defender);
+                    CriticalDamageMod = WorldObject.GetWeaponCritDamageMod(Weapon, attacker, attackSkill, defender);
 
                     CriticalDamageRatingMod = Creature.GetPositiveRatingMod(attacker.GetCritDamageRating());
 
