@@ -73,7 +73,12 @@ namespace ACE.Server.Factories
             var chance = ExtraWeaponEffects.GetBitingStrikeChanceForTier(treasureDeath.Tier);
             if (chance > ThreadSafeRandom.Next(0.0f, 1.0f))
             {
-                wo.CriticalFrequency = 0.15f;
+                float amount;
+                if (wo.IsCaster)
+                    amount = 0.10f;
+                else
+                    amount = 0.15f;
+                wo.CriticalFrequency = amount;
                 wo.IconOverlayId = 0x06005EBD;
                 return true;
             }
