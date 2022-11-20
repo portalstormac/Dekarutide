@@ -466,8 +466,11 @@ namespace ACE.Server.WorldObjects
                 case EquipMask.MeleeWeapon:
                 case EquipMask.MissileWeapon:
                 case EquipMask.Held:
-                case EquipMask.Shield:
                 case EquipMask.TwoHanded:
+                    return true;
+                case EquipMask.Shield:
+                    if (CombatMode == CombatMode.Magic || CombatMode == CombatMode.Missile)
+                        return false;
                     return true;
             }
 
@@ -1869,22 +1872,48 @@ namespace ACE.Server.WorldObjects
                         }
 
                         mainhand = GetEquippedMainHand();
-                        // Remove any Two Handed, Caster (magic), or Missile Weapons
-                        if (mainhand != null && (mainhand.IsTwoHanded || mainhand.IsCaster || mainhand.IsAmmoLauncher))
+                        if (Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.CustomDM)
                         {
-                            log.Warn($"'{Name}' tried to wield '{item.Name}' ({item.Guid}) in slot {wieldedLocation}, which conflicts with '{mainhand.Name}'");
-                            return false;
+                            if (mainhand != null)
+                            {
+                                if(mainhand.IsCaster || mainhand.IsAmmoLauncher)
+                                {
+                                    if (item.EncumbranceVal > 420)
+                                        return false;
+                                }
+                                else if (mainhand.IsTwoHanded)
+                                    return false;
+                            }
+                        }
+                        else
+                        {
+                            // Remove any Two Handed, Caster (magic), or Missile Weapons
+                            if (mainhand != null && (mainhand.IsTwoHanded || mainhand.IsCaster || mainhand.IsAmmoLauncher))
+                            {
+                                log.Warn($"'{Name}' tried to wield '{item.Name}' ({item.Guid}) in slot {wieldedLocation}, which conflicts with '{mainhand.Name}'");
+                                return false;
+                            }
                         }
 
                         break;
                     case EquipMask.MissileWeapon:
-                        // Should not have any items in either hand for ammo launchers (bows, atlatls)
-                        // Thrown weapons (ie. phials) can have a shield
                         offhand = GetEquippedOffHand();
-                        if (offhand != null && item.IsAmmoLauncher)
+                        if (Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.CustomDM)
                         {
-                            log.Warn($"'{Name}' tried to wield '{item.Name}' ({item.Guid}) in slot {wieldedLocation}, which conflicts with '{offhand.Name}'");
-                            return false;
+                            // Only light shields allowed in the offhand for ammo launchers (bows, atlatls)
+                            // Thrown weapons (ie. phials) can have a shield
+                            if (offhand != null && item.IsAmmoLauncher && (offhand.CombatUse != ACE.Entity.Enum.CombatUse.Shield || offhand.EncumbranceVal > 420))
+                                return false;
+                        }
+                        else
+                        {
+                            // Should not have any items in either hand for ammo launchers (bows, atlatls)
+                            // Thrown weapons (ie. phials) can have a shield
+                            if (offhand != null && item.IsAmmoLauncher)
+                            {
+                                log.Warn($"'{Name}' tried to wield '{item.Name}' ({item.Guid}) in slot {wieldedLocation}, which conflicts with '{offhand.Name}'");
+                                return false;
+                            }
                         }
 
                         mainhand = GetEquippedMainHand();
@@ -1948,14 +1977,23 @@ namespace ACE.Server.WorldObjects
                         break;
 
                     case EquipMask.Held:
-                        // Should not have any items in offhand slot for casters only
                         if (item.IsCaster)
                         {
                             offhand = GetEquippedOffHand();
-                            if (offhand != null)
+                            if (Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.CustomDM)
                             {
-                                log.Warn($"'{Name}' tried to wield '{item.Name}' ({item.Guid}) in slot {wieldedLocation}, which conflicts with '{offhand.Name}'");
-                                return false;
+                                // Only light shields allowed in the offhand
+                                if (offhand != null && (offhand.CombatUse != ACE.Entity.Enum.CombatUse.Shield || offhand.EncumbranceVal > 420))
+                                    return false;
+                            }
+                            else
+                            {
+                                // Should not have any items in offhand slot for casters only
+                                if (offhand != null)
+                                {
+                                    log.Warn($"'{Name}' tried to wield '{item.Name}' ({item.Guid}) in slot {wieldedLocation}, which conflicts with '{offhand.Name}'");
+                                    return false;
+                                }
                             }
                         }
 
@@ -1990,11 +2028,33 @@ namespace ACE.Server.WorldObjects
                 {
                     if (offhand != null)
                     {
-                        // Can't wield these with anything else!
-                        if (mainhand.IsTwoHanded || mainhand.IsAmmoLauncher || mainhand.IsCaster)
+                        if (Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.CustomDM)
                         {
-                            log.Warn($"'{Name}' is illegally wielding '{mainhand.Name}' ({mainhand.Guid}) and {offhand.Name}' ({offhand.Guid})");
-                            return false;
+                            if (mainhand != null)
+                            {
+                                if (mainhand.IsCaster || mainhand.IsAmmoLauncher)
+                                {
+                                    if (offhand.EncumbranceVal > 420)
+                                    {
+                                        log.Warn($"'{Name}' is illegally wielding '{mainhand.Name}' ({mainhand.Guid}) and {offhand.Name}' ({offhand.Guid})");
+                                        return false;
+                                    }
+                                }
+                                else if (mainhand.IsTwoHanded)
+                                {
+                                    log.Warn($"'{Name}' is illegally wielding '{mainhand.Name}' ({mainhand.Guid}) and {offhand.Name}' ({offhand.Guid})");
+                                    return false;
+                                }
+                            }
+                        }
+                        else
+                        {
+                            // Can't wield these with anything else!
+                            if (mainhand.IsTwoHanded || mainhand.IsAmmoLauncher || mainhand.IsCaster)
+                            {
+                                log.Warn($"'{Name}' is illegally wielding '{mainhand.Name}' ({mainhand.Guid}) and {offhand.Name}' ({offhand.Guid})");
+                                return false;
+                            }
                         }
                     }
 
