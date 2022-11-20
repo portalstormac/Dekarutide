@@ -829,23 +829,41 @@ namespace ACE.Server.WorldObjects
 
         public static float MaxArmorRendingMod = 0.6f;
 
+        public static float MaxArmorRendingModCustomDM = 0.35f;
+
         public static float GetArmorRendingMod(CreatureSkill skill)
         {
-            // % of armor ignored, min 0%, max 60%
-
             var baseSkill = GetBaseSkillImbued(skill);
 
             var armorRendingMod = 1.0f;
 
-            switch (GetImbuedSkillType(skill))
+            if (Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.CustomDM)
             {
-                case ImbuedSkillType.Melee:
-                    armorRendingMod -= Math.Max(0, baseSkill - 160) / 400.0f;
-                    break;
+                // % of armor ignored, min 0%, max 35%
+                switch (GetImbuedSkillType(skill))
+                {
+                    case ImbuedSkillType.Melee:
+                        armorRendingMod -= Math.Clamp(Math.Max(0, baseSkill - 160) / 685.0f, 0.0f, MaxArmorRendingModCustomDM);
+                        break;
 
-                case ImbuedSkillType.Missile:
-                    armorRendingMod -= Math.Max(0, baseSkill - 144) / 360.0f;
-                    break;
+                    case ImbuedSkillType.Missile:
+                        armorRendingMod -= Math.Clamp(Math.Max(0, baseSkill - 144) / 617.0f, 0.0f, MaxArmorRendingModCustomDM);
+                        break;
+                }
+            }
+            else
+            {
+                // % of armor ignored, min 0%, max 60%
+                switch (GetImbuedSkillType(skill))
+                {
+                    case ImbuedSkillType.Melee:
+                        armorRendingMod -= Math.Clamp(Math.Max(0, baseSkill - 160) / 400.0f, 0.0f, MaxArmorRendingMod);
+                        break;
+
+                    case ImbuedSkillType.Missile:
+                        armorRendingMod -= Math.Clamp(Math.Max(0, baseSkill - 144) / 360.0f, 0.0f, MaxArmorRendingMod);
+                        break;
+                }
             }
 
             //Console.WriteLine($"ArmorRendingMod: {armorRendingMod}");

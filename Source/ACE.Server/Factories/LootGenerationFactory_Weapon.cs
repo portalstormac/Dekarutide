@@ -128,7 +128,7 @@ namespace ACE.Server.Factories
             var chance = ExtraMutationEffects.GetArmorCleavingChanceForTier(treasureDeath.Tier);
             if (chance > ThreadSafeRandom.Next(0.0f, 1.0f))
             {
-                wo.IgnoreArmor = 0.7f;
+                wo.IgnoreArmor = 0.75f;
                 wo.IconOverlayId = 0x06005EBF;
                 return true;
             }
@@ -143,7 +143,7 @@ namespace ACE.Server.Factories
             var chance = ExtraMutationEffects.GetShieldCleavingChanceForTier(treasureDeath.Tier);
             if (chance > ThreadSafeRandom.Next(0.0f, 1.0f))
             {
-                wo.IgnoreShield = 0.8f;
+                wo.IgnoreShield = 0.5f;
                 wo.IconOverlayId = 0x06005EC2;
                 wo.Name = $"{wo.Name} of Shield Cleaving";
                 return true;
