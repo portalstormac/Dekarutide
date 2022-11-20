@@ -470,13 +470,13 @@ namespace ACE.Server.Factories.Tables
 
                     ( SpellId.LightWeaponsMasteryOther1,    0.5f ), // AxeMasteryOther1
                     ( SpellId.FinesseWeaponsMasteryOther1,  0.5f ), // DaggerMasteryOther1
-                    ( SpellId.MaceMasteryOther1,            0.5f ),
+                    //( SpellId.MaceMasteryOther1,            0.5f ),
                     ( SpellId.SpearMasteryOther1,           0.5f ),
-                    ( SpellId.StaffMasteryOther1,           0.5f ),
+                    //( SpellId.StaffMasteryOther1,           0.5f ),
                     ( SpellId.HeavyWeaponsMasteryOther1,    0.5f ), // SwordMasteryOther1
                     ( SpellId.UnarmedCombatMasteryOther1,   0.5f ),
                     ( SpellId.MissileWeaponsMasteryOther1,  0.5f ), // BowMasteryOther1
-                    ( SpellId.CrossbowMasteryOther1,        0.5f ),
+                    //( SpellId.CrossbowMasteryOther1,        0.5f ),
                     ( SpellId.ThrownWeaponMasteryOther1,    0.5f ),
                     ( SpellId.ShieldMasteryOther1,          0.5f ),
                     ( SpellId.DualWieldMasteryOther1,       0.5f ),
@@ -610,13 +610,13 @@ namespace ACE.Server.Factories.Tables
 
                     ( SpellId.LightWeaponsMasteryOther1,   0.07f ), // AxeMasteryOther1
                     ( SpellId.FinesseWeaponsMasteryOther1, 0.07f ), // DaggerMasteryOther1
-                    ( SpellId.MaceMasteryOther1,           0.07f ),
+                    //( SpellId.MaceMasteryOther1,           0.07f ),
                     ( SpellId.SpearMasteryOther1,          0.07f ),
-                    ( SpellId.StaffMasteryOther1,          0.07f ),
+                    //( SpellId.StaffMasteryOther1,          0.07f ),
                     ( SpellId.HeavyWeaponsMasteryOther1,   0.07f ), // SwordMasteryOther1
                     ( SpellId.UnarmedCombatMasteryOther1,  0.07f ),
                     ( SpellId.MissileWeaponsMasteryOther1, 0.07f ), // BowMasteryOther1
-                    ( SpellId.CrossbowMasteryOther1,       0.07f ),
+                    //( SpellId.CrossbowMasteryOther1,       0.07f ),
                     ( SpellId.ThrownWeaponMasteryOther1,   0.07f ),
                     ( SpellId.ShieldMasteryOther1,         0.07f ),
                 };
@@ -655,13 +655,13 @@ namespace ACE.Server.Factories.Tables
 
                     ( SpellId.LightWeaponsMasteryOther1,   0.05f ), // AxeMasteryOther1
                     ( SpellId.FinesseWeaponsMasteryOther1, 0.05f ), // DaggerMasteryOther1
-                    ( SpellId.MaceMasteryOther1,           0.05f ),
+                    //( SpellId.MaceMasteryOther1,           0.05f ),
                     ( SpellId.SpearMasteryOther1,          0.05f ),
-                    ( SpellId.StaffMasteryOther1,          0.05f ),
+                    //( SpellId.StaffMasteryOther1,          0.05f ),
                     ( SpellId.HeavyWeaponsMasteryOther1,   0.05f ), // SwordMasteryOther1
                     ( SpellId.UnarmedCombatMasteryOther1,  0.05f ),
                     ( SpellId.MissileWeaponsMasteryOther1, 0.05f ), // BowMasteryOther1
-                    ( SpellId.CrossbowMasteryOther1,       0.05f ),
+                    //( SpellId.CrossbowMasteryOther1,       0.05f ),
                     ( SpellId.ThrownWeaponMasteryOther1,   0.05f ),
                 };
 
