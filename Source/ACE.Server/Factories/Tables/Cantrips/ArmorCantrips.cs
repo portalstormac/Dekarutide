@@ -224,6 +224,7 @@ namespace ACE.Server.Factories.Tables
 
                     ( SpellId.CantripDualWieldAptitude1,           1.0f ),
                     ( SpellId.CantripShieldAptitude1,              1.0f ),
+                    ( SpellId.CantripArmorAptitude1,               1.0f ),
 
                     ( SpellId.CANTRIPALCHEMICALPROWESS1,           0.5f ),
                     ( SpellId.CANTRIPARCANEPROWESS1,               0.5f ),

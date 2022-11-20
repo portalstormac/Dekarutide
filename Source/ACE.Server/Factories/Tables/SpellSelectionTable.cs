@@ -435,6 +435,7 @@ namespace ACE.Server.Factories.Tables
         {
             if (Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.CustomDM)
             {
+                // gems
                 spellSelectionGroup1 = new ChanceTable<SpellId>(ChanceTableType.Weight)
                 {
                     ( SpellId.StrengthOther1,               5.0f ),
@@ -514,6 +515,7 @@ namespace ACE.Server.Factories.Tables
                     ( SpellId.ArcanumSalvagingOther1,    1.0f ),
                     ( SpellId.MagicItemExpertiseOther1,  1.0f ),
                     ( SpellId.WeaponExpertiseOther1,     1.0f ),
+                    ( SpellId.ArmorMasteryOther1,        1.0f ),
                 };
 
                 // crowns
@@ -620,23 +622,24 @@ namespace ACE.Server.Factories.Tables
                 };
 
                 // helms, basinets, helmets, coifs, cowls, heaumes, kabutons
-                spellSelectionGroup10 = new ChanceTable<SpellId>()
+                spellSelectionGroup10 = new ChanceTable<SpellId>(ChanceTableType.Weight)
                 {
-                    ( SpellId.MagicResistanceOther1,      0.16f ),
-                    ( SpellId.ImpregnabilityOther1,       0.12f ),
-                    ( SpellId.InvulnerabilityOther1,      0.12f ),
+                    ( SpellId.MagicResistanceOther1,         2.5f ),
+                    ( SpellId.ImpregnabilityOther1,          2.0f ),
+                    ( SpellId.InvulnerabilityOther1,         2.0f ),
 
-                    ( SpellId.ArmorExpertiseOther1,       0.06f ),
-                    ( SpellId.ItemExpertiseOther1,        0.06f ),
-                    ( SpellId.WeaponExpertiseOther1,      0.06f ),
-                    ( SpellId.MonsterAttunementOther1,    0.06f ),
-                    ( SpellId.HealingMasteryOther1,       0.06f ),
-                    ( SpellId.RegenerationOther1,         0.06f ),
-                    ( SpellId.RejuvenationOther1,         0.06f ),
-                    ( SpellId.ManaRenewalOther1,          0.06f ),
-                    ( SpellId.FealtyOther1,               0.06f ),
+                    ( SpellId.ArmorExpertiseOther1,          1.0f ),
+                    ( SpellId.ItemExpertiseOther1,           1.0f ),
+                    ( SpellId.WeaponExpertiseOther1,         1.0f ),
+                    ( SpellId.MonsterAttunementOther1,       1.0f ),
+                    ( SpellId.HealingMasteryOther1,          1.0f ),
+                    ( SpellId.RegenerationOther1,            1.0f ),
+                    ( SpellId.RejuvenationOther1,            1.0f ),
+                    ( SpellId.ManaRenewalOther1,             1.0f ),
+                    ( SpellId.FealtyOther1,                  1.0f ),
 
-                    ( SpellId.DualWieldMasteryOther1,     0.06f ),
+                    ( SpellId.DualWieldMasteryOther1,        1.0f ),
+                    ( SpellId.ArmorMasteryOther1,            1.0f ),
                 };
 
                 // boots, chiran sandals, sollerets
