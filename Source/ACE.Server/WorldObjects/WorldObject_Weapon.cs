@@ -876,11 +876,16 @@ namespace ACE.Server.WorldObjects
             if (IgnoreArmor == null)
                 return 1.0f;
 
-            // FIXME: data
-            var maxSpellLevel = GetMaxSpellLevel();
+            if (Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.CustomDM)
+                return (float)IgnoreArmor;
+            else
+            {
+                // FIXME: data
+                var maxSpellLevel = GetMaxSpellLevel();
 
-            // thanks to moro for this formula
-            return 1.0f - (0.1f + maxSpellLevel * 0.05f);
+                // thanks to moro for this formula
+                return 1.0f - (0.1f + maxSpellLevel * 0.05f);
+            }
         }
 
         public double? IgnoreShield
