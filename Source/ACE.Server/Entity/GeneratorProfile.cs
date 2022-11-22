@@ -108,6 +108,9 @@ namespace ACE.Server.Entity
         {
             get
             {
+                if (Generator is Chest)
+                    return 0;
+
                 return Biota.Delay ?? Generator.GeneratorProfiles[0].Biota.Delay ?? 0.0f;
             }
         }
@@ -209,9 +212,6 @@ namespace ACE.Server.Entity
 
                     if (objects != null)
                     {
-                        if (Generator is Chest chest)
-                            chest.CloseAndRelock();
-
                         foreach (var obj in objects)
                         {
                             var woi = new WorldObjectInfo(obj);
