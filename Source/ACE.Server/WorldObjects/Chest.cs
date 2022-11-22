@@ -47,12 +47,14 @@ namespace ACE.Server.WorldObjects
         {
             get
             {
-                var chestResetInterval = RegenerationInterval;
+                var chestResetInterval = GetProperty(PropertyFloat.ResetInterval);
+                if (chestResetInterval == null)
+                    chestResetInterval = GetProperty(PropertyFloat.RegenerationInterval);
 
-                if (chestResetInterval < 15)
+                if (chestResetInterval == null || chestResetInterval < 15)
                     chestResetInterval = Default_ChestResetInterval;
 
-                return chestResetInterval;
+                return chestResetInterval.Value;
             }
         }
 
