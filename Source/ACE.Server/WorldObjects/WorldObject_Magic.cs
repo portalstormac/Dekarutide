@@ -109,6 +109,9 @@ namespace ACE.Server.WorldObjects
 
             resistChance = (float)(1.0f - (chance * chanceMod));
 
+            if (Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.CustomDM)
+                resistChance = Math.Min(resistChance, 0.9f);
+
             return chance <= rng;
         }
 

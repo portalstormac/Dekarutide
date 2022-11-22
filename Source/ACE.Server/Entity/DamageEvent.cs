@@ -503,6 +503,10 @@ namespace ACE.Server.Entity
             }
 
             var evadeChance = 1.0f - SkillCheck.GetSkillChance(EffectiveAttackSkill, EffectiveDefenseSkill);
+
+            if (Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.CustomDM)
+                evadeChance = Math.Min(evadeChance, 0.9f);
+
             return (float)evadeChance;
         }
 
