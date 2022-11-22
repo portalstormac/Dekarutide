@@ -23,7 +23,7 @@ namespace ACE.Server.WorldObjects
         {
             get
             {
-                if (ChestResetInterval <= 5)
+                if (ResetInterval != null && ResetInterval <= 5)
                     return true;
 
                 return GetProperty(PropertyBool.ChestRegenOnClose) ?? false;
@@ -43,20 +43,33 @@ namespace ACE.Server.WorldObjects
         /// <summary>
         /// This is the default setup for resetting chests
         /// </summary>
-        public double ChestResetInterval
+        //public double ChestResetInterval
+        //{
+        //    get
+        //    {
+        //        var chestResetInterval = ResetInterval ?? Default_ChestResetInterval;
+
+        //        if (chestResetInterval < 15)
+        //            chestResetInterval = Default_ChestResetInterval;
+
+        //        return chestResetInterval;
+        //    }
+        //}
+
+        public virtual double Default_ChestResetInterval => 120;
+
+        public double ChestRegenerationInterval
         {
             get
             {
-                var chestResetInterval = RegenerationInterval;
+                var chestRegenInterval = RegenerationInterval;
 
-                if (chestResetInterval < 15)
-                    chestResetInterval = Default_ChestResetInterval;
+                if (chestRegenInterval < 10)
+                    chestRegenInterval = 10;
 
-                return chestResetInterval;
+                return chestRegenInterval;
             }
         }
-
-        public virtual double Default_ChestResetInterval => 120;
 
         /// <summary>
         /// A new biota be created taking all of its values from weenie.
@@ -188,19 +201,45 @@ namespace ACE.Server.WorldObjects
         {
             base.Open(player);
 
-            if (!ResetMessagePending && !double.IsPositiveInfinity(ChestResetInterval))
+            if (!ResetMessagePending)
             {
                 var resetTimestamp = ResetTimestamp;
 
-                var actionChain = new ActionChain();
-                actionChain.AddDelaySeconds(ChestResetInterval);
-                actionChain.AddAction(this, () => Reset(resetTimestamp));
-                actionChain.EnqueueChain();
+                if (ResetInterval != null && !double.IsPositiveInfinity(ResetInterval.Value))
+                {
+                    var actionChain = new ActionChain();
+                    actionChain.AddDelaySeconds(ResetInterval.Value);
+                    actionChain.AddAction(this, () => Reset(resetTimestamp));
+                    actionChain.EnqueueChain();
+                }
+                else
+                {
+                    var actionChain = new ActionChain();
+                    actionChain.AddDelaySeconds(ChestRegenerationInterval);
+                    actionChain.AddAction(this, () => PartialReset(resetTimestamp));
+                    actionChain.EnqueueChain();
+                }
 
                 ResetMessagePending = true;
             }
 
             UseLockTimestamp = null;
+        }
+
+        public void CloseAndRelock()
+        {
+            if (IsOpen)
+            {
+                var player = CurrentLandblock.GetObject(Viewer) as Player;
+                Close(player, false);
+            }
+
+            if (DefaultLocked && !IsLocked)
+            {
+                IsLocked = true;
+                if (!PropertyManager.GetBool("fix_chest_missing_inventory_window").Item)
+                    EnqueueBroadcast(new GameMessagePublicUpdatePropertyBool(this, PropertyBool.Locked, IsLocked));
+            }
         }
 
         public override void Close(Player player)
@@ -283,6 +322,35 @@ namespace ACE.Server.WorldObjects
             {
                 ResetGenerator();
                 CurrentlyPoweringUp = true;
+                if (InitCreate > 0)
+                    Generator_Generate();
+            }
+
+            ResetTimestamp = Time.GetUnixTime();
+            ResetMessagePending = false;
+        }
+
+        public void PartialReset(double? resetTimestamp)
+        {
+            if (resetTimestamp != ResetTimestamp)
+                return;     // already cleared by previous reset
+
+            // TODO: if 'ResetInterval' style, do we want to ensure a minimum amount of time for the last viewer?
+
+            // should only be an edge case with reload-landblock
+            if (CurrentLandblock == null)
+                return;
+
+            if (IsGenerator)
+            {
+                for (var i = 0; i < GeneratorProfiles.Count; i++)
+                {
+                    var profile = GeneratorProfiles[i];
+
+                    if(profile.RegenLocationType.HasFlag(RegenLocationType.Treasure) && profile.Delay == 0)
+                        profile.Reset(); //reset only our treasure, keep other contained generator items ticking according to their delay.
+                }
+
                 if (InitCreate > 0)
                     Generator_Generate();
             }
