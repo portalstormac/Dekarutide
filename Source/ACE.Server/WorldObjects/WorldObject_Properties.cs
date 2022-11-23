@@ -1903,6 +1903,12 @@ namespace ACE.Server.WorldObjects
             set { if (!value.HasValue) RemoveProperty(PropertyInt.EncumbranceVal); else SetProperty(PropertyInt.EncumbranceVal, value.Value); }
         }
 
+        public int? Mass
+        {
+            get => GetProperty(PropertyInt.Mass);
+            set { if (!value.HasValue) RemoveProperty(PropertyInt.Mass); else SetProperty(PropertyInt.Mass, value.Value); }
+        }
+
         public double? BulkMod
         {
             get => GetProperty(PropertyFloat.BulkMod);
