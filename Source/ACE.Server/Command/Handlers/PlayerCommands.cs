@@ -767,7 +767,7 @@ namespace ACE.Server.Command.Handlers
             {
                 if (player.MonarchId == session.Player.MonarchId)
                 {
-                    message.Append(player.Name + "\n");
+                    message.Append($"{player.Name} - Level {player.Level}\n");
                     playerCounter++;
                 }
             }
