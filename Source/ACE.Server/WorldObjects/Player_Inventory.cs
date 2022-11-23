@@ -1902,7 +1902,7 @@ namespace ACE.Server.WorldObjects
                         {
                             // Only light shields allowed in the offhand for ammo launchers (bows, atlatls)
                             // Thrown weapons (ie. phials) can have a shield
-                            if (offhand != null && item.IsAmmoLauncher && (offhand.CombatUse != ACE.Entity.Enum.CombatUse.Shield || offhand.EncumbranceVal > 140))
+                            if (offhand != null && item.IsAmmoLauncher && (offhand.CombatUse != ACE.Entity.Enum.CombatUse.Shield || offhand.Mass > 140))
                                 return false;
                         }
                         else
@@ -1983,7 +1983,7 @@ namespace ACE.Server.WorldObjects
                             if (Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.CustomDM)
                             {
                                 // Only light shields allowed in the offhand
-                                if (offhand != null && (offhand.CombatUse != ACE.Entity.Enum.CombatUse.Shield || offhand.EncumbranceVal > 140))
+                                if (offhand != null && (offhand.CombatUse != ACE.Entity.Enum.CombatUse.Shield || offhand.Mass > 140))
                                     return false;
                             }
                             else
@@ -2034,7 +2034,7 @@ namespace ACE.Server.WorldObjects
                             {
                                 if (mainhand.IsCaster || mainhand.IsAmmoLauncher)
                                 {
-                                    if (offhand.EncumbranceVal > 140)
+                                    if (offhand.Mass > 140)
                                     {
                                         log.Warn($"'{Name}' is illegally wielding '{mainhand.Name}' ({mainhand.Guid}) and {offhand.Name}' ({offhand.Guid})");
                                         return false;
