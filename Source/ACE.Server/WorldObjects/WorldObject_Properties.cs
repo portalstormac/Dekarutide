@@ -3150,5 +3150,23 @@ namespace ACE.Server.WorldObjects
         /// If not unlimited, client will only allow you to buy or add to buy list up this number of items for a single transaction.
         /// </summary>
         public int? VendorShopCreateListStackSize;
+
+        public double? MeleeDefenseCap
+        {
+            get => GetProperty(PropertyFloat.MeleeDefenseCap);
+            set { if (!value.HasValue) RemoveProperty(PropertyFloat.MeleeDefenseCap); else SetProperty(PropertyFloat.MeleeDefenseCap, value.Value); }
+        }
+
+        public double? MissileDefenseCap
+        {
+            get => GetProperty(PropertyFloat.MissileDefenseCap);
+            set { if (!value.HasValue) RemoveProperty(PropertyFloat.MissileDefenseCap); else SetProperty(PropertyFloat.MissileDefenseCap, value.Value); }
+        }
+
+        public double? MagicDefenseCap
+        {
+            get => GetProperty(PropertyFloat.MagicDefenseCap);
+            set { if (!value.HasValue) RemoveProperty(PropertyFloat.MagicDefenseCap); else SetProperty(PropertyFloat.MagicDefenseCap, value.Value); }
+        }
     }
 }
