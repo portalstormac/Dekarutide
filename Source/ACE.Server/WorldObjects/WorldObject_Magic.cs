@@ -154,9 +154,18 @@ namespace ACE.Server.WorldObjects
 
                 if (Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.CustomDM && caster.Wielder is Creature wielder)
                 {
+                    var weaponSkill = caster.WeaponSkill == Skill.None ? 0 : wielder.GetCreatureSkill(ConvertToMoASkill(caster.WeaponSkill)).Current;
+                    if (caster.WeaponSkill == Skill.Axe || caster.WeaponSkill == Skill.Staff || caster.WeaponSkill == Skill.Dagger || caster.WeaponSkill == Skill.Sword || caster.WeaponSkill == Skill.UnarmedCombat)
+                        weaponSkill = (uint)(weaponSkill * 0.75f); // Convert skill value to match lower value from magic school formulas.
+
+                    var schoolSkill = wielder.GetCreatureSkill(spell.School).Current;
+
                     var arcaneLore = wielder.GetCreatureSkill(Skill.ArcaneLore).Current;
                     var arcaneLoreMod = Math.Max(1.0f + (arcaneLore - 55) * 0.002f, 1.0f);
-                    magicSkill = (uint)(magicSkill * arcaneLoreMod);
+                    var ArcaneLoreModifiedSpellcraft = (uint)(magicSkill * arcaneLoreMod);
+
+                    magicSkill = Math.Max(weaponSkill, schoolSkill);
+                    magicSkill = Math.Max(magicSkill, ArcaneLoreModifiedSpellcraft);
                 }
             }
             else if (caster.Wielder is Creature wielder)
