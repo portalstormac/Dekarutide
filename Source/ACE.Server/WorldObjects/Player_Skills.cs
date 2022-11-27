@@ -636,8 +636,8 @@ namespace ACE.Server.WorldObjects
                 return !AlwaysTrained.Contains(skill);
             else
             {
-                if (!AlwaysTrained.Contains(skill))
-                    return true; // this gets the easy ones out of the way.
+                if (AlwaysTrained.Contains(skill))
+                    return false;
 
                 if (Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.CustomDM)
                 {
@@ -898,13 +898,31 @@ namespace ACE.Server.WorldObjects
 
                 RemoveProperty(PropertyBool.SkillTemplesTimerReset);
 
-                QuestManager.Erase("ForgetfulnessGems1");
-                QuestManager.Erase("ForgetfulnessGems2");
-                QuestManager.Erase("ForgetfulnessGems3");
-                QuestManager.Erase("ForgetfulnessGems4");
-                QuestManager.Erase("Forgetfulness6days");
-                QuestManager.Erase("Forgetfulness13days");
-                QuestManager.Erase("Forgetfulness20days");
+                if (Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.EoR)
+                {
+                    QuestManager.Erase("ForgetfulnessGems1");
+                    QuestManager.Erase("ForgetfulnessGems2");
+                    QuestManager.Erase("ForgetfulnessGems3");
+                    QuestManager.Erase("ForgetfulnessGems4");
+                    QuestManager.Erase("Forgetfulness6days");
+                    QuestManager.Erase("Forgetfulness13days");
+                    QuestManager.Erase("Forgetfulness20days");
+                }
+                else if (Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.CustomDM)
+                {
+                    QuestManager.Erase("AttributeLoweringGemPickedUp");
+                    QuestManager.Erase("AttributeRaisingGemPickedUp");
+                    QuestManager.Erase("SkillEnlightenmentGemPickedUp");
+                    QuestManager.Erase("SkillForgetfulnessGemPickedUp");
+                    QuestManager.Erase("SkillPrimaryGemPickedUp");
+                    QuestManager.Erase("SkillSecondaryGemPickedUp");
+                }
+                else if (Common.ConfigManager.Config.Server.WorldRuleset <= Common.Ruleset.Infiltration)
+                {
+                    QuestManager.Erase("AttributeLoweringGemPickedUp");
+                    QuestManager.Erase("AttributeRaisingGemPickedUp");
+                    QuestManager.Erase("SkillAlterationGemPickedUp");
+                }
             });
             actionChain.EnqueueChain();
         }
