@@ -1075,6 +1075,11 @@ namespace ACE.Server.WorldObjects
                 PlayerSkills.Remove(Skill.Crossbow);
                 PlayerSkills.Remove(Skill.Mace);
                 PlayerSkills.Remove(Skill.Staff);
+
+                PlayerSkills.Remove(Skill.WeaponTinkering);
+                PlayerSkills.Remove(Skill.ArmorTinkering);
+                PlayerSkills.Remove(Skill.MagicItemTinkering);
+                PlayerSkills.Remove(Skill.ItemTinkering);
             }
         }
 

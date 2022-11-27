@@ -185,31 +185,44 @@ namespace ACE.Server.Managers
             var tinkeredCount = target.NumTimesTinkered;
 
             var materialType = tool.MaterialType ?? MaterialType.Unknown;
-            var salvageMod = GetMaterialMod(materialType);
-
-            var workmanshipMod = 1.0f;
-            if (toolWorkmanship >= itemWorkmanship)
-                workmanshipMod = 2.0f;
-
-            var recipeSkill = (Skill)recipe.Skill;
-
-            var skill = player.GetCreatureSkill(recipeSkill);
-
-            // tinkering skill must be trained
-            if (skill.AdvancementClass < SkillAdvancementClass.Trained)
-            {
-                player.Session.Network.EnqueueSend(new GameMessageSystemChat($"You are not trained in {skill.Skill.ToSentence()}.", ChatMessageType.Broadcast));
-                return null;
-            }
 
             // thanks to Endy's Tinkering Calculator for this formula!
             var attemptMod = TinkeringDifficulty[tinkeredCount];
 
-            var difficulty = (int)Math.Floor(((salvageMod * 5.0f) + (itemWorkmanship * salvageMod * 2.0f) - (toolWorkmanship * workmanshipMod * salvageMod / 5.0f)) * attemptMod);
+            double successChance;
+            if (Common.ConfigManager.Config.Server.WorldRuleset != Common.Ruleset.CustomDM)
+            {
+                var recipeSkill = (Skill)recipe.Skill;
 
-            var playerCurrentPlusLumAugSkilledCraft = skill.Current + (uint)player.LumAugSkilledCraft;
+                var skill = player.GetCreatureSkill(recipeSkill);
 
-            var successChance = SkillCheck.GetSkillChance((int)playerCurrentPlusLumAugSkilledCraft, difficulty);
+                // tinkering skill must be trained
+                if (skill.AdvancementClass < SkillAdvancementClass.Trained && Common.ConfigManager.Config.Server.WorldRuleset != Common.Ruleset.CustomDM)
+                {
+                    player.Session.Network.EnqueueSend(new GameMessageSystemChat($"You are not trained in {skill.Skill.ToSentence()}.", ChatMessageType.Broadcast));
+                    return null;
+                }
+
+                var salvageMod = GetMaterialMod(materialType);
+
+                var workmanshipMod = 1.0f;
+                if (toolWorkmanship >= itemWorkmanship)
+                    workmanshipMod = 2.0f;
+
+                var playerCurrentPlusLumAugSkilledCraft = skill.Current + (uint)player.LumAugSkilledCraft;
+
+                var difficulty = (int)Math.Floor(((salvageMod * 5.0f) + (itemWorkmanship * salvageMod * 2.0f) - (toolWorkmanship * workmanshipMod * salvageMod / 5.0f)) * attemptMod);
+
+                successChance = SkillCheck.GetSkillChance((int)playerCurrentPlusLumAugSkilledCraft, difficulty);
+            }
+            else
+            {
+                var salvageMod = 10.0f;
+
+                var difficulty = (int)Math.Floor(((salvageMod * 5.0f) + ((itemWorkmanship * salvageMod * 0.8f) - (toolWorkmanship * salvageMod * 1.0f))) * attemptMod * 3.0f);
+
+                successChance = SkillCheck.GetSkillChance(250, difficulty);
+            }
 
             // imbue: divide success by 3
             if (recipe.IsImbuing())

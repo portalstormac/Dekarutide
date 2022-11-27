@@ -8,7 +8,7 @@
 
 **Required Data Files:**
 - [Infiltration 1.8](https://mega.nz/file/tvhQFL5a#B87QCh8vRKURVJ2FqSDMhdVjZfD7wRf8aE8aCB5aM5E)
-- [CustomDM 1.20](https://mega.nz/file/gug13LJB#qFSQzOGCGE1XlgmE6mNW_UmKbZAUbPEvRZQ5LohDOkE)
+- [CustomDM 1.21](https://mega.nz/file/liJDVaKT#nQcjxRz10hZWWvgTRTwe9FntqhCyqzJgpcYGDumdnPo)
 
 ## Disclaimer
 **This project is for educational and non-commercial purposes only, use of the game client is for interoperability with the emulated server.**

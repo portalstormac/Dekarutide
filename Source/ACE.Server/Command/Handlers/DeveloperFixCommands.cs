@@ -253,7 +253,7 @@ namespace ACE.Server.Command.Handlers
 
                     if (sac != SkillAdvancementClass.Specialized)
                     {
-                        if (skill.Value.InitLevel > 0)
+                        if ((Common.ConfigManager.Config.Server.WorldRuleset != Common.Ruleset.CustomDM && skill.Value.InitLevel > 0) || (Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.CustomDM && skill.Value.InitLevel > 5))
                         {
                             Console.WriteLine($"{player.Name} has {sac} skill {skill.Key} with {skill.Value.InitLevel:N0} InitLevel{fixStr}");
                             foundIssues = true;
@@ -1634,6 +1634,155 @@ namespace ACE.Server.Command.Handlers
 
                 if (!foundIssues)
                     Console.WriteLine($"Verified {results.Count:N0} shields");
+            }
+        }
+
+        [CommandHandler("verify-character-version", AccessLevel.Admin, CommandHandlerFlag.ConsoleInvoke, "Verifies and optionally migrates character versions")]
+        public static void HandleVerifyCharacterVersion(Session session, params string[] parameters)
+        {
+            var players = PlayerManager.GetAllOffline();
+
+            var fix = parameters.Length > 0 && parameters[0].Equals("fix");
+            var foundIssues = false;
+
+            foreach (var player in players)
+            {
+                var version = player.GetProperty(PropertyInt.Version) ?? 0;
+
+                switch (version)
+                {
+                    case Player.LatestVersion:
+                        // Latest version: no changes required.
+                        break;
+                    case 0:
+                        MigrateCharacterFromVersion0to1(player, fix, ref foundIssues);
+                        break;
+                    default:
+                        foundIssues = true;
+                        Console.WriteLine($"{player.Name}:0x{player.Guid}.HandleVerifyCharacterVersion() - Invalid character version: {version}. Can't fix.");
+                        break;
+                }
+            }
+
+            if (!fix && foundIssues)
+                Console.WriteLine($"Dry run completed. Type 'verify-character-version fix' to fix any issues.");
+
+            if (!foundIssues)
+                Console.WriteLine($"Verified character version for {players.Count:N0} players");
+        }
+
+        public static void MigrateCharacterFromVersion0to1(OfflinePlayer player, bool fix, ref bool foundIssues)
+        {
+            if (Common.ConfigManager.Config.Server.WorldRuleset != Common.Ruleset.CustomDM)
+            {
+                Console.WriteLine($"This command is only intended for the CustomDM ruleset.");
+                return;
+            }
+
+            var fixStr = fix ? " -- fixed" : "";
+
+            var skillCreditsToRefund = 0;
+            uint xpToRefund = 0;
+            var skillsToRemove = new List<Skill>();
+
+            var skills = new Dictionary<Skill, PropertiesSkill>(player.Biota.PropertiesSkill);
+            if (skills.TryGetValue(Skill.Alchemy, out var alchemySkill))
+            {
+                if (alchemySkill.SAC == SkillAdvancementClass.Specialized)
+                {
+                    Console.WriteLine($"{player.Name}:0x{player.Guid}.HandleVerifyCharacterVersion() - Version 0 -> 1: Alchemy Specialized - Refund 8 skill points.{fixStr}");
+                    skillCreditsToRefund += 8;
+                    xpToRefund += alchemySkill.PP;
+                    foundIssues = true;
+                }
+                else if (alchemySkill.SAC == SkillAdvancementClass.Trained)
+                {
+                    Console.WriteLine($"{player.Name}:0x{player.Guid}.HandleVerifyCharacterVersion() - Version 0 -> 1: Alchemy Trained - Refund 4 skill points.{fixStr}");
+                    skillCreditsToRefund += 4;
+                    xpToRefund += alchemySkill.PP;
+                    foundIssues = true;
+                }
+            }
+
+            if (skills.TryGetValue(Skill.ArmorTinkering, out var armorTinkeringSkill))
+            {
+                foundIssues = true;
+
+                if (armorTinkeringSkill.SAC == SkillAdvancementClass.Trained)
+                {
+                    Console.WriteLine($"{player.Name}:0x{player.Guid}.HandleVerifyCharacterVersion() - Version 0 -> 1: Armor Tinkering Trained - Refund 4 skill points.{fixStr}");
+                    skillCreditsToRefund += 4;
+                    xpToRefund += armorTinkeringSkill.PP;
+                }
+
+                Console.WriteLine($"{player.Name}:0x{player.Guid}.HandleVerifyCharacterVersion() - Version 0 -> 1: Armor Tinkering Exists - Remove.{fixStr}");
+                skillsToRemove.Add(Skill.ArmorTinkering);
+            }
+
+            if (skills.TryGetValue(Skill.WeaponTinkering, out var weaponTinkering))
+            {
+                foundIssues = true;
+
+                if (weaponTinkering.SAC == SkillAdvancementClass.Trained)
+                {
+                    Console.WriteLine($"{player.Name}:0x{player.Guid}.HandleVerifyCharacterVersion() - Version 0 -> 1: Weapon Tinkering Trained - Refund 4 skill points.{fixStr}");
+                    skillCreditsToRefund += 4;
+                    xpToRefund += weaponTinkering.PP;
+                }
+
+                Console.WriteLine($"{player.Name}:0x{player.Guid}.HandleVerifyCharacterVersion() - Version 0 -> 1: Weapon Tinkering Exists - Remove.{fixStr}");
+                skillsToRemove.Add(Skill.WeaponTinkering);
+            }
+
+            if (skills.TryGetValue(Skill.MagicItemTinkering, out var magicItemTinkeringSkill))
+            {
+                foundIssues = true;
+
+                if (magicItemTinkeringSkill.SAC == SkillAdvancementClass.Trained)
+                {
+                    Console.WriteLine($"{player.Name}:0x{player.Guid}.HandleVerifyCharacterVersion() - Version 0 -> 1: Magic Item Tinkering Trained - Refund 4 skill points.{fixStr}");
+                    skillCreditsToRefund += 4;
+                    xpToRefund += magicItemTinkeringSkill.PP;
+                }
+
+                Console.WriteLine($"{player.Name}:0x{player.Guid}.HandleVerifyCharacterVersion() - Version 0 -> 1: Magic Item Tinkering Exists - Remove.{fixStr}");
+                skillsToRemove.Add(Skill.MagicItemTinkering);
+            }
+
+            if (skills.TryGetValue(Skill.ItemTinkering, out var itemTinkering))
+            {
+                foundIssues = true;
+
+                if (itemTinkering.SAC == SkillAdvancementClass.Trained)
+                {
+                    Console.WriteLine($"{player.Name}:0x{player.Guid}.HandleVerifyCharacterVersion() - Version 0 -> 1: Item Tinkering Trained - Refund 2 skill points.{fixStr}");
+                    skillCreditsToRefund += 2;
+                    xpToRefund += itemTinkering.PP;
+                }
+
+                Console.WriteLine($"{player.Name}:0x{player.Guid}.HandleVerifyCharacterVersion() - Version 0 -> 1: Item Tinkering Exists - Remove.{fixStr}");
+                skillsToRemove.Add(Skill.ItemTinkering);
+            }
+
+            if (fix)
+            {
+                var availableExperience = player.GetProperty(PropertyInt64.AvailableExperience) ?? 0;
+                var availableSkillCredits = player.GetProperty(PropertyInt.AvailableSkillCredits) ?? 0;
+
+                foreach (var skill in skillsToRemove)
+                {
+                    player.Biota.PropertiesSkill.Remove(skill);
+                }
+
+                player.SetProperty(PropertyInt64.AvailableExperience, availableExperience + xpToRefund);
+
+                player.SetProperty(PropertyInt.AvailableSkillCredits, availableSkillCredits + skillCreditsToRefund);
+
+                player.SetProperty(PropertyBool.SkillTemplesTimerReset, true);
+
+                player.SetProperty(PropertyInt.Version, 1);
+
+                player.SaveBiotaToDatabase();
             }
         }
     }

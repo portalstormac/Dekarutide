@@ -44,6 +44,9 @@ namespace ACE.Server.Factories
             else
                 player = new Player(weenie, guid, accountId);
 
+            if (Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.CustomDM)
+                player.SetProperty(PropertyInt.Version, Player.LatestVersion);
+
             player.SetProperty(PropertyInt.HeritageGroup, (int)characterCreateInfo.Heritage);
             player.SetProperty(PropertyString.HeritageGroup, heritageGroup.Name);
             player.SetProperty(PropertyInt.Gender, (int)characterCreateInfo.Gender);

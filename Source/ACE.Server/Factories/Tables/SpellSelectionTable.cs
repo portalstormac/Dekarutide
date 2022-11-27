@@ -462,10 +462,6 @@ namespace ACE.Server.Factories.Tables
                     ( SpellId.CookingMasteryOther1,         1.0f ),
                     ( SpellId.FletchingMasteryOther1,       1.0f ),
                     ( SpellId.LockpickMasteryOther1,        1.0f ),
-                    ( SpellId.ItemExpertiseOther1,          1.0f ),
-                    ( SpellId.ArmorExpertiseOther1,         1.0f ),
-                    ( SpellId.MagicItemExpertiseOther1,     1.0f ),
-                    ( SpellId.WeaponExpertiseOther1,        1.0f ),
                     ( SpellId.ArcanumSalvagingOther1,       1.0f ),
 
                     ( SpellId.LightWeaponsMasteryOther1,    0.5f ), // AxeMasteryOther1
@@ -507,14 +503,10 @@ namespace ACE.Server.Factories.Tables
                     ( SpellId.ManaMasteryOther1,         4.0f ),
                     ( SpellId.RegenerationOther1,        3.0f ),
                     ( SpellId.RejuvenationOther1,        3.0f ),
-                    ( SpellId.ItemExpertiseOther1,       3.0f ),
-                    ( SpellId.ArmorExpertiseOther1,      2.0f ),
                     ( SpellId.DeceptionMasteryOther1,    1.0f ),
                     ( SpellId.FealtyOther1,              1.0f ),
                     ( SpellId.MonsterAttunementOther1,   1.0f ),
                     ( SpellId.ArcanumSalvagingOther1,    1.0f ),
-                    ( SpellId.MagicItemExpertiseOther1,  1.0f ),
-                    ( SpellId.WeaponExpertiseOther1,     1.0f ),
                     ( SpellId.ArmorMasteryOther1,        1.0f ),
                 };
 
@@ -628,9 +620,6 @@ namespace ACE.Server.Factories.Tables
                     ( SpellId.ImpregnabilityOther1,          2.0f ),
                     ( SpellId.InvulnerabilityOther1,         2.0f ),
 
-                    ( SpellId.ArmorExpertiseOther1,          1.0f ),
-                    ( SpellId.ItemExpertiseOther1,           1.0f ),
-                    ( SpellId.WeaponExpertiseOther1,         1.0f ),
                     ( SpellId.MonsterAttunementOther1,       1.0f ),
                     ( SpellId.HealingMasteryOther1,          1.0f ),
                     ( SpellId.RegenerationOther1,            1.0f ),
@@ -689,10 +678,6 @@ namespace ACE.Server.Factories.Tables
                     ( SpellId.LockpickMasteryOther1,            0.8f ),
                     ( SpellId.DeceptionMasteryOther1,           0.8f ),
                     ( SpellId.ArcanumSalvagingOther1,           0.8f ),
-                    ( SpellId.ArmorExpertiseOther1,             0.8f ),
-                    ( SpellId.MagicItemExpertiseOther1,         0.8f ),
-                    ( SpellId.ItemExpertiseOther1,              0.8f ),
-                    ( SpellId.WeaponExpertiseOther1,            0.8f ),
                     ( SpellId.MonsterAttunementOther1,          0.8f ),
                 };
 
@@ -712,30 +697,25 @@ namespace ACE.Server.Factories.Tables
                     ( SpellId.ManaMasteryOther1,                0.9f ),
                     ( SpellId.ArcaneEnlightenmentOther1,        0.9f ),
                     ( SpellId.ArcanumSalvagingOther1,           0.9f ),
-
-                    ( SpellId.ArmorExpertiseOther1,             0.8f ),
-                    ( SpellId.ItemExpertiseOther1,              0.8f ),
-                    ( SpellId.MagicItemExpertiseOther1,         0.8f ),
-                    ( SpellId.WeaponExpertiseOther1,            0.8f ),
                 };
 
                 // greaves, leggings, tassets, leather pants
-                spellSelectionGroup15 = new ChanceTable<SpellId>()
+                spellSelectionGroup15 = new ChanceTable<SpellId>(ChanceTableType.Weight)
                 {
-                    ( SpellId.StrengthOther1,         0.29f ),
-                    ( SpellId.QuicknessOther1,        0.29f ),
-                    ( SpellId.JumpingMasteryOther1,   0.14f ),
-                    ( SpellId.SprintOther1,           0.14f ),
-                    ( SpellId.EnduranceOther1,        0.14f ),
+                    ( SpellId.StrengthOther1,         1.0f ),
+                    ( SpellId.QuicknessOther1,        1.0f ),
+                    ( SpellId.JumpingMasteryOther1,   0.5f ),
+                    ( SpellId.SprintOther1,           0.5f ),
+                    ( SpellId.EnduranceOther1,        0.5f ),
                 };
 
                 // missile weapons, two-handed weapons
-                spellSelectionGroup17 = new ChanceTable<SpellId>()
+                spellSelectionGroup17 = new ChanceTable<SpellId>(ChanceTableType.Weight)
                 {
-                    ( SpellId.StrengthOther1,             0.25f ),
-                    ( SpellId.EnduranceOther1,            0.25f ),
-                    ( SpellId.CoordinationOther1,         0.25f ),
-                    ( SpellId.QuicknessOther1,            0.25f ),
+                    ( SpellId.StrengthOther1,             1.0f ),
+                    ( SpellId.EnduranceOther1,            1.0f ),
+                    ( SpellId.CoordinationOther1,         1.0f ),
+                    ( SpellId.QuicknessOther1,            1.0f ),
                 };
 
                 // shoes, loafers, slippers, sandals
@@ -780,10 +760,6 @@ namespace ACE.Server.Factories.Tables
                     ( SpellId.FletchingMasteryOther1,           0.8f ),
                     ( SpellId.AlchemyMasteryOther1,             0.8f ),
 
-                    ( SpellId.ItemExpertiseOther1,              0.7f ),
-                    ( SpellId.WeaponExpertiseOther1,            0.7f ),
-                    ( SpellId.ArmorExpertiseOther1,             0.7f ),
-
                     ( SpellId.WarMagicMasteryOther1,            0.6f ),
                     ( SpellId.FealtyOther1,                     0.6f ),
                     ( SpellId.ManaMasteryOther1,                0.6f ),
@@ -798,7 +774,6 @@ namespace ACE.Server.Factories.Tables
                     ( SpellId.MonsterAttunementOther1,          0.4f ),
                     ( SpellId.LifeMagicMasteryOther1,           0.4f ),
                     ( SpellId.HealingMasteryOther1,             0.4f ),
-                    ( SpellId.MagicItemExpertiseOther1,         0.4f ),
                     ( SpellId.MagicResistanceOther1,            0.4f ),
                     ( SpellId.ManaRenewalOther1,                0.4f ),
                     ( SpellId.RejuvenationOther1,               0.4f ),
