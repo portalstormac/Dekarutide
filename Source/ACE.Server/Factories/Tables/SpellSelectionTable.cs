@@ -709,6 +709,22 @@ namespace ACE.Server.Factories.Tables
                     ( SpellId.EnduranceOther1,        0.5f ),
                 };
 
+                // dinnerware
+                spellSelectionGroup16 = new ChanceTable<SpellId>(ChanceTableType.Weight)
+                {
+                    ( SpellId.AlchemyMasteryOther1,        2.0f ),
+                    ( SpellId.CookingMasteryOther1,        2.0f ),
+                    ( SpellId.FletchingMasteryOther1,      2.0f ),
+                    ( SpellId.LockpickMasteryOther1,       2.0f ),
+                    ( SpellId.ArcanumSalvagingOther1,      2.0f ),
+                    ( SpellId.StrengthOther1,              1.0f ),
+                    ( SpellId.EnduranceOther1,             1.0f ),
+                    ( SpellId.CoordinationOther1,          1.0f ),
+                    ( SpellId.QuicknessOther1,             1.0f ),
+                    ( SpellId.FocusOther1,                 1.0f ),
+                    ( SpellId.WillpowerOther1,             1.0f ),
+                };
+
                 // missile weapons, two-handed weapons
                 spellSelectionGroup17 = new ChanceTable<SpellId>(ChanceTableType.Weight)
                 {
