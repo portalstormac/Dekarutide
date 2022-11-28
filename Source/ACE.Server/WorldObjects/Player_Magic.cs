@@ -541,7 +541,7 @@ namespace ACE.Server.WorldObjects
                 difficulty += 50;
 
             if (MagicState.IsCombatCasting)
-                difficulty = (uint)(difficulty * 1.25f); // Combat casting is 25% more difficult.
+                difficulty += 10; // Combat casting is a bit more difficult than regular casting.
 
             var castingPreCheckStatus = CastingPreCheckStatus.CastFailed;
 
