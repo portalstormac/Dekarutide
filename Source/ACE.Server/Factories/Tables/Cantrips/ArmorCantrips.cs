@@ -228,22 +228,18 @@ namespace ACE.Server.Factories.Tables
 
                     ( SpellId.CANTRIPALCHEMICALPROWESS1,           0.5f ),
                     ( SpellId.CANTRIPARCANEPROWESS1,               0.5f ),
-                    ( SpellId.CANTRIPARMOREXPERTISE1,              0.5f ),
                     ( SpellId.CANTRIPCOOKINGPROWESS1,              0.5f ),
                     ( SpellId.CANTRIPDECEPTIONPROWESS1,            0.5f ),
                     ( SpellId.CANTRIPFEALTY1,                      0.5f ),
                     ( SpellId.CANTRIPFLETCHINGPROWESS1,            0.5f ),
                     ( SpellId.CANTRIPHEALINGPROWESS1,              0.5f ),
-                    ( SpellId.CANTRIPITEMEXPERTISE1,               0.5f ),
                     ( SpellId.CANTRIPJUMPINGPROWESS1,              0.5f ),
                     ( SpellId.CANTRIPLEADERSHIP1,                  0.5f ),
                     ( SpellId.CANTRIPLOCKPICKPROWESS1,             0.5f ),
-                    ( SpellId.CANTRIPMAGICITEMEXPERTISE1,          0.5f ),
                     ( SpellId.CANTRIPMANACONVERSIONPROWESS1,       0.5f ),
                     ( SpellId.CANTRIPMONSTERATTUNEMENT1,           0.5f ),
                     ( SpellId.CantripSalvaging1,                   0.5f ),
                     ( SpellId.CANTRIPSPRINT1,                      0.5f ),
-                    ( SpellId.CANTRIPWEAPONEXPERTISE1,             0.5f ),
                 };
             }
         }
