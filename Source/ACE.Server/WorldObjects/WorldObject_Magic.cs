@@ -24,6 +24,7 @@ using ACE.Server.Entity.Actions;
 using ACE.Server.Physics;
 using ACE.Server.Physics.Extensions;
 using ACE.Server.WorldObjects.Managers;
+using ACE.Server.Factories.Tables;
 
 namespace ACE.Server.WorldObjects
 {
@@ -141,11 +142,21 @@ namespace ACE.Server.WorldObjects
 
             var casterCreature = caster as Creature;
 
+            LeyLineAmulet amulet = null;
+
             if (casterCreature != null)
             {
                 // Retrieve caster's skill level in the Magic School
-                magicSkill = casterCreature.GetCreatureSkill(spell.School).Current;
+                var magicSchool = spell.School;
 
+                if (Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.CustomDM)
+                {
+                    amulet = casterCreature.GetEquippedLeyLineAmulet();
+                    if (amulet != null && amulet.LeyLineEffectId == (uint)LeyLineEffect.GrantCastableSpell && LeyLineAmulet.PossibleAcquireSpells.Contains(SpellLevelProgression.GetLevel1SpellId((SpellId)spell.Id)))
+                        magicSchool = (MagicSchool)amulet.LeyLineSchool;
+                }
+
+                magicSkill = casterCreature.GetCreatureSkill(magicSchool).Current;
             }
             else if (caster.ItemSpellcraft != null)
             {
@@ -184,9 +195,8 @@ namespace ACE.Server.WorldObjects
             var difficulty = targetCreature.GetEffectiveMagicDefense();
 
             float resistChanceMod = 1.0f;
-            if (Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.CustomDM && casterCreature != null)
+            if (Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.CustomDM)
             {
-                var amulet = casterCreature.GetEquippedLeyLineAmulet();
                 if (amulet != null && (amulet.LeyLineTriggerChance ?? 0) > 0 && (amulet.LeyLineEffectId == (uint)LeyLineEffect.LowerResistChance))
                 {
                     SpellId triggerSpellLevel1Id = (SpellId)(amulet.LeyLineTriggerSpellId ?? 0);
