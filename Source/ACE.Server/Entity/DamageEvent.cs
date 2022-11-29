@@ -305,7 +305,11 @@ namespace ACE.Server.Entity
                         }
 
                         if (isAttackFromSneaking)
+                        {
                             CriticalChance = 1.0f;
+                            if(playerDefender == null)
+                                SneakAttackMod = 3.0f;
+                        }
                         else if (attackerTechniqueId == TacticAndTechniqueType.Opportunist)
                         {
                             CriticalChance += 0.10f + playerAttacker.ScaleWithPowerAccuracyBar(0.10f); // Extra critical chance while using the Opportunist technique.
