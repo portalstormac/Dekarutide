@@ -551,17 +551,19 @@ namespace ACE.Server.Entity.Mutations
                     log.Error($"MutationCache.CacheResourceNames() - unknown resource format {resourceName}");
                     continue;
                 }
+
                 var shortName = pieces[pieces.Length - 2];
-
-                var match = Regex.Match(shortName, @"([0-9A-F]{8})");
-
-                if (match.Success && uint.TryParse(match.Groups[1].Value, NumberStyles.HexNumber, CultureInfo.InvariantCulture, out var mutationId))
-                    mutationIdToFilename[mutationId] = resourceName.Replace(prefix, "");
+                if (!shortName.Contains("CustomDM")) // Avoid overrides for now.
+                {
+                    var match = Regex.Match(shortName, @"([0-9A-F]{8})");
+                    if (match.Success && uint.TryParse(match.Groups[1].Value, NumberStyles.HexNumber, CultureInfo.InvariantCulture, out var mutationId))
+                        mutationIdToFilename[mutationId] = resourceName.Replace(prefix, "");
+                }
             }
 
             if (Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.CustomDM)
             {
-                // Search for overrides
+                // Search for overrides.
                 foreach (var resourceName in resourceNames)
                 {
                     var pieces = resourceName.Split('.');
@@ -571,12 +573,11 @@ namespace ACE.Server.Entity.Mutations
                         log.Error($"MutationCache.CacheResourceNames() - unknown resource format {resourceName}");
                         continue;
                     }
-                    var shortName = pieces[pieces.Length - 2];
 
-                    if (shortName.Contains("CustomDM"))
+                    var shortName = pieces[pieces.Length - 2];
+                    if (shortName.Contains("CustomDM")) // Only the overrides now.
                     {
                         var match = Regex.Match(shortName, @"([0-9A-F]{8})");
-
                         if (match.Success && uint.TryParse(match.Groups[1].Value, NumberStyles.HexNumber, CultureInfo.InvariantCulture, out var mutationId))
                             mutationIdToFilename[mutationId] = resourceName.Replace(prefix, "");
                     }
