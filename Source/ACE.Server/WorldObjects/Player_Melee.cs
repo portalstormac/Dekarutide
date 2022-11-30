@@ -288,7 +288,7 @@ namespace ACE.Server.WorldObjects
             if (IsSneaking)
             {
                 var angle = Math.Abs(creature.GetAngle(this));
-                if (angle < 90)
+                if (angle < 90 || creature.CombatMode != CombatMode.NonCombat)
                     EndSneaking();
                 else
                     EndSneaking(null, true);
