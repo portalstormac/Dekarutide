@@ -273,7 +273,14 @@ namespace ACE.Server.WorldObjects
                     continue;
                 }
 
-                if (wo.Value > vendor.MerchandiseMaxValue)
+                if (wo.ItemType != ItemType.PromissoryNote && wo.Value < vendor.MerchandiseMinValue)
+                {
+                    var itemName = (wo.StackSize ?? 1) > 1 ? wo.GetPluralName() : wo.Name;
+                    Session.Network.EnqueueSend(new GameEventCommunicationTransientString(Session, $"You cannot sell that! The {itemName} is of too little value to be sold here.")); // custom message?
+                    continue;
+                }
+
+                if (wo.ItemType != ItemType.PromissoryNote && wo.Value > vendor.MerchandiseMaxValue)
                 {
                     var itemName = (wo.StackSize ?? 1) > 1 ? wo.GetPluralName() : wo.Name;
                     Session.Network.EnqueueSend(new GameEventCommunicationTransientString(Session, $"You cannot sell that! The {itemName} is too valuable to sell here.")); // custom message?
