@@ -369,7 +369,11 @@ namespace ACE.Server.WorldObjects
             RotUniques();
 
             if (Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.CustomDM)
+            {
+                if (!RandomItemGenerationInitialized)
+                    SetupRandomItemShop();
                 RestockRandomItems();
+            }
 
             player.Session.Network.EnqueueSend(new GameEventApproachVendor(player.Session, this, altCurrencySpent));
 
@@ -880,9 +884,6 @@ namespace ACE.Server.WorldObjects
                 sellsRandomScrolls = ((ItemType)MerchandiseItemTypes & ItemType.Writable) == ItemType.Writable && sellsRandomCasters; // Check if we also sell casters to prevent scribes from carrying scrolls
             }
 
-            if (!sellsRandomArmor && !sellsRandomMeleeWeapons && !sellsRandomMissileWeapons && !sellsRandomCasters && !sellsRandomClothing && !sellsRandomJewelry && !sellsRandomGems && !sellsRandomScrolls)
-                return;
-
             int categoriesSold = 0;
             if (sellsRandomArmor)
                 categoriesSold++;
@@ -959,9 +960,6 @@ namespace ACE.Server.WorldObjects
 
         private void RestockRandomItems()
         {
-            if (!RandomItemGenerationInitialized)
-                SetupRandomItemShop();
-
             if (ShopTier == 0)
                 return;
 
