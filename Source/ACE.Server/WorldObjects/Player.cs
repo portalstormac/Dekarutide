@@ -566,6 +566,8 @@ namespace ACE.Server.WorldObjects
             IsBusy = true;
             IsLoggingOut = true;
 
+            EndSneaking();
+
             if (Fellowship != null)
                 FellowshipQuit(false);
 

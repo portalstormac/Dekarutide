@@ -4,20 +4,17 @@ using ACE.Server.Entity;
 using ACE.Server.Entity.Actions;
 using ACE.Server.Network.GameEvent.Events;
 using ACE.Server.Network.GameMessages.Messages;
+using ACE.Server.Network.Structure;
 using System;
 
 namespace ACE.Server.WorldObjects
 {
     partial class Player
     {
-        private static int SneakingCheckInterval = 1;
         private static uint EnterSneakingDifficulty = 50;
 
         public bool IsSneaking = false;
         public bool IsAttackFromSneaking = false;
-
-        private double SneakingDeltaTimeSum = 0;
-        private ACE.Entity.Position PositionAtLastSneakingCheck = null;
 
         public void BeginSneaking()
         {
@@ -28,10 +25,13 @@ namespace ACE.Server.WorldObjects
             if (result == SneakingTestResult.Success)
             {
                 IsSneaking = true;
-                SneakingDeltaTimeSum = 0;
-                PositionAtLastSneakingCheck = new ACE.Entity.Position(Location);
                 Session.Network.EnqueueSend(new GameMessageSystemChat("You start sneaking.", ChatMessageType.Broadcast));
                 EnqueueBroadcast(new GameMessageScript(Guid, PlayScript.SneakingBegin));
+
+                var spell = new Spell(SpellId.MireFoot);
+                var addResult = EnchantmentManager.Add(spell, null, null, true);
+                Session.Network.EnqueueSend(new GameEventMagicUpdateEnchantment(Session, new Enchantment(this, addResult.Enchantment)));
+                HandleRunRateUpdate(spell);
             }
             else if(result == SneakingTestResult.Failure)
                 Session.Network.EnqueueSend(new GameMessageSystemChat("You fail on your attempt to start sneaking.", ChatMessageType.Broadcast));
@@ -48,17 +48,27 @@ namespace ACE.Server.WorldObjects
             IsAttackFromSneaking = isAttackFromSneaking;
 
             Session.Network.EnqueueSend(new GameMessageSystemChat(message == null ? "You stop sneaking." : message, ChatMessageType.Broadcast));
+            // Add delay here to avoid remaining translucent indefinitely when EndSneaking is called right after BeginSneaking(like when a creature detects the player instantly).
+            var actionChain = new ActionChain();
+            actionChain.AddDelaySeconds(0.25f);
             if (!Teleporting)
             {
-                // Add delay here to avoid remaining translucent indefinitely when EndSneaking is called right after BeginSneaking(like when a creature detects the player instantly).
-                var actionChain = new ActionChain();
-                actionChain.AddDelayForOneTick();
                 actionChain.AddAction(this, () =>
                 {
                     EnqueueBroadcast(new GameMessageScript(Guid, PlayScript.SneakingEnd));
                 });
-                actionChain.EnqueueChain();
             }
+            actionChain.AddAction(this, () =>
+            {
+                var propertiesEnchantmentRegistry = EnchantmentManager.GetEnchantment((uint)SpellId.MireFoot, null);
+                if (propertiesEnchantmentRegistry != null)
+                {
+                    EnchantmentManager.Dispel(propertiesEnchantmentRegistry);
+                    if (!Teleporting)
+                        HandleRunRateUpdate(new Spell(propertiesEnchantmentRegistry.SpellId));
+                }
+            });
+            actionChain.EnqueueChain();
         }
 
         public bool TestSneaking(Creature creature, double distanceSquared, string failureMessage)
@@ -69,22 +79,27 @@ namespace ACE.Server.WorldObjects
             if (creature == null || distanceSquared > creature.VisualAwarenessRangeSq || !creature.IsDirectVisible(this))
                 return true;
 
+            uint difficulty;
+
             var angle = Math.Abs(creature.GetAngle(this));
-            if (angle < 110)
+            if (angle < 90)
             {
                 if (distanceSquared < 2)
                 {
                     EndSneaking(failureMessage);
                     return false;
                 }
+                else if (distanceSquared < creature.VisualAwarenessRangeSq / 10)
+                    difficulty = (uint)((creature.Level ?? 1) * 3.0f);
+                else if (distanceSquared < creature.VisualAwarenessRangeSq / 5)
+                    difficulty = (uint)((creature.Level ?? 1) * 2.0f);
                 else
-                {
-                    var difficulty = (uint)((creature.Level ?? 1) * 3.0f);
-                    return TestSneaking(difficulty, failureMessage);
-                }
+                    difficulty = (uint)((creature.Level ?? 1) * 1.0f);
             }
             else
-                return true;
+                difficulty = (uint)((creature.Level ?? 1) * 0.5f);
+
+            return TestSneaking(difficulty, failureMessage);
         }
 
         public bool TestSneaking(Creature creature, string failureMessage)
@@ -125,22 +140,6 @@ namespace ACE.Server.WorldObjects
                 return SneakingTestResult.Success;
             }
             return SneakingTestResult.Failure;
-        }
-
-        public void CheckSneaking(double deltaTime)
-        {
-            if (!IsSneaking)
-                return;
-
-            SneakingDeltaTimeSum += deltaTime;
-            if (SneakingDeltaTimeSum < SneakingCheckInterval)
-                return;
-            SneakingDeltaTimeSum = 0;
-
-            if (Location.DistanceTo(PositionAtLastSneakingCheck) > 5)
-                EndSneaking("You've moved too quickly to keep sneaking.");
-
-            PositionAtLastSneakingCheck = Location;
         }
 
         public bool IsAware(WorldObject wo)

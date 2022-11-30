@@ -285,7 +285,14 @@ namespace ACE.Server.WorldObjects
             // point of no return beyond this point -- cannot be cancelled
             Attacking = true;
 
-            EndSneaking(null, true);
+            if (IsSneaking)
+            {
+                var angle = Math.Abs(creature.GetAngle(this));
+                if (angle < 90)
+                    EndSneaking();
+                else
+                    EndSneaking(null, true);
+            }
 
             if (subsequent)
             {

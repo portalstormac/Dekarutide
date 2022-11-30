@@ -686,7 +686,6 @@ namespace ACE.Server.WorldObjects
                                 }
                             }
 
-                            CheckSneaking(deltaTime);
                             CheckMonsters();
                         }
                     }
