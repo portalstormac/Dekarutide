@@ -169,6 +169,7 @@
     <None Remove="Entity\Mutations\Recipes\3800001A - Iron.txt" />
     <None Remove="Entity\Mutations\Recipes\3800001B - Mahogany.txt" />
     <None Remove="Entity\Mutations\Recipes\3800001C - Granite.txt" />
+    <None Remove="Entity\Mutations\Recipes\3800001D - Oak - CustomDM.txt" />
     <None Remove="Entity\Mutations\Recipes\3800001D - Oak.txt" />
     <None Remove="Entity\Mutations\Recipes\3800001E - Pine.txt" />
     <None Remove="Entity\Mutations\Recipes\3800001F - Gold.txt" />
@@ -351,6 +352,7 @@
     <EmbeddedResource Include="Entity\Mutations\Recipes\3800001A - Iron.txt" />
     <EmbeddedResource Include="Entity\Mutations\Recipes\3800001B - Mahogany.txt" />
     <EmbeddedResource Include="Entity\Mutations\Recipes\3800001C - Granite.txt" />
+    <EmbeddedResource Include="Entity\Mutations\Recipes\3800001D - Oak - CustomDM.txt" />
     <EmbeddedResource Include="Entity\Mutations\Recipes\3800001D - Oak.txt" />
     <EmbeddedResource Include="Entity\Mutations\Recipes\3800001E - Pine.txt" />
     <EmbeddedResource Include="Entity\Mutations\Recipes\3800001F - Gold.txt" />

@@ -558,6 +558,30 @@ namespace ACE.Server.Entity.Mutations
                 if (match.Success && uint.TryParse(match.Groups[1].Value, NumberStyles.HexNumber, CultureInfo.InvariantCulture, out var mutationId))
                     mutationIdToFilename[mutationId] = resourceName.Replace(prefix, "");
             }
+
+            if (Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.CustomDM)
+            {
+                // Search for overrides
+                foreach (var resourceName in resourceNames)
+                {
+                    var pieces = resourceName.Split('.');
+
+                    if (pieces.Length < 2)
+                    {
+                        log.Error($"MutationCache.CacheResourceNames() - unknown resource format {resourceName}");
+                        continue;
+                    }
+                    var shortName = pieces[pieces.Length - 2];
+
+                    if (shortName.Contains("CustomDM"))
+                    {
+                        var match = Regex.Match(shortName, @"([0-9A-F]{8})");
+
+                        if (match.Success && uint.TryParse(match.Groups[1].Value, NumberStyles.HexNumber, CultureInfo.InvariantCulture, out var mutationId))
+                            mutationIdToFilename[mutationId] = resourceName.Replace(prefix, "");
+                    }
+                }
+            }
         }
     }
 }
