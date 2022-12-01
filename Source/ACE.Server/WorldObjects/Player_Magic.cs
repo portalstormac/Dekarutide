@@ -1204,7 +1204,7 @@ namespace ACE.Server.WorldObjects
             if (spell.MetaSpellType == SpellType.Dispel && !VerifyDispelPKStatus(this, target))
                 return;
 
-            if (SpellConduitToAttune != null)
+            if (SpellConduitToAttune != null && !isWeaponSpell)
                 SpellConduitToAttune.AttuneSpell(this, spell);
 
             switch (spell.School)
