@@ -1,5 +1,6 @@
 using ACE.Common;
 using ACE.Entity.Enum;
+using ACE.Entity.Enum.Properties;
 using ACE.Server.Entity;
 using ACE.Server.Entity.Actions;
 using ACE.Server.Network.GameEvent.Events;
@@ -32,6 +33,16 @@ namespace ACE.Server.WorldObjects
                 var addResult = EnchantmentManager.Add(spell, null, null, true);
                 Session.Network.EnqueueSend(new GameEventMagicUpdateEnchantment(Session, new Enchantment(this, addResult.Enchantment)));
                 HandleRunRateUpdate(spell);
+
+                RadarColor = ACE.Entity.Enum.RadarColor.Creature;
+                EnqueueBroadcast(true, new GameMessagePublicUpdatePropertyInt(this, PropertyInt.RadarBlipColor, (int)RadarColor));
+                //The following code would remove the player from radar but has the drawback of having to reload the player causing some twitchiness and other players to lose target, which would be fine when entering sneak state but it's rather annoying when leaving sneak state.
+                //SetProperty(PropertyInt.ShowableOnRadar, (int)ACE.Entity.Enum.RadarBehavior.ShowNever);
+                //EnqueueBroadcast(false, new GameMessageUpdateObject(this));
+                //var actionChain = new ActionChain();
+                //actionChain.AddDelaySeconds(0.25f);
+                //actionChain.AddAction(this, () => EnqueueBroadcast(new GameMessageScript(Guid, PlayScript.SneakingBegin)));
+                //actionChain.EnqueueChain();
             }
             else if(result == SneakingTestResult.Failure)
                 Session.Network.EnqueueSend(new GameMessageSystemChat("You fail on your attempt to start sneaking.", ChatMessageType.Broadcast));
@@ -68,6 +79,17 @@ namespace ACE.Server.WorldObjects
                         HandleRunRateUpdate(new Spell(propertiesEnchantmentRegistry.SpellId));
                 }
             });
+
+            RadarColor = null;
+            EnqueueBroadcast(true, new GameMessagePublicUpdatePropertyInt(this, PropertyInt.RadarBlipColor, 0));
+            //The following code would remove the player from radar but has the drawback of having to reload the player causing some twitchiness and other players to lose target, which would be fine when entering sneak state but it's rather annoying when leaving sneak state.
+            //actionChain.AddDelaySeconds(1.0f);
+            //actionChain.AddAction(this, () =>
+            //{
+            //    SetProperty(PropertyInt.ShowableOnRadar, (int)ACE.Entity.Enum.RadarBehavior.ShowAlways);
+            //    EnqueueBroadcast(false, new GameMessageUpdateObject(this));
+            //});
+
             actionChain.EnqueueChain();
         }
 
