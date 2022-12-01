@@ -237,6 +237,9 @@ namespace ACE.Server.WorldObjects.Entity
 
         private void UpdateSecondarySkill(ushort primaryRanks)
         {
+            if (Skill == Skill.None)
+                return;
+
             var oldValue = Ranks;
 
             if (SecondaryTo == 0 || creature == null)

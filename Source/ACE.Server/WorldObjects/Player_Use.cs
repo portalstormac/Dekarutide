@@ -190,7 +190,7 @@ namespace ACE.Server.WorldObjects
 
             if (item != null)
             {
-                if ((item.TacticAndTechniqueId ?? 0) != (int)TacticAndTechniqueType.Sneak)
+                if ((item.TacticAndTechniqueId ?? 0) != (int)TacticAndTechniqueType.Sneak && item.WeenieType != WeenieType.Corpse)
                     EndSneaking();
 
                 if (IsTrading && item.IsBeingTradedOrContainsItemBeingTraded(ItemsInTradeWindow))

@@ -1111,6 +1111,8 @@ namespace ACE.Server.WorldObjects
                             }
                             else if (containerRootOwner == this)
                             {
+                                EndSneaking();
+
                                 if (itemAsContainer != null) // We're picking up a pack
                                 {
                                     Session.Network.EnqueueSend(new GameEventViewContents(Session, itemAsContainer));
@@ -1571,6 +1573,8 @@ namespace ACE.Server.WorldObjects
 
                         if (DoHandleActionGetAndWieldItem(item, fromContainer, rootOwner, wasEquipped, wieldedLocation))
                         {
+                            EndSneaking();
+
                             Session.Network.EnqueueSend(new GameMessagePrivateUpdatePropertyInt(this, PropertyInt.EncumbranceVal, EncumbranceVal ?? 0));
 
                             EnqueueBroadcast(new GameMessageSound(Guid, Sound.PickUpItem));
@@ -3058,6 +3062,8 @@ namespace ACE.Server.WorldObjects
                     Session.Network.EnqueueSend(new GameEventInventoryServerSaveFailed(Session, itemGuid, WeenieError.ActionCancelled));
                     return;
                 }
+
+                EndSneaking();
 
                 if (target is Player targetAsPlayer)
                     GiveObjectToPlayer(targetAsPlayer, item, itemFoundInContainer, itemRootOwner, itemWasEquipped, amount);
