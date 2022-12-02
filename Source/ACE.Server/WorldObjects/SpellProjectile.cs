@@ -688,8 +688,8 @@ namespace ACE.Server.WorldObjects
                 if (missileLauncher != null && missileLauncher.GetAbsorbMagicDamage() != null)
                     missileLauncherMagicAbsorb = AbsorbMagic(target, missileLauncher);
 
-                var casterOrMissileAbsord = Math.Min(casterMagicAbsorb, missileLauncherMagicAbsorb);
-                return Math.Min(shieldMagicAbsorb, casterOrMissileAbsord);
+                var casterOrMissileAbsorb = Math.Min(casterMagicAbsorb, missileLauncherMagicAbsorb);
+                return Math.Min(shieldMagicAbsorb, casterOrMissileAbsorb);
             }
         }
 
