@@ -638,31 +638,67 @@ namespace ACE.Server.WorldObjects
             {
                 case CombatMode.Melee:
 
-                    // does target have shield equipped?
-                    var shield = target.GetEquippedShield();
-                    if (shield != null && shield.GetAbsorbMagicDamage() != null)
-                 	{
-                        if (Common.ConfigManager.Config.Server.WorldRuleset != Common.Ruleset.Infiltration)
-                            return GetShieldMod(target, shield);
-                        else
-                            return AbsorbMagic(target, shield);
+                    {
+                        // does target have shield equipped?
+                        var shield = target.GetEquippedShield();
+                        if (shield != null && shield.GetAbsorbMagicDamage() != null)
+                        {
+                            if (Common.ConfigManager.Config.Server.WorldRuleset != Common.Ruleset.Infiltration)
+                                return GetShieldMod(target, shield);
+                            else
+                                return AbsorbMagic(target, shield);
+                        }
                     }
 
                     break;
 
                 case CombatMode.Missile:
 
-                    var missileLauncherOrShield = target.GetEquippedMissileLauncher() ?? target.GetEquippedShield();
-                    if (missileLauncherOrShield != null && missileLauncherOrShield.GetAbsorbMagicDamage() != null)
-                        return AbsorbMagic(target, missileLauncherOrShield);
+                    if (Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.CustomDM)
+                    {
+                        float shieldMagicAbsorb = 0.0f;
+                        float missileLauncherMagicAbsorb = 0.0f;
+                        var shield = target.GetEquippedShield();
+                        if (shield != null && shield.GetAbsorbMagicDamage() != null)
+                            shieldMagicAbsorb = GetShieldMod(target, shield);
+
+                        var missileLauncher = target.GetEquippedMissileLauncher() ?? target.GetEquippedShield();
+                        if (missileLauncher != null && missileLauncher.GetAbsorbMagicDamage() != null)
+                            missileLauncherMagicAbsorb = AbsorbMagic(target, missileLauncher);
+
+                        return Math.Max(shieldMagicAbsorb, missileLauncherMagicAbsorb);
+                    }
+                    else
+                    {
+                        var missileLauncherOrShield = target.GetEquippedMissileLauncher() ?? target.GetEquippedShield();
+                        if (missileLauncherOrShield != null && missileLauncherOrShield.GetAbsorbMagicDamage() != null)
+                            return AbsorbMagic(target, missileLauncherOrShield);
+                    }
 
                     break;
 
                 case CombatMode.Magic:
 
-                    var caster = target.GetEquippedWand();
-                    if (caster != null && caster.GetAbsorbMagicDamage() != null)
-                        return AbsorbMagic(target, caster);
+                    if (Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.CustomDM)
+                    {
+                        float shieldMagicAbsorb = 0.0f;
+                        float casterMagicAbsorb = 0.0f;
+                        var shield = target.GetEquippedShield();
+                        if (shield != null && shield.GetAbsorbMagicDamage() != null)
+                            shieldMagicAbsorb = GetShieldMod(target, shield);
+
+                        var caster = target.GetEquippedWand();
+                        if (caster != null && caster.GetAbsorbMagicDamage() != null)
+                            casterMagicAbsorb = AbsorbMagic(target, caster);
+
+                        return Math.Max(shieldMagicAbsorb, casterMagicAbsorb);
+                    }
+                    else
+                    {
+                        var caster = target.GetEquippedWand();
+                        if (caster != null && caster.GetAbsorbMagicDamage() != null)
+                            return AbsorbMagic(target, caster);
+                    }
 
                     break;
             }
