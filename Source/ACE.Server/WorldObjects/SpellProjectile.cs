@@ -502,7 +502,7 @@ namespace ACE.Server.WorldObjects
             bool isPVP = sourcePlayer != null && targetPlayer != null;
 
             //http://acpedia.org/wiki/Announcements_-_2014/01_-_Forces_of_Nature - Aegis is 72% effective in PvP
-            if (isPVP && (target.CombatMode == CombatMode.Melee || target.CombatMode == CombatMode.Missile))
+            if (isPVP && (target.CombatMode == CombatMode.Melee || target.CombatMode == CombatMode.Missile) && Common.ConfigManager.Config.Server.WorldRuleset != Common.Ruleset.CustomDM)
             {
                 absorbMod = 1 - absorbMod;
                 absorbMod *= 0.72f;
@@ -634,11 +634,12 @@ namespace ACE.Server.WorldObjects
 
         public float GetAbsorbMod(Creature target)
         {
-            switch (target.CombatMode)
+            if (Common.ConfigManager.Config.Server.WorldRuleset != Common.Ruleset.CustomDM)
             {
-                case CombatMode.Melee:
+                switch (target.CombatMode)
+                {
+                    case CombatMode.Melee:
 
-                    {
                         // does target have shield equipped?
                         var shield = target.GetEquippedShield();
                         if (shield != null && shield.GetAbsorbMagicDamage() != null)
@@ -648,61 +649,48 @@ namespace ACE.Server.WorldObjects
                             else
                                 return AbsorbMagic(target, shield);
                         }
-                    }
 
-                    break;
+                        break;
 
-                case CombatMode.Missile:
+                    case CombatMode.Missile:
 
-                    if (Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.CustomDM)
-                    {
-                        float shieldMagicAbsorb = 0.0f;
-                        float missileLauncherMagicAbsorb = 0.0f;
-                        var shield = target.GetEquippedShield();
-                        if (shield != null && shield.GetAbsorbMagicDamage() != null)
-                            shieldMagicAbsorb = GetShieldMod(target, shield);
-
-                        var missileLauncher = target.GetEquippedMissileLauncher() ?? target.GetEquippedShield();
-                        if (missileLauncher != null && missileLauncher.GetAbsorbMagicDamage() != null)
-                            missileLauncherMagicAbsorb = AbsorbMagic(target, missileLauncher);
-
-                        return Math.Max(shieldMagicAbsorb, missileLauncherMagicAbsorb);
-                    }
-                    else
-                    {
                         var missileLauncherOrShield = target.GetEquippedMissileLauncher() ?? target.GetEquippedShield();
                         if (missileLauncherOrShield != null && missileLauncherOrShield.GetAbsorbMagicDamage() != null)
                             return AbsorbMagic(target, missileLauncherOrShield);
-                    }
 
-                    break;
+                        break;
 
-                case CombatMode.Magic:
+                    case CombatMode.Magic:
 
-                    if (Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.CustomDM)
-                    {
-                        float shieldMagicAbsorb = 0.0f;
-                        float casterMagicAbsorb = 0.0f;
-                        var shield = target.GetEquippedShield();
-                        if (shield != null && shield.GetAbsorbMagicDamage() != null)
-                            shieldMagicAbsorb = GetShieldMod(target, shield);
-
-                        var caster = target.GetEquippedWand();
-                        if (caster != null && caster.GetAbsorbMagicDamage() != null)
-                            casterMagicAbsorb = AbsorbMagic(target, caster);
-
-                        return Math.Max(shieldMagicAbsorb, casterMagicAbsorb);
-                    }
-                    else
-                    {
                         var caster = target.GetEquippedWand();
                         if (caster != null && caster.GetAbsorbMagicDamage() != null)
                             return AbsorbMagic(target, caster);
-                    }
 
-                    break;
+                        break;
+                }
+                return 1.0f;
             }
-            return 1.0f;
+            else
+            {
+                float shieldMagicAbsorb = 1.0f;
+                float casterMagicAbsorb = 1.0f;
+                float missileLauncherMagicAbsorb = 1.0f;
+
+                var shield = target.GetEquippedShield();
+                if (shield != null && shield.GetAbsorbMagicDamage() != null)
+                    shieldMagicAbsorb = GetShieldMod(target, shield);
+
+                var caster = target.GetEquippedWand();
+                if (caster != null && caster.GetAbsorbMagicDamage() != null)
+                    casterMagicAbsorb = AbsorbMagic(target, caster);
+
+                var missileLauncher = target.GetEquippedMissileLauncher();
+                if (missileLauncher != null && missileLauncher.GetAbsorbMagicDamage() != null)
+                    missileLauncherMagicAbsorb = AbsorbMagic(target, missileLauncher);
+
+                var casterOrMissileAbsord = Math.Min(casterMagicAbsorb, missileLauncherMagicAbsorb);
+                return Math.Min(shieldMagicAbsorb, casterOrMissileAbsord);
+            }
         }
 
         /// <summary>
@@ -729,23 +717,36 @@ namespace ACE.Server.WorldObjects
             if (shieldSkill.AdvancementClass < SkillAdvancementClass.Trained || shieldSkill.Base < 100)
                 return 1.0f;
 
-            var baseSkill = Math.Min(shieldSkill.Base, 433);
-            var specMod = shieldSkill.AdvancementClass == SkillAdvancementClass.Specialized ? 1.0f : 0.8f;
-            var cap = (float)(shield.GetAbsorbMagicDamage() ?? 0.0f);
+            if (Common.ConfigManager.Config.Server.WorldRuleset != Common.Ruleset.CustomDM)
+            {
+                var baseSkill = Math.Min(shieldSkill.Base, 433);
+                var specMod = shieldSkill.AdvancementClass == SkillAdvancementClass.Specialized ? 1.0f : 0.8f;
+                var cap = (float)(shield.GetAbsorbMagicDamage() ?? 0.0f);
 
-            // speced, 100 skill = 0%
-            // trained, 100 skill = 0%
-            // speced, 200 skill = 30%
-            // trained, 200 skill = 24%
-            // speced, 300 skill = 60%
-            // trained, 300 skill = 48%
-            // speced, 433 skill = 100%
-            // trained, 433 skill = 80%
+                // speced, 100 skill = 0%
+                // trained, 100 skill = 0%
+                // speced, 200 skill = 30%
+                // trained, 200 skill = 24%
+                // speced, 300 skill = 60%
+                // trained, 300 skill = 48%
+                // speced, 433 skill = 100%
+                // trained, 433 skill = 80%
 
-            var reduction = (cap * specMod * baseSkill * 0.003f) - (cap * specMod * 0.3f);
+                var reduction = (cap * specMod * baseSkill * 0.003f) - (cap * specMod * 0.3f);
 
-            var shieldMod = Math.Min(1.0f, 1.0f - reduction);
-            return shieldMod;
+                var shieldMod = Math.Min(1.0f, 1.0f - reduction);
+                return shieldMod;
+            }
+            else
+            {
+                var baseSkill = Math.Min(shieldSkill.Base, 433);
+                var cap = (float)(shield.GetAbsorbMagicDamage() ?? 0.0f);
+
+                var reduction = (cap * baseSkill * 0.003f) - (cap * 0.3f);
+
+                var shieldMod = Math.Min(1.0f, 1.0f - reduction);
+                return shieldMod;
+            }
         }
 
         /// <summary>
