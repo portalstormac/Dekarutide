@@ -98,7 +98,7 @@ namespace ACE.Server.WorldObjects
             if (!IsSneaking)
                 return false;
 
-            if (creature == null || distanceSquared > creature.VisualAwarenessRangeSq || !creature.IsDirectVisible(this))
+            if (creature == null || creature.PlayerKillerStatus == PlayerKillerStatus.RubberGlue || creature.PlayerKillerStatus == PlayerKillerStatus.Protected || distanceSquared > creature.VisualAwarenessRangeSq || !creature.IsDirectVisible(this))
                 return true;
 
             uint difficulty;
@@ -128,6 +128,10 @@ namespace ACE.Server.WorldObjects
         {
             if (!IsSneaking)
                 return false;
+
+            if (creature == null)
+                return true;
+
             return TestSneaking(creature, PhysicsObj.get_distance_sq_to_object(creature.PhysicsObj, true), failureMessage);
         }
 
