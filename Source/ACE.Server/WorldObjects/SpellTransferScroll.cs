@@ -288,9 +288,9 @@ namespace ACE.Server.WorldObjects
                         Spell spell = new Spell(spellId);
                         if(spell.IsCantrip)
                         {
-                            if(spell.Level == 1 && source.Level == 3) // Minor
+                            if(spell.Formula.Level == 1 && source.Level == 3) // Minor
                                 spells.Add(spellId);
-                            else if (spell.Level == 2 && source.Level == 6) // Major
+                            else if (spell.Formula.Level == 2 && source.Level == 6) // Major
                                 spells.Add(spellId);
                         }
                         else if (spell.Level == source.Level)
@@ -308,7 +308,7 @@ namespace ACE.Server.WorldObjects
                     return;
                 }
 
-                var chance = 0.25;
+                var chance = Math.Clamp(0.25 + ((spellCount - 1) * 0.1), 0.25, 1.0);
                 var percent = chance * 100;
                 var showDialog = player.GetCharacterOption(CharacterOption.UseCraftingChanceOfSuccessDialog);
                 if (showDialog && !confirmed)
