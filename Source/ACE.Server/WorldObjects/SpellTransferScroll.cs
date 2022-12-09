@@ -234,12 +234,13 @@ namespace ACE.Server.WorldObjects
                         var newManaRate = LootGenerationFactory.CalculateManaRate(newMaxBaseMana);
                         var newMaxMana = (int)spellToAdd.BaseMana * 15;
 
-                        if (newMaxMana > (target.ItemMaxMana ?? 0))
-                        {
+                        if(isGem)
+                            target.ItemManaCost = (int)spellToAdd.BaseMana;
+                        else if (newMaxMana > (target.ItemMaxMana ?? 0))
                             target.ManaRate = newManaRate;
-                            target.ItemMaxMana = newMaxMana;
-                            target.ItemCurMana = Math.Clamp(target.ItemCurMana ?? 0, 0, target.ItemMaxMana ?? 0);
-                        }
+
+                        target.ItemMaxMana = newMaxMana;
+                        target.ItemCurMana = Math.Clamp(target.ItemCurMana ?? 0, 0, target.ItemMaxMana ?? 0);
 
                         var newRollDiff = LootGenerationFactory.RollEnchantmentDifficulty(enchantments);
                         newRollDiff += LootGenerationFactory.RollCantripDifficulty(cantrips);
