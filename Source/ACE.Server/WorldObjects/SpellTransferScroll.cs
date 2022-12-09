@@ -102,10 +102,8 @@ namespace ACE.Server.WorldObjects
 
                 var isGem = false;
                 if(target.ItemType == ItemType.Gem)
-                    isGem = true;
-
-                if (target.ItemType == ItemType.Gem || target.ItemType == ItemType.Jewelry)
                 {
+                    isGem = true;
                     if(spellToAdd.IsCantrip)
                     {
                         player.Session.Network.EnqueueSend(new GameMessageSystemChat($"The {target.NameWithMaterial} cannot contain {spellToAdd.Name}.", ChatMessageType.Craft));
