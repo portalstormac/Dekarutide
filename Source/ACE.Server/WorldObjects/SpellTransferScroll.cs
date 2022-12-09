@@ -88,7 +88,7 @@ namespace ACE.Server.WorldObjects
                 Spell spellToAdd = new Spell(spellToAddId);
 
                 var isProc = false;
-                if (MeleeSpells.meleeProcs.FirstOrDefault(x => x.result == spellToAddlevel1Id) != default((SpellId, float)) || MissileSpells.missileProcs.FirstOrDefault(x => x.result == spellToAddlevel1Id) != default((SpellId, float)))
+                if (spellToAddlevel1Id != SpellId.Undef && (MeleeSpells.meleeProcs.FirstOrDefault(x => x.result == spellToAddlevel1Id) != default((SpellId, float)) || MissileSpells.missileProcs.FirstOrDefault(x => x.result == spellToAddlevel1Id) != default((SpellId, float))))
                 {
                     isProc = true;
 
@@ -148,7 +148,7 @@ namespace ACE.Server.WorldObjects
                         player.SendUseDoneEvent();
                         return;
                     }
-                    else if(SpellLevelProgression.GetLevel1SpellId((SpellId)spellOnItemId) == spellToAddlevel1Id)
+                    else if(spellOnItem.Category == spellToAdd.Category)
                     {
                         if (spellOnItem.Power > spellToAdd.Power)
                         {
@@ -300,9 +300,9 @@ namespace ACE.Server.WorldObjects
                         Spell spell = new Spell(spellId);
                         if(spell.IsCantrip)
                         {
-                            if(spell.Formula.Level == 1 && source.Level == 3) // Minor
+                            if(spell.Formula.Level == 1 && source.Level == 3) // Minor Cantrips
                                 spells.Add(spellId);
-                            else if (spell.Formula.Level == 2 && source.Level == 6) // Major
+                            else if (spell.Formula.Level > 1 && source.Level == 6) // Other Cantrips
                                 spells.Add(spellId);
                         }
                         else if (spell.Level == source.Level)

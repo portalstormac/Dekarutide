@@ -7708,6 +7708,30 @@ namespace ACE.Server.Factories.Tables
             SpellId.CantripArmorAptitude4,
         };
 
+        public static readonly List<SpellId> CantripWarriorVitality = new List<SpellId>()
+        {
+            SpellId.WarriorsLesserVitality,
+            SpellId.WarriorsVitality,
+            SpellId.WarriorsGreaterVitality,
+            SpellId.WarriorsUltimateVitality,
+        };
+
+        public static readonly List<SpellId> CantripWarriorVigor = new List<SpellId>()
+        {
+            SpellId.WarriorsLesserVigor,
+            SpellId.WarriorsVigor,
+            SpellId.WarriorsGreaterVigor,
+            SpellId.WarriorsUltimateVigor,
+        };
+
+        public static readonly List<SpellId> CantripWizardIntelect = new List<SpellId>()
+        {
+            SpellId.WizardsLesserIntellect,
+            SpellId.WizardsIntellect,
+            SpellId.WizardsGreaterIntellect,
+            SpellId.WizardsUltimateIntellect,
+        };
+
         static SpellLevelProgression()
         {
             // takes ~5ms
@@ -8453,6 +8477,9 @@ namespace ACE.Server.Factories.Tables
             AddSpells(GauntletCriticalDamageReduction);
             AddSpells(GauntletHealingBoost);
             AddSpells(GauntletVitality);
+            AddSpells(CantripWarriorVitality);
+            AddSpells(CantripWarriorVigor);
+            AddSpells(CantripWizardIntelect);
             //CustomDM
             AddSpells(ArmorMasterySelf);
             AddSpells(ArmorMasteryOther);
