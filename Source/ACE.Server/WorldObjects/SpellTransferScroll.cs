@@ -1,5 +1,6 @@
 using ACE.Common;
 using ACE.Common.Extensions;
+using ACE.Database;
 using ACE.Entity;
 using ACE.Entity.Enum;
 using ACE.Entity.Models;
@@ -234,10 +235,22 @@ namespace ACE.Server.WorldObjects
                         var newManaRate = LootGenerationFactory.CalculateManaRate(newMaxBaseMana);
                         var newMaxMana = (int)spellToAdd.BaseMana * 15;
 
-                        if(isGem)
+                        if (isGem)
+                        {
                             target.ItemManaCost = (int)spellToAdd.BaseMana;
+                            var baseWeenie = DatabaseManager.World.GetCachedWeenie(target.WeenieClassId);
+                            if (baseWeenie != null)
+                            {
+                                target.Name = baseWeenie.GetName(); // Reset to base name before rebuilding suffix.
+                                target.LongDesc = LootGenerationFactory.GetLongDesc(target);
+                                target.Name = target.LongDesc;
+                            }
+                        }
                         else if (newMaxMana > (target.ItemMaxMana ?? 0))
+                        {
                             target.ManaRate = newManaRate;
+                            target.LongDesc = LootGenerationFactory.GetLongDesc(target);
+                        }
 
                         target.ItemMaxMana = newMaxMana;
                         target.ItemCurMana = Math.Clamp(target.ItemCurMana ?? 0, 0, target.ItemMaxMana ?? 0);
