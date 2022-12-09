@@ -614,7 +614,7 @@ namespace ACE.Server.Factories
 
         // old method / based on item type
 
-        private static int RollSpellcraft(WorldObject wo)
+        public static int RollSpellcraft(WorldObject wo)
         {
             var maxSpellPower = GetMaxSpellPower(wo);
 

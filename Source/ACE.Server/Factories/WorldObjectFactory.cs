@@ -141,6 +141,8 @@ namespace ACE.Server.Factories
                     return new LeyLineAmulet(weenie, guid);
                 case WeenieType.SpellConduit:
                     return new SpellConduit(weenie, guid);
+                case WeenieType.SpellTransferScroll:
+                    return new SpellTransferScroll(weenie, guid);
                 default:
                     return new GenericObject(weenie, guid);
             }
@@ -260,6 +262,8 @@ namespace ACE.Server.Factories
                     return new LeyLineAmulet(biota);
                 case WeenieType.SpellConduit:
                     return new SpellConduit(biota);
+                case WeenieType.SpellTransferScroll:
+                    return new SpellTransferScroll(biota);
                 default:
                     return new GenericObject(biota);
             }

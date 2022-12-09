@@ -292,7 +292,7 @@ namespace ACE.Server.Factories
                 return 3;
         }
 
-        private static float RollEnchantmentDifficulty(List<SpellId> spellIds)
+        public static float RollEnchantmentDifficulty(List<SpellId> spellIds)
         {
             var spells = new List<Server.Entity.Spell>();
 
@@ -306,15 +306,15 @@ namespace ACE.Server.Factories
 
             var itemDifficulty = 0.0f;
 
-            // exclude highest spell
-            for (var i = 0; i < spells.Count - 1; i++)
-            {
-                var spell = spells[i];
+                // exclude highest spell
+                for (var i = 0; i < spells.Count - 1; i++)
+                {
+                    var spell = spells[i];
 
-                var rng = (float)ThreadSafeRandom.Next(0.5f, 1.5f);
+                    var rng = (float)ThreadSafeRandom.Next(0.5f, 1.5f);
 
-                itemDifficulty += spell.Formula.Level * 5.0f * rng;
-            }
+                    itemDifficulty += spell.Formula.Level * 5.0f * rng;
+                }
 
             return itemDifficulty;
         }
@@ -450,7 +450,7 @@ namespace ACE.Server.Factories
             }
         }
 
-        private static float RollCantripDifficulty(List<SpellId> cantripIds)
+        public static float RollCantripDifficulty(List<SpellId> cantripIds)
         {
             var itemDifficulty = 0.0f;
 

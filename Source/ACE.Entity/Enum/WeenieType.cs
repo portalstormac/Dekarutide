@@ -75,6 +75,7 @@ namespace ACE.Entity.Enum
         PetDevice,
         CombatPet,
         LeyLineAmulet,
-        SpellConduit
+        SpellConduit,
+        SpellTransferScroll,
     }
 }

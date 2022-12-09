@@ -103,7 +103,7 @@ namespace ACE.Server.Factories.Tables
             ( SpellId.BloodDrinkerSelf1, 1.00f ),
         };
 
-        private static ChanceTable<SpellId> missileProcs = new ChanceTable<SpellId>(ChanceTableType.Weight)
+        public static ChanceTable<SpellId> missileProcs = new ChanceTable<SpellId>(ChanceTableType.Weight)
         {
             ( SpellId.Undef,               10.0f ),
 

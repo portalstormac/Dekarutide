@@ -60,7 +60,7 @@ namespace ACE.Server.WorldObjects
             }
 
             // handle objects with built-in spells
-            if (sourceItem.SpellDID != null && sourceItem.WeenieType != WeenieType.Gem)
+            if (sourceItem.SpellDID != null && sourceItem.WeenieType != WeenieType.Gem && sourceItem.WeenieType != WeenieType.SpellTransferScroll)
             {
                 if (!RecipeManager.VerifyUse(this, sourceItem, target))
                 {

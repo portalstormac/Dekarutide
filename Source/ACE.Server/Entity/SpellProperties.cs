@@ -488,5 +488,7 @@ namespace ACE.Server.Entity
         /// Number * NumberVariance = the minimum # of spells to dispel
         /// </summary>
         public float NumberVariance { get => _spell.NumberVariance ?? 0; }
+
+        public bool IsCantrip { get => _spellBase.Desc.Contains("Additional spells can be layered over this."); } // TODO: a better way to do this?
     }
 }
