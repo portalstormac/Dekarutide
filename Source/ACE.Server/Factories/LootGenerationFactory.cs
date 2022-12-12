@@ -1457,6 +1457,16 @@ namespace ACE.Server.Factories
 
                     treasureRoll.Wcid = WeenieClassName.ace49485_encapsulatedspirit;
                     break;
+
+                case TreasureItemType_Orig.Salvage:
+
+                    treasureRoll.Wcid = SalvageWcids.Roll(treasureDeath);
+                    break;
+
+                case TreasureItemType_Orig.SpecialItem:
+
+                    treasureRoll.Wcid = SpecialItemsWcids.Roll(treasureDeath, treasureRoll);
+                    break;
             }
             return treasureRoll;
         }
@@ -1661,7 +1671,11 @@ namespace ACE.Server.Factories
                     MutatePetDevice(wo, treasureDeath.Tier);
                     break;
 
-                // other mundane items (mana stones, food/drink, healing kits, lockpicks, and spell components/peas) don't get mutated
+                case TreasureItemType_Orig.Salvage:
+                    MutateSalvage(wo, treasureDeath.Tier);
+                    break;
+
+                    // other mundane items (mana stones, food/drink, healing kits, lockpicks, and spell components/peas) don't get mutated
             }
 
             if (Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.CustomDM)

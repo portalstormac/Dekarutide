@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-
+using ACE.Common;
 using ACE.Entity.Enum;
 using ACE.Entity.Enum.Properties;
 using ACE.Server.Entity;
@@ -88,9 +88,19 @@ namespace ACE.Server.WorldObjects
                 {
                     vendor.UniqueItemsForSale.Remove(item.Guid);
 
-                    // this was only for when the unique item was sold to the vendor,
-                    // to determine when the item should rot on the vendor. it gets removed now
-                    item.SoldTimestamp = null;
+
+                    if (Common.ConfigManager.Config.Server.WorldRuleset != Common.Ruleset.CustomDM)
+                    {
+                        // this was only for when the unique item was sold to the vendor,
+                        // to determine when the item should rot on the vendor. it gets removed now
+                        item.SoldTimestamp = null;
+                    }
+                    else
+                    {
+                        // this is used to determine if an item is a recently purchased item when a player dies on a drop recently purchased items landblock.
+                        item.SoldTimestamp = Time.GetUnixTime();
+                    }
+
 
                     vendor.NumItemsSold++;
                 }

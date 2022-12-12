@@ -1080,6 +1080,8 @@ namespace ACE.Server.WorldObjects
                 PlayerSkills.Remove(Skill.ArmorTinkering);
                 PlayerSkills.Remove(Skill.MagicItemTinkering);
                 PlayerSkills.Remove(Skill.ItemTinkering);
+
+                NoLog_Landblocks.Add(0xB095); // Smuggler's Den
             }
         }
 

@@ -226,6 +226,10 @@ namespace ACE.Entity.Enum.Properties
         MeleeDefenseCap                = 10003,
         MissileDefenseCap              = 10004,
         MagicDefenseCap                = 10005,
+        [ServerOnly]
+        VendorRestockInterval          = 10006,
+        [ServerOnly]
+        VendorStockTimeToRot           = 10007,
     }
 
     public static class PropertyFloatExtensions

@@ -498,7 +498,7 @@ namespace ACE.Server.WorldObjects
 
         private double GetNextRegenerationTime(double generatorInitialDelay)
         {
-            if (RegenerationTimestamp == 0)
+            if (RegenerationTimestamp != 0)
                 return Time.GetUnixTime();
 
             return Time.GetUnixTime() + generatorInitialDelay;

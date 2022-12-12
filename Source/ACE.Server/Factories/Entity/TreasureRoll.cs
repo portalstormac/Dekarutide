@@ -74,5 +74,7 @@ namespace ACE.Server.Factories.Entity
         public bool IsJewelry => ItemType == TreasureItemType_Orig.Jewelry;
 
         public bool IsDinnerware => ItemType == TreasureItemType_Orig.ArtObject;
+
+        public bool IsSalvage => ItemType == TreasureItemType_Orig.Salvage;
     }
 }
