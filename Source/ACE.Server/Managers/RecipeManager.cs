@@ -784,7 +784,7 @@ namespace ACE.Server.Managers
             return true;
         }
 
-        public static bool VerifyUse(Player player, WorldObject source, WorldObject target)
+        public static bool VerifyUse(Player player, WorldObject source, WorldObject target, bool blockWielded = false)
         {
             var usable = source.ItemUseable ?? Usable.Undef;
 
@@ -797,7 +797,9 @@ namespace ACE.Server.Managers
                     return false;
 
                 // almost always MyInventory, but sometimes can be applied to equipped
-                if (player.FindObject(target.Guid.Full, Player.SearchLocations.MyInventory | Player.SearchLocations.MyEquippedItems) == null)
+                if (!blockWielded && player.FindObject(target.Guid.Full, Player.SearchLocations.MyInventory | Player.SearchLocations.MyEquippedItems) == null)
+                    return false;
+                else if (blockWielded && player.FindObject(target.Guid.Full, Player.SearchLocations.MyInventory) == null)
                     return false;
 
                 return true;
@@ -806,17 +808,21 @@ namespace ACE.Server.Managers
             var sourceUse = usable.GetSourceFlags();
             var targetUse = usable.GetTargetFlags();
 
-            return VerifyUse(player, source, sourceUse) && VerifyUse(player, target, targetUse);
+            return VerifyUse(player, source, sourceUse, blockWielded) && VerifyUse(player, target, targetUse, blockWielded);
         }
 
-        public static bool VerifyUse(Player player, WorldObject obj, Usable usable)
+        public static bool VerifyUse(Player player, WorldObject obj, Usable usable, bool blockWielded = false)
         {
             var searchLocations = Player.SearchLocations.None;
 
             // TODO: figure out other Usable flags
             if (usable.HasFlag(Usable.Contained))
-                searchLocations |= Player.SearchLocations.MyInventory | Player.SearchLocations.MyEquippedItems;
-            if (usable.HasFlag(Usable.Wielded))
+            {
+                searchLocations |= Player.SearchLocations.MyInventory;
+                if (!blockWielded)
+                    searchLocations |= Player.SearchLocations.MyEquippedItems;
+            }
+            if (!blockWielded && usable.HasFlag(Usable.Wielded))
                 searchLocations |= Player.SearchLocations.MyEquippedItems;
             if (usable.HasFlag(Usable.Remote))
                 searchLocations |= Player.SearchLocations.LocationsICanMove;    // TODO: moveto for this type

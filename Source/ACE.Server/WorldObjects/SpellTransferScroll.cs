@@ -75,7 +75,7 @@ namespace ACE.Server.WorldObjects
                 return;
             }
 
-            if (!RecipeManager.VerifyUse(player, source, target) || target.Workmanship == null || target.ParentLocation != null)
+            if (!RecipeManager.VerifyUse(player, source, target, true) || target.Workmanship == null)
             {
                 player.SendUseDoneEvent(WeenieError.YouDoNotPassCraftingRequirements);
                 return;
