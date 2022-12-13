@@ -166,6 +166,13 @@ namespace ACE.Server.WorldObjects
                     }
                 }
 
+                if (Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.CustomDM && (spell.IsImpenBaneType || spell.IsOtherRedirectable))
+                {
+                    // Temporary fix for unintended banes on gems.
+                    player.Session.Network.EnqueueSend(new GameEventCommunicationTransientString(player.Session, $"The {Name} doesn't have a valid spell!"));
+                    return;
+                }
+
                 // should be 'You cast', instead of 'Item cast'
                 // omitting the item caster here, so player is also used for enchantment registry caster,
                 // which could prevent some scenarios with spamming enchantments from multiple gem sources to protect against dispels

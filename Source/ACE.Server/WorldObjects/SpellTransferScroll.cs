@@ -110,7 +110,32 @@ namespace ACE.Server.WorldObjects
                         player.SendUseDoneEvent();
                         return;
                     }
+                    else if (spellToAdd.School == MagicSchool.ItemEnchantment)
+                    {
+                        player.Session.Network.EnqueueSend(new GameMessageSystemChat($"The {target.NameWithMaterial} cannot contain {spellToAdd.Name}.", ChatMessageType.Craft));
+                        player.SendUseDoneEvent();
+                        return;
+                    }
                 }
+                else if(target.ItemType == ItemType.MeleeWeapon || target.ItemType == ItemType.MissileWeapon || target.ItemType == ItemType.Caster)
+                {
+                    if (spellToAdd.IsImpenBaneType)
+                    {
+                        player.Session.Network.EnqueueSend(new GameMessageSystemChat($"The {target.NameWithMaterial} cannot contain {spellToAdd.Name}.", ChatMessageType.Craft));
+                        player.SendUseDoneEvent();
+                        return;
+                    }
+                }
+                else
+                {
+                    if (spellToAdd.IsWeaponTargetType)
+                    {
+                        player.Session.Network.EnqueueSend(new GameMessageSystemChat($"The {target.NameWithMaterial} cannot contain {spellToAdd.Name}.", ChatMessageType.Craft));
+                        player.SendUseDoneEvent();
+                        return;
+                    }
+                }
+
 
                 var spellsOnItem = target.Biota.GetKnownSpellsIds(target.BiotaDatabaseLock);
 
