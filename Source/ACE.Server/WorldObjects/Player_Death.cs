@@ -117,7 +117,7 @@ namespace ACE.Server.WorldObjects
 
                 PlayerManager.BroadcastToAll(new GameMessageSystemChat(globalPKDe, ChatMessageType.Broadcast));
 
-                _ = TurbineChatHandler.SendWebhookedChat("Bael'Zharon", webhookMsg, null, "General");
+                _ = TurbineChatHandler.SendWebhookedChat("", webhookMsg, null, "PvP");
             }
             else if (IsPKLiteDeath(topDamager))
                 pkPlayer.PlayerKillsPkl++;
