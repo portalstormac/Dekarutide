@@ -38,9 +38,6 @@ namespace ACE.Server.Factories.Tables.Wcids
             ( WeenieClassName.materialrosequartz,       2.00f ), // Minor Quickness
             ( WeenieClassName.materialagate,            2.00f ), // Minor Focus
             ( WeenieClassName.materiallapislazuli,      2.00f ), // Minor Willpower
-            ( WeenieClassName.materialredjade,          2.00f ), // Minor Health Gain
-            ( WeenieClassName.materialcitrine,          2.00f ), // Minor Stamina Gain
-            ( WeenieClassName.materiallavenderjade,     2.00f ), // Minor Mana Gain
 
             ( WeenieClassName.materialmalachite,        2.00f ), // Warrior's Vigor
             ( WeenieClassName.materialhematite,         2.00f ), // Warrior's Vitality
