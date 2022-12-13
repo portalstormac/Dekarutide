@@ -10,13 +10,19 @@ namespace ACE.Server.Factories.Tables.Wcids
         private static ChanceTable<TreasureItemType_Orig> specialItemCategory = new ChanceTable<TreasureItemType_Orig>(ChanceTableType.Weight)
         {
             (TreasureItemType_Orig.Salvage,      1.0f ),
-            (TreasureItemType_Orig.Unmutated,    0.2f ),
+            (TreasureItemType_Orig.SpecialItem_Unmutated,    0.2f ),
         };
 
         private static ChanceTable<WeenieClassName> specialItemsUnmutatedWcids = new ChanceTable<WeenieClassName>(ChanceTableType.Weight)
         {
             ((WeenieClassName)50128,      1.00f ), // Spell Extraction Scroll VI
             ((WeenieClassName)50129,      1.00f ), // Spell Extraction Scroll VII
+        };
+
+        private static Dictionary<WeenieClassName, int> specialItemsUnmutatedAmount = new Dictionary<WeenieClassName, int>()
+        {
+            {(WeenieClassName)50128,      10 }, // Spell Extraction Scroll VI
+            {(WeenieClassName)50129,      10 }, // Spell Extraction Scroll VII
         };
 
         private static ChanceTable<WeenieClassName> specialItemsSalvageWcids = new ChanceTable<WeenieClassName>(ChanceTableType.Weight)
@@ -60,9 +66,17 @@ namespace ACE.Server.Factories.Tables.Wcids
                 case TreasureItemType_Orig.Salvage:
                     return specialItemsSalvageWcids.Roll(profile.LootQualityMod);
                 default:
-                case TreasureItemType_Orig.Unmutated:
+                case TreasureItemType_Orig.SpecialItem_Unmutated:
                     return specialItemsUnmutatedWcids.Roll(profile.LootQualityMod);
             }
+        }
+
+        public static int GetAmount(uint wcid)
+        {
+            if (specialItemsUnmutatedAmount.TryGetValue((WeenieClassName)wcid, out var amount))
+                return amount;
+            else
+                return 1;
         }
     }
 }

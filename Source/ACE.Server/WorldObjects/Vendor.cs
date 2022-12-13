@@ -1089,12 +1089,18 @@ namespace ACE.Server.WorldObjects
             for (int i = 0; i < UniqueItemsForSale.Count; i++)
             {
                 var item = UniqueItemsForSale.Values.ElementAt(i);
-                if (i == 0)
-                    message = $"{message} {item.NameWithMaterial}{(item.ItemType == ItemType.TinkeringMaterial ? $" (Workmanship {(item.Workmanship ?? 0):#.00})" : "")} for {(int)Math.Round(item.Value ?? 0 * SellPrice ?? 0):N0} Pyreals";
-                else if (i == UniqueItemsForSale.Count - 1)
-                    message = $"{message} and {item.NameWithMaterial}{(item.ItemType == ItemType.TinkeringMaterial ? $" (Workmanship {(item.Workmanship ?? 0):#.00})" : "")} for {(int)Math.Round(item.Value ?? 0 * SellPrice ?? 0):N0} Pyreals";
+                int value;
+                if (item.MaxStackSize > 1)
+                    value = item.StackUnitValue ?? 0;
                 else
-                    message = $"{message}, {item.NameWithMaterial}{(item.ItemType == ItemType.TinkeringMaterial ? $" (Workmanship {(item.Workmanship ?? 0):#.00})" : "")} for {(int)Math.Round(item.Value ?? 0 * SellPrice ?? 0):N0} Pyreals";
+                    value = item.Value ?? 0;
+
+                if (i == 0)
+                    message = $"{message} {item.NameWithMaterial}{(item.ItemType == ItemType.TinkeringMaterial ? $" (Workmanship {(item.Workmanship ?? 0):#.00})" : "")} for {(int)Math.Round(value * SellPrice ?? 0):N0} Pyreals";
+                else if (i == UniqueItemsForSale.Count - 1)
+                    message = $"{message} and {item.NameWithMaterial}{(item.ItemType == ItemType.TinkeringMaterial ? $" (Workmanship {(item.Workmanship ?? 0):#.00})" : "")} for {(int)Math.Round(value * SellPrice ?? 0):N0} Pyreals";
+                else
+                    message = $"{message}, {item.NameWithMaterial}{(item.ItemType == ItemType.TinkeringMaterial ? $" (Workmanship {(item.Workmanship ?? 0):#.00})" : "")} for {(int)Math.Round(value * SellPrice ?? 0):N0} Pyreals";
             }
             var append = GetProperty(PropertyString.VendorBroadcastAppend) ?? "";
             if(append.Length > 0)

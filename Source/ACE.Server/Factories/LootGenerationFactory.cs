@@ -1541,7 +1541,7 @@ namespace ACE.Server.Factories
         public static WorldObject CreateAndMutateWcid(TreasureDeath treasureDeath, TreasureRoll treasureRoll, bool isMagical)
         {
             WorldObject wo = null;
-              
+
             if (treasureRoll.ItemType != TreasureItemType_Orig.Scroll)
             {
                 wo = WorldObjectFactory.CreateNewWorldObject((uint)treasureRoll.Wcid);
@@ -1553,9 +1553,12 @@ namespace ACE.Server.Factories
                     return null;
                 }
 
+
                 if (wo.MaxStackSize > 1)
                 {
-                    if (treasureRoll.WeaponType == TreasureWeaponType.Thrown)
+                    if (treasureRoll.ItemType == TreasureItemType_Orig.SpecialItem_Unmutated)
+                        wo.SetStackSize(SpecialItemsWcids.GetAmount(wo.WeenieClassId));
+                    else if (treasureRoll.WeaponType == TreasureWeaponType.Thrown)
                         wo.SetStackSize(Math.Min(30, (int)(wo.MaxStackSize ?? 1)));
                     else if (treasureRoll.ItemType == TreasureItemType_Orig.ArtObject)
                         wo.SetStackSize(Math.Min(10, (int)(wo.MaxStackSize ?? 1)));

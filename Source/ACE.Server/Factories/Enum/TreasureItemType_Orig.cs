@@ -66,6 +66,6 @@ namespace ACE.Server.Factories.Enum
         // CustomDM
         Salvage,
         SpecialItem,
-        Unmutated
+        SpecialItem_Unmutated
     }
 }
