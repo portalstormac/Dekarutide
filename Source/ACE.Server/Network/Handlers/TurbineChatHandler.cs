@@ -381,8 +381,11 @@ namespace ACE.Server.Network.Handlers
                     if (!string.IsNullOrWhiteSpace(channelName))
                         channelName = $"[{channelName}] ";
 
+                    if (!string.IsNullOrWhiteSpace(sender))
+                        sender = $"{sender}: ";
+
                     var dict = new System.Collections.Generic.Dictionary<string, string>();
-                    dict["content"] = $"{channelName}{sender}: \"{message}\"";
+                    dict["content"] = $"{channelName}{sender}\"{message}\"";
 
                     var payload = Newtonsoft.Json.JsonConvert.SerializeObject(dict);
                     using (var wc = new System.Net.WebClient())

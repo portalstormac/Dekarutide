@@ -21,6 +21,7 @@ using ACE.Server.Network.GameMessages.Messages;
 using ACE.Server.WorldObjects;
 
 using Biota = ACE.Entity.Models.Biota;
+using ACE.Server.Network.Handlers;
 
 namespace ACE.Server.Managers
 {
@@ -555,6 +556,12 @@ namespace ACE.Server.Managers
         /// </summary>
         public static void BroadcastToAll(GameMessage msg)
         {
+            if (msg.Opcode == GameMessageOpcode.ServerMessage && msg is GameMessageSystemChat systemChat)
+            {
+                if (systemChat.Message != null && systemChat.ChatMessageType == ChatMessageType.WorldBroadcast)
+                    _ = TurbineChatHandler.SendWebhookedChat("", systemChat.Message, null, "World Broadcast");
+            }
+
             foreach (var player in GetAllOnline())
                 player.Session.Network.EnqueueSend(msg);
         }
