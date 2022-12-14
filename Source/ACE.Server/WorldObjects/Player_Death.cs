@@ -115,7 +115,7 @@ namespace ACE.Server.WorldObjects
 
                 globalPKDe += "\n[PKDe]";
 
-                PlayerManager.BroadcastToAll(new GameMessageSystemChat(globalPKDe, ChatMessageType.Broadcast));
+                PlayerManager.BroadcastToAll(new GameMessageSystemChat(globalPKDe, ChatMessageType.Help));
 
                 _ = TurbineChatHandler.SendWebhookedChat("", webhookMsg, null, "PvP");
             }
