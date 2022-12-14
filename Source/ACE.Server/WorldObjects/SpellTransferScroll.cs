@@ -136,6 +136,12 @@ namespace ACE.Server.WorldObjects
                     }
                 }
 
+                if (spellToAdd.School == MagicSchool.ItemEnchantment && target.ResistMagic >= 9999)
+                {
+                    player.Session.Network.EnqueueSend(new GameMessageSystemChat($"The {target.NameWithMaterial} cannot contain {spellToAdd.Name}.", ChatMessageType.Craft));
+                    player.SendUseDoneEvent();
+                    return;
+                }
 
                 var spellsOnItem = target.Biota.GetKnownSpellsIds(target.BiotaDatabaseLock);
 
@@ -144,20 +150,10 @@ namespace ACE.Server.WorldObjects
 
                 var enchantments = new List<SpellId>();
                 var cantrips = new List<SpellId>();
-                var isItemEnchantment = false;
                 if (spellToAdd.IsCantrip)
                     cantrips.Add((SpellId)spellToAddId);
                 else if (spellToAdd.School == MagicSchool.CreatureEnchantment)
                     enchantments.Add((SpellId)spellToAddId);
-                else if (spellToAdd.School == MagicSchool.ItemEnchantment)
-                    isItemEnchantment = true;
-
-                if(isItemEnchantment && target.ResistMagic >= 9999)
-                {
-                    player.Session.Network.EnqueueSend(new GameMessageSystemChat($"The {target.NameWithMaterial} cannot contain {spellToAdd.Name}.", ChatMessageType.Craft));
-                    player.SendUseDoneEvent();
-                    return;
-                }
 
                 foreach (var spellOnItemId in spellsOnItem)
                 {

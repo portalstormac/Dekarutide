@@ -168,8 +168,19 @@ namespace ACE.Server.WorldObjects
 
                 if (Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.CustomDM && (spell.IsImpenBaneType || spell.IsOtherRedirectable))
                 {
-                    // Temporary fix for unintended banes on gems.
-                    player.Session.Network.EnqueueSend(new GameEventCommunicationTransientString(player.Session, $"The {Name} doesn't have a valid spell!"));
+                    // Temporary fix for unintended spells on gems.
+                    player.Session.Network.EnqueueSend(new GameMessageSystemChat($"The {Name} has an invalid spell, converting to a spell transfer scroll...", ChatMessageType.Craft));
+                    if (Workmanship.HasValue)
+                    {
+                        if (player.TryConsumeFromInventoryWithNetworking(this, 1)) // Consume the gem
+                        {
+                            var newScroll = WorldObjectFactory.CreateNewWorldObject(50130); // Spell Transfer Scroll
+                            newScroll.SpellDID = SpellDID;
+                            newScroll.Name += spell.Name;
+                            if (!player.TryCreateInInventoryWithNetworking(newScroll)) // Create the transfer scroll
+                                newScroll.Destroy(); // Clean up on creation failure
+                        }
+                    }
                     return;
                 }
 
