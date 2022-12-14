@@ -844,7 +844,7 @@ namespace ACE.Server.WorldObjects
                 case "Cragstone":
                 case "Eastham":
                 case "Glenden Wood":
-                case "Hebian-To":
+                case "Hebian-to":
                 case "Khayyaban":
                 case "Kryst":
                 case "Lin":
