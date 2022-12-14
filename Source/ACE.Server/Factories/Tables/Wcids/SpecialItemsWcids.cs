@@ -9,20 +9,24 @@ namespace ACE.Server.Factories.Tables.Wcids
     {
         private static ChanceTable<TreasureItemType_Orig> specialItemCategory = new ChanceTable<TreasureItemType_Orig>(ChanceTableType.Weight)
         {
-            (TreasureItemType_Orig.Salvage,      1.0f ),
-            (TreasureItemType_Orig.SpecialItem_Unmutated,    0.2f ),
+            (TreasureItemType_Orig.Salvage,                 1.0f ),
+            (TreasureItemType_Orig.SpecialItem_Unmutated,   1.0f ),
         };
 
         private static ChanceTable<WeenieClassName> specialItemsUnmutatedWcids = new ChanceTable<WeenieClassName>(ChanceTableType.Weight)
         {
             ((WeenieClassName)50128,      1.00f ), // Spell Extraction Scroll VI
             ((WeenieClassName)50129,      1.00f ), // Spell Extraction Scroll VII
+            ((WeenieClassName)50140,      1.00f ), // Minor Cantrip Extraction Scroll
+            ((WeenieClassName)50141,      1.00f ), // Major Cantrip Extraction Scroll
         };
 
         private static Dictionary<WeenieClassName, int> specialItemsUnmutatedAmount = new Dictionary<WeenieClassName, int>()
         {
             {(WeenieClassName)50128,      10 }, // Spell Extraction Scroll VI
             {(WeenieClassName)50129,      10 }, // Spell Extraction Scroll VII
+            {(WeenieClassName)50140,       1 }, // Minor Cantrip Extraction Scroll
+            {(WeenieClassName)50141,       1 }, // Major Cantrip Extraction Scroll
         };
 
         private static ChanceTable<WeenieClassName> specialItemsSalvageWcids = new ChanceTable<WeenieClassName>(ChanceTableType.Weight)

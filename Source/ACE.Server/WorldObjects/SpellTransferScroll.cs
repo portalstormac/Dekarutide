@@ -322,9 +322,9 @@ namespace ACE.Server.WorldObjects
                         Spell spell = new Spell(spellId);
                         if(spell.IsCantrip)
                         {
-                            if(spell.Formula.Level == 1 && source.Level == 3) // Minor Cantrips
+                            if(spell.Formula.Level == 1 && (source.Level == 3 || source.Level == 10)) // Minor Cantrips
                                 spells.Add(spellId);
-                            else if (spell.Formula.Level > 1 && source.Level == 6) // Other Cantrips
+                            else if (spell.Formula.Level > 1 && (source.Level == 6 || source.Level == 11)) // Other Cantrips
                                 spells.Add(spellId);
                         }
                         else if (spell.Level == source.Level)
