@@ -969,10 +969,10 @@ namespace ACE.Server.WorldObjects
                     MerchandiseMaxValue = 18000;
                     break;
                 case 4:
-                    MerchandiseMaxValue = 24000;
+                    MerchandiseMaxValue = 30000;
                     break;
                 case 5:
-                    MerchandiseMaxValue = 30000;
+                    MerchandiseMaxValue = 40000;
                     break;
                 case 6:
                     MerchandiseMaxValue = 50000;
