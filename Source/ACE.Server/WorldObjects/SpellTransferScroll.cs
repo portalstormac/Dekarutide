@@ -155,6 +155,7 @@ namespace ACE.Server.WorldObjects
                 else if (spellToAdd.School == MagicSchool.CreatureEnchantment)
                     enchantments.Add((SpellId)spellToAddId);
 
+                Spell spellToReplace = null;
                 foreach (var spellOnItemId in spellsOnItem)
                 {
                     Spell spellOnItem = new Spell(spellOnItemId);
@@ -183,6 +184,8 @@ namespace ACE.Server.WorldObjects
                             player.SendUseDoneEvent();
                             return;
                         }
+                        else
+                            spellToReplace = spellOnItem;
                     }
                 }
 
@@ -193,7 +196,7 @@ namespace ACE.Server.WorldObjects
                 spellCount = spells.Count;
 
                 var chance = Math.Clamp((10 - spellCount) * 0.1, 0.0, 1.0);
-                if (isProc || isGem)
+                if (isProc || isGem || spellToReplace != null)
                     chance = 1.0; // These are spell replacements and not additions, so full chance every time.
                 var percent = chance * 100;
                 var showDialog = player.GetCharacterOption(CharacterOption.UseCraftingChanceOfSuccessDialog);
@@ -204,6 +207,9 @@ namespace ACE.Server.WorldObjects
                         extraMessage = "\nThis will replace the current Cast on Strike spell!\n\n";
                     else if(isGem)
                         extraMessage = "\nThis will replace the current gem spell!\n\n";
+                    else if(spellToReplace != null)
+                        extraMessage = $"\nThis will replace {spellToReplace.Name}!\n\n";
+
                     if (!player.ConfirmationManager.EnqueueSend(new Confirmation_CraftInteration(player.Guid, source.Guid, target.Guid), $"Transfering {spellToAdd.Name} to {target.NameWithMaterial}.\n{(extraMessage.Length > 0 ? extraMessage : "")}You determine that you have a {percent.Round()} percent chance to succeed.\n\n"))
                         player.SendUseDoneEvent(WeenieError.ConfirmationInProgress);
                     else
@@ -248,7 +254,11 @@ namespace ACE.Server.WorldObjects
                         else if (isGem)
                             target.SpellDID = spellToAddId;
                         else
+                        {
+                            if (spellToReplace != null)
+                                target.Biota.TryRemoveKnownSpell((int)spellToReplace.Id, target.BiotaDatabaseLock);
                             target.Biota.GetOrAddKnownSpell((int)spellToAddId, target.BiotaDatabaseLock, out _);
+                        }
 
                         var newMaxBaseMana = LootGenerationFactory.GetMaxBaseMana(target);
                         var newManaRate = LootGenerationFactory.CalculateManaRate(newMaxBaseMana);
