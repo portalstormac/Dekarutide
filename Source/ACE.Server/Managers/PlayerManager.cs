@@ -560,9 +560,11 @@ namespace ACE.Server.Managers
             bool isWorldBroadcast = false;
             if (msg.Opcode == GameMessageOpcode.ServerMessage && msg is GameMessageSystemChat systemChat)
             {
-                isWorldBroadcast = true;
                 if (systemChat.Message != null && systemChat.ChatMessageType == ChatMessageType.WorldBroadcast)
+                {
                     _ = TurbineChatHandler.SendWebhookedChat("", systemChat.Message, null, "World Broadcast");
+                    isWorldBroadcast = true;
+                }
             }
 
             foreach (var player in GetAllOnline())
