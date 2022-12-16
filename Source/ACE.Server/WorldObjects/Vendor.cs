@@ -398,6 +398,8 @@ namespace ACE.Server.WorldObjects
 
                 case VendorType.Buy:    // player buys item from vendor
                     EmoteManager.DoVendorEmote(vendorType, player);
+                    if (DefaultItemsForSale.Count == 0 && UniqueItemsForSale.Count == 0)
+                        EmoteManager.ExecuteEmoteSet(EmoteManager.GetEmoteSet(EmoteCategory.Vendor, null, VendorType.SoldOut), player, true);
                     break;
 
                 case VendorType.Sell:   // player sells item to vendor
@@ -1086,9 +1088,19 @@ namespace ACE.Server.WorldObjects
             if (message.Length == 0)
                 message = $"{Name} is now selling";
 
-            for (int i = 0; i < UniqueItemsForSale.Count; i++)
+            var itemsForSale = new Dictionary<uint, WorldObject>();
+
+            // Concatenate non mutated entries.
+            foreach(var itemEntry in UniqueItemsForSale)
             {
-                var item = UniqueItemsForSale.Values.ElementAt(i);
+                var item = itemEntry.Value;
+                if (item.Workmanship.HasValue || !itemsForSale.ContainsKey(item.WeenieClassId))
+                    itemsForSale.Add(item.WeenieClassId, item);
+            }
+
+            for (int i = 0; i < itemsForSale.Count; i++)
+            {
+                var item = itemsForSale.Values.ElementAt(i);
                 int value;
                 if (item.MaxStackSize > 1)
                     value = item.StackUnitValue ?? 0;
@@ -1097,7 +1109,7 @@ namespace ACE.Server.WorldObjects
 
                 if (i == 0)
                     message = $"{message} {item.NameWithMaterial}{(item.ItemType == ItemType.TinkeringMaterial ? $" (Workmanship {(item.Workmanship ?? 0):#.00})" : "")} for {(int)Math.Round(value * SellPrice ?? 0):N0} Pyreals";
-                else if (i == UniqueItemsForSale.Count - 1)
+                else if (i == itemsForSale.Count - 1)
                     message = $"{message} and {item.NameWithMaterial}{(item.ItemType == ItemType.TinkeringMaterial ? $" (Workmanship {(item.Workmanship ?? 0):#.00})" : "")} for {(int)Math.Round(value * SellPrice ?? 0):N0} Pyreals";
                 else
                     message = $"{message}, {item.NameWithMaterial}{(item.ItemType == ItemType.TinkeringMaterial ? $" (Workmanship {(item.Workmanship ?? 0):#.00})" : "")} for {(int)Math.Round(value * SellPrice ?? 0):N0} Pyreals";
@@ -1123,12 +1135,31 @@ namespace ACE.Server.WorldObjects
         {
             var item = LootGenerationFactory.CreateRandomLootObjects_New(ShopTier, ShopQualityMod, (DealMagicalItems ?? false) ? TreasureItemCategory.MagicItem : TreasureItemCategory.Item, treasureItemType, armorType, weaponType, ShopHeritage);
 
-            item.ContainerId = Guid.Full;
+            var amount = item.StackSize ?? 1;
+            if (amount > 1 && !item.Workmanship.HasValue) // Split stackable uniques.
+            {
+                for (int i = 0; i < amount; i++)
+                {
+                    var newItem = WorldObjectFactory.CreateNewWorldObject(item.WeenieClassId);
+                    newItem.ContainerId = Guid.Full;
 
-            UniqueItemsForSale.Add(item.Guid, item);
+                    UniqueItemsForSale.Add(newItem.Guid, newItem);
 
-            item.SoldTimestamp = Time.GetUnixTime();
-            item.RemoveBiotaFromDatabase();
+                    newItem.SoldTimestamp = Time.GetUnixTime();
+                    newItem.RemoveBiotaFromDatabase();
+                }
+                item.Destroy();
+            }
+            else
+            {
+                item.ContainerId = Guid.Full;
+
+                UniqueItemsForSale.Add(item.Guid, item);
+
+                item.SoldTimestamp = Time.GetUnixTime();
+
+                item.RemoveBiotaFromDatabase();
+            }
         }
 
         /// <summary>
