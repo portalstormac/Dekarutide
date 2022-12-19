@@ -354,7 +354,11 @@ namespace ACE.Server.WorldObjects
                     combatStance = MotionStance.SwordShieldCombat;
                     break;
                 case MotionStance.ThrownWeaponCombat:
+                    GetCombatTable();
+                    if (CombatTable.Stances.ContainsKey(MotionStance.ThrownShieldCombat))
                     combatStance = MotionStance.ThrownShieldCombat;
+                    else
+                        combatStance = MotionStance.ThrownWeaponCombat;
                     break;
             }
             return combatStance;
