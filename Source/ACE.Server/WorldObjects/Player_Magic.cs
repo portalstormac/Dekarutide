@@ -1235,7 +1235,13 @@ namespace ACE.Server.WorldObjects
                             OnAttackMonster(targetCreature);
 
                         if (TryResistSpell(target, spell, itemCaster))
+                        {
+                            if (spell.IsHarmful && targetCreature != null && targetCreature != this)
+                                targetCreature.OnAttackReceived(this, CombatType.Magic, false, true);
                             break;
+                        }
+                        else if (spell.IsHarmful && targetCreature != null && targetCreature != this)
+                            targetCreature.OnAttackReceived(this, CombatType.Magic, false, false);
 
                         if (targetCreature != null && targetCreature.NonProjectileMagicImmune)
                         {

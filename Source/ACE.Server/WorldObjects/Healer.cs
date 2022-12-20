@@ -214,8 +214,12 @@ namespace ACE.Server.WorldObjects
             var healingSkill = healer.GetCreatureSkill(Skill.Healing);
             Proficiency.OnSuccessUse(healer, healingSkill, difficulty);
 
+            var pkLoweredMessage = "";
+            if (Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.CustomDM && healer.PKTimerActive)
+                pkLoweredMessage = " Your recent PvP activity lowers the effectiveness of this action.";
+
             var crit = critical ? "expertly " : "";
-            var message = new GameMessageSystemChat($"You {crit}heal {targetName} for {healAmount} {BoosterEnum.ToString()} points.{remainingMsg}", ChatMessageType.Broadcast);
+            var message = new GameMessageSystemChat($"You {crit}heal {targetName} for {healAmount} {BoosterEnum.ToString()} points.{pkLoweredMessage}{remainingMsg}", ChatMessageType.Broadcast);
 
             healer.Session.Network.EnqueueSend(message, stackSize);
 

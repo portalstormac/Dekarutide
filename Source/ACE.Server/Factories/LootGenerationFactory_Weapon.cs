@@ -128,7 +128,7 @@ namespace ACE.Server.Factories
             var chance = ExtraMutationEffects.GetArmorCleavingChanceForTier(treasureDeath.Tier);
             if (chance > ThreadSafeRandom.Next(0.0f, 1.0f))
             {
-                wo.IgnoreArmor = 0.75f;
+                wo.IgnoreArmor = 0.75f; // 0.0 = ignore 100% of all armor.
                 wo.IconOverlayId = 0x06005EBF;
                 return true;
             }
@@ -140,10 +140,13 @@ namespace ACE.Server.Factories
             if (Common.ConfigManager.Config.Server.WorldRuleset != Common.Ruleset.CustomDM)
                 return false;
 
+            if (wo.IsTwoHanded)
+                return false; // Two-handed weapons area always shield cleaving so this is unnecessary.
+
             var chance = ExtraMutationEffects.GetShieldCleavingChanceForTier(treasureDeath.Tier);
             if (chance > ThreadSafeRandom.Next(0.0f, 1.0f))
             {
-                wo.IgnoreShield = 0.5f;
+                wo.IgnoreShield = 0.50f; // 1.0 = ignore 100% of the armor from shields.
                 wo.IconOverlayId = 0x06005EC2;
                 wo.Name = $"{wo.Name} of Shield Cleaving";
                 return true;

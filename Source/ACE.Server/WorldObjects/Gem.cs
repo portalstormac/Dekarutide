@@ -161,7 +161,7 @@ namespace ACE.Server.WorldObjects
                     }
                     else
                     {
-                        player.Session.Network.EnqueueSend(new GameEventCommunicationTransientString(player.Session, $"The {Name} doesn't have enough mana!"));
+                        player.Session.Network.EnqueueSend(new GameEventCommunicationTransientString(player.Session, $"The {NameWithMaterial} doesn't have enough mana!"));
                         return;
                     }
                 }
@@ -169,7 +169,7 @@ namespace ACE.Server.WorldObjects
                 if (Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.CustomDM && (spell.IsImpenBaneType || spell.IsOtherRedirectable))
                 {
                     // Temporary fix for unintended spells on gems.
-                    player.Session.Network.EnqueueSend(new GameMessageSystemChat($"The {Name} has an invalid spell, converting to a spell transfer scroll...", ChatMessageType.Craft));
+                    player.Session.Network.EnqueueSend(new GameMessageSystemChat($"The {NameWithMaterial} has an invalid spell, converting to a spell transfer scroll...", ChatMessageType.Craft));
                     if (Workmanship.HasValue)
                     {
                         if (player.TryConsumeFromInventoryWithNetworking(this, 1)) // Consume the gem

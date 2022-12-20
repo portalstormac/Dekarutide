@@ -116,6 +116,7 @@ namespace ACE.Server.Factories.Tables
             ( SpellId.ManaToHealthSelf1,    2.0f ),
             ( SpellId.DrainHealth1,         2.0f ),
             ( SpellId.DrainStamina1,        2.0f ),
+            ( SpellId.DrainMana1,           2.0f ),
         };
 
         private static ChanceTable<SpellId> meleeProcsCertain = new ChanceTable<SpellId>(ChanceTableType.Weight)
@@ -127,6 +128,7 @@ namespace ACE.Server.Factories.Tables
             ( SpellId.ManaToHealthSelf1,    2.0f ),
             ( SpellId.DrainHealth1,         2.0f ),
             ( SpellId.DrainStamina1,        2.0f ),
+            ( SpellId.DrainMana1,           2.0f ),
         };
 
         public static List<SpellId> Roll(TreasureDeath treasureDeath)

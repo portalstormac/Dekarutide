@@ -133,9 +133,13 @@ namespace ACE.Server.WorldObjects
                     player.DamageHistory.Add(this, DamageType.Health, vitalChange);
             }
 
+            var pkLoweredMessage = "";
+            if (Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.CustomDM && BoostValue >= 0 && player.PKTimerActive)
+                pkLoweredMessage = " Your recent PvP activity lowers the effectiveness of this action.";
+
             var verb = BoostValue >= 0 ? "restores" : "takes";
 
-            player.Session.Network.EnqueueSend(new GameMessageSystemChat($"The {Name} {verb} {vitalChange} points of your {BoosterEnum}.", ChatMessageType.Broadcast));
+            player.Session.Network.EnqueueSend(new GameMessageSystemChat($"The {Name} {verb} {vitalChange} points of your {BoosterEnum}.{pkLoweredMessage}", ChatMessageType.Broadcast));
         }
 
         public void CastSpell(Player player)

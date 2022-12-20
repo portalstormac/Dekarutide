@@ -4,6 +4,7 @@ using ACE.Common;
 using ACE.Entity.Enum;
 using ACE.Entity.Enum.Properties;
 using ACE.Server.Entity;
+using ACE.Server.Network.GameEvent.Events;
 using ACE.Server.Network.GameMessages.Messages;
 using ACE.Server.WorldObjects.Entity;
 
@@ -915,7 +916,11 @@ namespace ACE.Server.WorldObjects
         public float GetIgnoreShieldMod(WorldObject weapon)
         {
             var creatureMod = IgnoreShield ?? 0.0f;
-            var weaponMod = weapon?.IgnoreShield ?? 0.0f;
+            double weaponMod;
+            if (Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.CustomDM && weapon != null && weapon.IsTwoHanded)
+                weaponMod = 1.0f;
+            else
+                weaponMod = weapon?.IgnoreShield ?? 0.0f;
 
             return 1.0f - (float)Math.Max(creatureMod, weaponMod);
         }
@@ -1071,38 +1076,33 @@ namespace ACE.Server.WorldObjects
         {
             var currentTime = Time.GetUnixTime();
 
-            if (Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.CustomDM)
+            // roll for a chance of casting spell
+            var chance = ProcSpellRate ?? 0.0f;
+
+            var creatureAttacker = attacker as Creature;
+            var playerAttacker = attacker as Player;
+
+            if (Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.CustomDM && creatureAttacker != null)
             {
                 if (ItemMaxMana > 0 && !IsAffecting)
                     return; // The item spells must be active for the item to proc.
 
                 if (NextProcAttemptTime > currentTime)
                     return;
-            }
 
-            // roll for a chance of casting spell
-            var chance = ProcSpellRate ?? 0.0f;
-
-            if (Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.CustomDM)
-            {
-                Player playerWielder = Wielder as Player;
-                if (playerWielder != null)
-                    chance += playerWielder.ScaleWithPowerAccuracyBar((float)chance);
+                if (playerAttacker != null)
+                    chance += playerAttacker.ScaleWithPowerAccuracyBar((float)chance);
             }
 
             // special handling for aetheria
-            if (Aetheria.IsAetheria(WeenieClassId) && attacker is Creature wielder)
-                chance = Aetheria.CalcProcRate(this, wielder);
+            if (Aetheria.IsAetheria(WeenieClassId) && creatureAttacker != null)
+                chance = Aetheria.CalcProcRate(this, creatureAttacker);
 
             var rng = ThreadSafeRandom.Next(0.0f, 1.0f);
             if (rng >= chance)
                 return;
 
-            if (Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.CustomDM)
-                NextProcAttemptTime = currentTime + ProcAttemptInterval;
-
             var spell = new Spell(ProcSpell.Value);
-
             if (spell.NotFound)
             {
                 if (attacker is Player player)
@@ -1113,6 +1113,26 @@ namespace ACE.Server.WorldObjects
                         player.Session.Network.EnqueueSend(new GameMessageSystemChat($"{spell.Name} spell not implemented, yet!", ChatMessageType.System));
                 }
                 return;
+            }
+
+            if (Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.CustomDM && creatureAttacker != null)
+            {
+                NextProcAttemptTime = currentTime + ProcAttemptInterval;
+
+                var manaCost = spell.BaseMana / 4;
+
+                var manaConversion = creatureAttacker.GetCreatureSkill(Skill.ManaConversion);
+                if (manaConversion.AdvancementClass >= SkillAdvancementClass.Trained)
+                    manaCost = Creature.GetManaCost((uint)ItemSpellcraft, manaCost, manaConversion.Current);
+
+                if (creatureAttacker.Mana.Current >= manaCost)
+                    creatureAttacker.UpdateVitalDelta(creatureAttacker.Mana, -(int)manaCost);
+                else
+                {
+                    if(playerAttacker != null)
+                        playerAttacker.Session.Network.EnqueueSend(new GameEventCommunicationTransientString(playerAttacker.Session, $"You don't have enough mana so your {NameWithMaterial} cannot cast {spell.Name}!"));
+                    return;
+                }
             }
 
             var itemCaster = this is Creature ? null : this;

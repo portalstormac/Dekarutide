@@ -356,7 +356,7 @@ namespace ACE.Server.WorldObjects
                 case MotionStance.ThrownWeaponCombat:
                     GetCombatTable();
                     if (CombatTable.Stances.ContainsKey(MotionStance.ThrownShieldCombat))
-                    combatStance = MotionStance.ThrownShieldCombat;
+                        combatStance = MotionStance.ThrownShieldCombat;
                     else
                         combatStance = MotionStance.ThrownWeaponCombat;
                     break;
@@ -676,7 +676,7 @@ namespace ACE.Server.WorldObjects
         public virtual void OnAttackReceived(WorldObject attacker, CombatType attackType, bool critical, bool avoided)
         {
             var attackerAsCreature = attacker as Creature;
-            if (!avoided && attackerAsCreature != null)
+            if (attackerAsCreature != null)
                 attackerAsCreature.TryCastAssessDebuff(this, attackType);
 
             numRecentAttacksReceived++;
@@ -812,7 +812,7 @@ namespace ACE.Server.WorldObjects
                 return 1.0f;
 
             bool bypassShieldAngleCheck = false;
-            if (Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.CustomDM)
+            if (Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.CustomDM && (weapon == null || ((weapon.IgnoreShield ?? 0) == 0 && !weapon.IsTwoHanded)))
             {
                 var techniqueTrinket = GetEquippedTrinket();
                 if (techniqueTrinket != null && techniqueTrinket.TacticAndTechniqueId == (int)TacticAndTechniqueType.Defensive)

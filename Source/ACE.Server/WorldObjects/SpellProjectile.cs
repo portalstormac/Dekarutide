@@ -698,27 +698,38 @@ namespace ACE.Server.WorldObjects
         /// </summary>
         public float GetShieldMod(Creature target, WorldObject shield)
         {
-            // is spell projectile in front of creature target,
-            // within shield effectiveness area?
-            var effectiveAngle = 180.0f;
-            var angle = target.GetAngle(this);
-            if (Math.Abs(angle) > effectiveAngle / 2.0f)
-                return 1.0f;
+            bool bypassShieldAngleCheck = false;
+            if (Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.CustomDM)
+            {
+                var techniqueTrinket = target.GetEquippedTrinket();
+                if (techniqueTrinket != null && techniqueTrinket.TacticAndTechniqueId == (int)TacticAndTechniqueType.Defensive)
+                    bypassShieldAngleCheck = true; // Shields cover all angles while using the Defensive technique.
+            }
 
-            // https://asheron.fandom.com/wiki/Shield
-            // The formula to determine magic absorption for shields is:
-            // Reduction Percent = (cap * specMod * baseSkill * 0.003f) - (cap * specMod * 0.3f)
-            // Cap = Maximum reduction
-            // SpecMod = 1.0 for spec, 0.8 for trained
-            // BaseSkill = 100 to 433 (above 433 base shield you always achieve the maximum %)
-
-            var shieldSkill = target.GetCreatureSkill(Skill.Shield);
-            // ensure trained?
-            if (shieldSkill.AdvancementClass < SkillAdvancementClass.Trained || shieldSkill.Base < 100)
-                return 1.0f;
+            if (!bypassShieldAngleCheck)
+            {
+                // is spell projectile in front of creature target,
+                // within shield effectiveness area?
+                var effectiveAngle = 180.0f;
+                var angle = target.GetAngle(this);
+                if (Math.Abs(angle) > effectiveAngle / 2.0f)
+                    return 1.0f;
+            }
 
             if (Common.ConfigManager.Config.Server.WorldRuleset != Common.Ruleset.CustomDM)
             {
+                // https://asheron.fandom.com/wiki/Shield
+                // The formula to determine magic absorption for shields is:
+                // Reduction Percent = (cap * specMod * baseSkill * 0.003f) - (cap * specMod * 0.3f)
+                // Cap = Maximum reduction
+                // SpecMod = 1.0 for spec, 0.8 for trained
+                // BaseSkill = 100 to 433 (above 433 base shield you always achieve the maximum %)
+
+                var shieldSkill = target.GetCreatureSkill(Skill.Shield);
+                // ensure trained?
+                if (shieldSkill.AdvancementClass < SkillAdvancementClass.Trained || shieldSkill.Base < 100)
+                    return 1.0f;
+
                 var baseSkill = Math.Min(shieldSkill.Base, 433);
                 var specMod = shieldSkill.AdvancementClass == SkillAdvancementClass.Specialized ? 1.0f : 0.8f;
                 var cap = (float)(shield.GetAbsorbMagicDamage() ?? 0.0f);
@@ -738,15 +749,7 @@ namespace ACE.Server.WorldObjects
                 return shieldMod;
             }
             else
-            {
-                var baseSkill = Math.Min(shieldSkill.Base, 433);
-                var cap = (float)(shield.GetAbsorbMagicDamage() ?? 0.0f);
-
-                var reduction = (cap * baseSkill * 0.003f) - (cap * 0.3f);
-
-                var shieldMod = Math.Min(1.0f, 1.0f - reduction);
-                return shieldMod;
-            }
+                return Math.Min(1.0f, 1.0f - (float)(shield.GetAbsorbMagicDamage() ?? 0.0f));
         }
 
         /// <summary>
