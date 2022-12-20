@@ -134,12 +134,12 @@ namespace ACE.Server.WorldObjects
             }
             else
             {
-                var stack = FindObject(item.Guid, SearchLocations.MyInventory | SearchLocations.MyEquippedItems, out var stackFoundInContainer, out var stackRootOwner, out _);
+                var stack = FindObject(item.Guid, SearchLocations.MyInventory | SearchLocations.MyEquippedItems, out var stackFoundInContainer, out var stackRootOwner, out var wasEquipped);
 
                 if (stack == null || stackRootOwner == null)
                     return false;
 
-                if (!AdjustStack(stack, -amount, stackFoundInContainer, stackRootOwner))
+                if (!AdjustStack(stack, -amount, stackFoundInContainer, stackRootOwner, wasEquipped))
                     return false;
 
                 Session.Network.EnqueueSend(new GameMessageSetStackSize(stack));
