@@ -60,7 +60,7 @@
     <None Remove="Entity\Mutations\Casters\CustomDM\caster.txt" />
     <None Remove="Entity\Mutations\Casters\CustomDM\caster_elemental.txt" />
     <None Remove="Entity\Mutations\Casters\CustomDM\caster_non_elemental.txt" />
-    <None Remove="Entity\Mutations\Casters\CustomDM\weapon_defense.txt" />    
+    <None Remove="Entity\Mutations\Casters\CustomDM\weapon_defense.txt" />
     <None Remove="Entity\Mutations\MeleeWeapons\Damage_WieldDifficulty_DamageVariance\heavy_axe.txt" />
     <None Remove="Entity\Mutations\MeleeWeapons\Damage_WieldDifficulty_DamageVariance\heavy_dagger.txt" />
     <None Remove="Entity\Mutations\MeleeWeapons\Damage_WieldDifficulty_DamageVariance\heavy_dagger_ms.txt" />
@@ -199,6 +199,14 @@
     <None Remove="Entity\Mutations\Recipes\38000046 - Fetish of the Dark Idols.txt" />
     <None Remove="Entity\Mutations\Recipes\3800004B - Green Garnet.txt" />
     <None Remove="Entity\Mutations\Recipes\3800004E - Sandstone.txt" />
+    <None Remove="Entity\Mutations\Recipes\38000050 - Onyx.txt" />
+    <None Remove="Entity\Mutations\Recipes\38000051 - Tiger Eye.txt" />
+    <None Remove="Entity\Mutations\Recipes\38000052 - White Quartz.txt" />
+    <None Remove="Entity\Mutations\Recipes\38000053 - Serpentine.txt" />
+    <None Remove="Entity\Mutations\Recipes\38000054 - Amethyst.txt" />
+    <None Remove="Entity\Mutations\Recipes\38000055 - Yellow Garnet.txt" />
+    <None Remove="Entity\Mutations\Recipes\38000056 - White Jade.txt" />
+    <None Remove="Entity\Mutations\Recipes\38000057 - Obsidian.txt" />
     <None Remove="Entity\Mutations\Recipes\39000000 - Paragon Weapons.txt" />
     <None Remove="Entity\Mutations\Recipes\39000001 - Lucky White Rabbit%27s Foot.txt" />
     <None Include="..\..\LICENSE">
@@ -382,6 +390,14 @@
     <EmbeddedResource Include="Entity\Mutations\Recipes\38000046 - Fetish of the Dark Idols.txt" />
     <EmbeddedResource Include="Entity\Mutations\Recipes\3800004B - Green Garnet.txt" />
     <EmbeddedResource Include="Entity\Mutations\Recipes\3800004E - Sandstone.txt" />
+    <EmbeddedResource Include="Entity\Mutations\Recipes\38000050 - Onyx.txt" />
+    <EmbeddedResource Include="Entity\Mutations\Recipes\38000051 - Tiger Eye.txt" />
+    <EmbeddedResource Include="Entity\Mutations\Recipes\38000052 - White Quartz.txt" />
+    <EmbeddedResource Include="Entity\Mutations\Recipes\38000053 - Serpentine.txt" />
+    <EmbeddedResource Include="Entity\Mutations\Recipes\38000054 - Amethyst.txt" />
+    <EmbeddedResource Include="Entity\Mutations\Recipes\38000055 - Yellow Garnet.txt" />
+    <EmbeddedResource Include="Entity\Mutations\Recipes\38000056 - White Jade.txt" />
+    <EmbeddedResource Include="Entity\Mutations\Recipes\38000057 - Obsidian.txt" />
     <EmbeddedResource Include="Entity\Mutations\Recipes\39000000 - Paragon Weapons.txt" />
     <EmbeddedResource Include="Entity\Mutations\Recipes\39000001 - Lucky White Rabbit's Foot.txt" />
   </ItemGroup>
