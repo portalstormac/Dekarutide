@@ -390,7 +390,6 @@
     <EmbeddedResource Include="Entity\Mutations\Recipes\38000046 - Fetish of the Dark Idols.txt" />
     <EmbeddedResource Include="Entity\Mutations\Recipes\3800004B - Green Garnet.txt" />
     <EmbeddedResource Include="Entity\Mutations\Recipes\3800004E - Sandstone.txt" />
-    <EmbeddedResource Include="Entity\Mutations\Recipes\38000050 - Onyx.txt" />
     <EmbeddedResource Include="Entity\Mutations\Recipes\38000051 - Tiger Eye.txt" />
     <EmbeddedResource Include="Entity\Mutations\Recipes\38000052 - White Quartz.txt" />
     <EmbeddedResource Include="Entity\Mutations\Recipes\38000053 - Serpentine.txt" />

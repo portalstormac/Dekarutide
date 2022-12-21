@@ -147,6 +147,14 @@ namespace ACE.Server.Factories.Tables.Wcids
             { WeenieClassName.materialcitrine,          2.00f }, // Minor Stamina Gain
             { WeenieClassName.materiallavenderjade,     2.00f }, // Minor Mana Gain
 
+            { WeenieClassName.materialtigereye,         2.00f }, // Fire Element
+            { WeenieClassName.materialwhitequartz,      2.00f }, // Cold Element
+            { WeenieClassName.materialserpentine,       2.00f }, // Acid Element
+            { WeenieClassName.materialamethyst,         2.00f }, // Lightning Element
+            { WeenieClassName.materialyellowgarnet,     2.00f }, // Slash Element
+            { WeenieClassName.materialwhitejade,        2.00f }, // Pierce Element
+            { WeenieClassName.materialobsidian,         2.00f }, // Bludge Element
+
             { WeenieClassName.materialmalachite,        3.00f }, // Warrior's Vigor
             { WeenieClassName.materialhematite,         3.00f }, // Warrior's Vitality
             { WeenieClassName.materialazurite,          3.00f }, // Wizard's Intellect
@@ -169,18 +177,11 @@ namespace ACE.Server.Factories.Tables.Wcids
             //{ WeenieClassName.materialgromniehide,      1.00f }, // Armature
             //{ WeenieClassName.materialpyreal,           1.00f }, // Armature
             //{ WeenieClassName.materialruby,             1.00f }, // Armature
-            //{ WeenieClassName.materialsapphire,         1.00f }, // Armature
-            //{ WeenieClassName.materialamethyst,         1.00f }, // Unused
-            //{ WeenieClassName.materialgreenjade,        1.00f }, // Unused
-            //{ WeenieClassName.materialobsidian,         1.00f }, // Unused
+            //{ WeenieClassName.materialsapphire,         1.00f }, // Armature            
+            //{ WeenieClassName.materialgreenjade,        1.00f }, // Unused            
             //{ WeenieClassName.materialonyx,             1.00f }, // Unused
-            //{ WeenieClassName.materialserpentine,       1.00f }, // Unused
-            //{ WeenieClassName.materialtigereye,         1.00f }, // Unused
             //{ WeenieClassName.materialtourmaline,       1.00f }, // Unused
             //{ WeenieClassName.materialturquoise,        1.00f }, // Unused
-            //{ WeenieClassName.materialwhitejade,        1.00f }, // Unused
-            //{ WeenieClassName.materialwhitequartz,      1.00f }, // Unused
-            //{ WeenieClassName.materialyellowgarnet,     1.00f }, // Unused
         };
 
         public static float GetValueMod(uint wcid)
