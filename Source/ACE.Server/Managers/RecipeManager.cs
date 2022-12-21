@@ -1054,6 +1054,9 @@ namespace ACE.Server.Managers
                 var destroyTargetAmount = success ? recipe.SuccessDestroyTargetAmount : recipe.FailDestroyTargetAmount;
                 var destroyTargetMessage = success ? recipe.SuccessDestroyTargetMessage : recipe.FailDestroyTargetMessage;
 
+                if (recipe.IsTinkering() && target.WeenieType == WeenieType.Missile)
+                    destroyTargetAmount = (uint)(target.StackSize ?? 1); // Thrown weapons tinkering should destroy the whole stack on failure.
+
                 DestroyItem(player, recipe, target, destroyTargetAmount, destroyTargetMessage);
             }
 
