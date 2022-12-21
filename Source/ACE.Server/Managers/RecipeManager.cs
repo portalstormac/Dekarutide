@@ -21,6 +21,7 @@ using ACE.Server.Factories;
 using ACE.Server.Network.GameEvent.Events;
 using ACE.Server.Network.GameMessages.Messages;
 using ACE.Server.WorldObjects;
+using Weenie = ACE.Entity.Models.Weenie;
 
 namespace ACE.Server.Managers
 {
@@ -419,7 +420,7 @@ namespace ACE.Server.Managers
 
                  // mutations apparently didn't cap to 2.0 here, clamps are applied in damage calculations though
 
-                case 0x38000017:    // Alabaster    
+                case 0x38000017:    // Alabaster
                     //target.ArmorModVsPierce = Math.Min((target.ArmorModVsPierce ?? 0) + 0.2f, 2.0f);
                     target.ArmorModVsPierce += 0.2f;
                     break;
@@ -656,7 +657,7 @@ namespace ACE.Server.Managers
                 case 0x38000046:    // Fetish of the Dark Idols
 
                     // shouldn't exist on player items, but just recreating original script here
-                    if (target.ImbuedEffect >= ImbuedEffectType.IgnoreAllArmor)  
+                    if (target.ImbuedEffect >= ImbuedEffectType.IgnoreAllArmor)
                         target.ImbuedEffect = ImbuedEffectType.Undef;
 
                     target.ImbuedEffect |= ImbuedEffectType.IgnoreSomeMagicProjectileDamage;
@@ -1214,6 +1215,9 @@ namespace ACE.Server.Managers
                 foreach (var didMod in mod.RecipeModsDID)
                     ModifyDataID(player, didMod, source, target, result, modified);
 
+                if (mod.WeenieClassId != 0)
+                    ModifyWeenieClassId(target, (uint)mod.WeenieClassId, modified);
+
                 // run mutation script, if applicable
                 if (mod.DataId != 0)
                     TryMutate(player, source, target, recipe, (uint)mod.DataId, modified);
@@ -1471,6 +1475,76 @@ namespace ACE.Server.Managers
                     log.Warn($"RecipeManager.ModifyDataID({source.Name}, {target.Name}): unhandled operation {op}");
                     break;
             }
+        }
+
+        private static void ModifyWeenieClassId(WorldObject target, uint weenieClassId, HashSet<uint> modified)
+        {
+            var newWeenie = DatabaseManager.World.GetCachedWeenie(weenieClassId);
+            var oldWeenie = DatabaseManager.World.GetCachedWeenie(target.Biota.WeenieClassId);
+
+            switch (target.ItemType)
+            {
+                case ItemType.MeleeWeapon:
+                case ItemType.MissileWeapon:
+                case ItemType.Caster:
+                    ModifyWeenieWeapon(target, newWeenie);
+                    break;
+                default:
+                    log.Error($"RecipeManager.ModifyWeenieClassId({target.Guid}, {weenieClassId}) Unsupported ItemType: {target.ItemType}");
+                    return;
+            }
+
+            target.Biota.WeenieClassId = weenieClassId;
+            ModifyWeenieName(target, oldWeenie, newWeenie);
+            ModifyWeenieDescription(target, oldWeenie, newWeenie);
+
+            modified.Add(target.Guid.Full);
+        }
+
+        private static void ModifyWeenieName(WorldObject target, Weenie oldWeenie, Weenie newWeenie)
+        {
+            var previousWeenieName = oldWeenie.GetProperty(PropertyString.Name);
+            var newWeenieName = newWeenie.GetProperty(PropertyString.Name);
+
+            var previousTargetName = target.GetProperty(PropertyString.Name);
+            var newTargetName = previousTargetName.Replace(previousWeenieName, newWeenieName);
+
+            target.SetProperty(PropertyString.Name, newTargetName);
+        }
+
+        private static void ModifyWeenieDescription(WorldObject target, Weenie oldWeenie, Weenie newWeenie)
+        {
+            var previousWeenieName = oldWeenie.GetProperty(PropertyString.Name);
+            var newWeenieName = newWeenie.GetProperty(PropertyString.Name);
+
+            var previousTargetDesc = target.GetProperty(PropertyString.LongDesc);
+            var newTargetDesc = previousTargetDesc.Replace(previousWeenieName, newWeenieName);
+
+            target.SetProperty(PropertyString.LongDesc, newTargetDesc);
+        }
+
+        private static void ModifyWeenieWeapon(WorldObject target, Weenie newWeenie)
+        {
+            var newDamageType = newWeenie.GetProperty(PropertyInt.DamageType);
+            var newUiEffects = newWeenie.GetProperty(PropertyInt.UiEffects);
+            var newSetup = newWeenie.GetProperty(PropertyDataId.Setup);
+
+            if (newDamageType != null)
+                target.SetProperty(PropertyInt.DamageType, (int) newDamageType);
+            else
+                target.RemoveProperty(PropertyInt.DamageType);
+
+            if (newUiEffects != null)
+                target.SetProperty(PropertyInt.UiEffects, (int) newUiEffects);
+            else if (target.ProcSpell != null || target.Biota.HasKnownSpell(target.BiotaDatabaseLock))
+                target.SetProperty(PropertyInt.UiEffects, (int) UiEffects.Magical);
+            else
+                target.RemoveProperty(PropertyInt.UiEffects);
+
+            if (newSetup != null)
+                target.SetProperty(PropertyDataId.Setup, (uint) newSetup);
+            else
+                target.RemoveProperty(PropertyDataId.Setup);
         }
 
         /// <summary>

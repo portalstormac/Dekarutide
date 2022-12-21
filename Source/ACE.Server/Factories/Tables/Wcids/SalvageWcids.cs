@@ -56,6 +56,14 @@ namespace ACE.Server.Factories.Tables.Wcids
             ( WeenieClassName.materialcitrine,          1.00f ), // Minor Stamina Gain
             ( WeenieClassName.materiallavenderjade,     1.00f ), // Minor Mana Gain
 
+            ( WeenieClassName.materialtigereye,         0.50f ), // Fire Element
+            ( WeenieClassName.materialwhitequartz,      0.50f ), // Cold Element
+            ( WeenieClassName.materialserpentine,       0.50f ), // Acid Element
+            ( WeenieClassName.materialamethyst,         0.50f ), // Lightning Element
+            ( WeenieClassName.materialyellowgarnet,     0.50f ), // Slash Element
+            ( WeenieClassName.materialwhitejade,        0.50f ), // Pierce Element
+            ( WeenieClassName.materialobsidian,         0.50f ), // Bludge Element
+
             ( WeenieClassName.materialmalachite,        0.10f ), // Warrior's Vigor
             ( WeenieClassName.materialhematite,         0.10f ), // Warrior's Vitality
             ( WeenieClassName.materialazurite,          0.10f ), // Wizard's Intellect
@@ -79,17 +87,10 @@ namespace ACE.Server.Factories.Tables.Wcids
             //( WeenieClassName.materialpyreal,           1.00f ), // Armature
             //( WeenieClassName.materialruby,             1.00f ), // Armature
             //( WeenieClassName.materialsapphire,         1.00f ), // Armature
-            //( WeenieClassName.materialamethyst,         1.00f ), // Unused
             //( WeenieClassName.materialgreenjade,        1.00f ), // Unused
-            //( WeenieClassName.materialobsidian,         1.00f ), // Unused
             //( WeenieClassName.materialonyx,             1.00f ), // Unused
-            //( WeenieClassName.materialserpentine,       1.00f ), // Unused
-            //( WeenieClassName.materialtigereye,         1.00f ), // Unused
             //( WeenieClassName.materialtourmaline,       1.00f ), // Unused
             //( WeenieClassName.materialturquoise,        1.00f ), // Unused
-            //( WeenieClassName.materialwhitejade,        1.00f ), // Unused
-            //( WeenieClassName.materialwhitequartz,      1.00f ), // Unused
-            //( WeenieClassName.materialyellowgarnet,     1.00f ), // Unused
         };
 
         public static WeenieClassName Roll(TreasureDeath profile)
