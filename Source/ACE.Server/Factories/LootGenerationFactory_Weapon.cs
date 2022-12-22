@@ -43,12 +43,18 @@ namespace ACE.Server.Factories
             return weaponSpeedMod;
         }
 
+        private static float ApplyQualityModToExtraMutationChance(float chance, float lootQualityMod)
+        {
+            return chance * (1 + lootQualityMod);
+        }
+
         private static bool RollCrushingBlow(TreasureDeath treasureDeath, WorldObject wo)
         {
             if (Common.ConfigManager.Config.Server.WorldRuleset != Common.Ruleset.CustomDM)
                 return false;
 
             var chance = ExtraMutationEffects.GetCrushingBlowChanceForTier(treasureDeath.Tier);
+            chance = ApplyQualityModToExtraMutationChance(chance, treasureDeath.LootQualityMod);
             if (chance > ThreadSafeRandom.Next(0.0f, 1.0f))
             {
                 float amount;
@@ -71,6 +77,7 @@ namespace ACE.Server.Factories
                 return false;
 
             var chance = ExtraMutationEffects.GetBitingStrikeChanceForTier(treasureDeath.Tier);
+            chance = ApplyQualityModToExtraMutationChance(chance, treasureDeath.LootQualityMod);
             if (chance > ThreadSafeRandom.Next(0.0f, 1.0f))
             {
                 float amount;
@@ -92,6 +99,7 @@ namespace ACE.Server.Factories
                 return false;
 
             var chance = SlayerTypeChance.GetSlayerChanceForTier(treasureDeath.Tier);
+            chance = ApplyQualityModToExtraMutationChance(chance, treasureDeath.LootQualityMod);
             if (chance > ThreadSafeRandom.Next(0.0f, 1.0f))
             {
                 wo.SlayerCreatureType = SlayerTypeChance.Roll(treasureDeath);
@@ -108,6 +116,7 @@ namespace ACE.Server.Factories
                 return false;
 
             var chance = ExtraMutationEffects.GetHollowChanceForTier(treasureDeath.Tier);
+            chance = ApplyQualityModToExtraMutationChance(chance, treasureDeath.LootQualityMod);
             if (chance > ThreadSafeRandom.Next(0.0f, 1.0f))
             {
                 wo.IgnoreMagicArmor = true;
@@ -126,6 +135,7 @@ namespace ACE.Server.Factories
                 return false;
 
             var chance = ExtraMutationEffects.GetArmorCleavingChanceForTier(treasureDeath.Tier);
+            chance = ApplyQualityModToExtraMutationChance(chance, treasureDeath.LootQualityMod);
             if (chance > ThreadSafeRandom.Next(0.0f, 1.0f))
             {
                 wo.IgnoreArmor = 0.75f;
@@ -141,6 +151,7 @@ namespace ACE.Server.Factories
                 return false;
 
             var chance = ExtraMutationEffects.GetShieldCleavingChanceForTier(treasureDeath.Tier);
+            chance = ApplyQualityModToExtraMutationChance(chance, treasureDeath.LootQualityMod);
             if (chance > ThreadSafeRandom.Next(0.0f, 1.0f))
             {
                 wo.IgnoreShield = 0.5f;
@@ -157,6 +168,7 @@ namespace ACE.Server.Factories
                 return false;
 
             var chance = ExtraMutationEffects.GetAbsorbMagicChanceForTier(treasureDeath.Tier);
+            chance = ApplyQualityModToExtraMutationChance(chance, treasureDeath.LootQualityMod);
             if (chance > ThreadSafeRandom.Next(0.0f, 1.0f))
             {
                 wo.AbsorbMagicDamage = 0.25f;
