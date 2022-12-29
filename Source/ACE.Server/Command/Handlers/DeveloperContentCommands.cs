@@ -441,6 +441,13 @@ namespace ACE.Server.Command.Handlers.Processors
                 return;
             }
         }
+        
+        [CommandHandler("import-sql-folders", AccessLevel.Developer, CommandHandlerFlag.None, 1, "Imports all weenie sql data from the Content folder and all sub-folders", "<wcid>")]
+        public static void HandleImportSQLFolders(Session session, params string[] parameters)
+        {
+            var param = parameters[0];
+            ImportSQLWeenie(session, param, true);
+        }
 
         [CommandHandler("import-sql", AccessLevel.Developer, CommandHandlerFlag.None, 1, "Imports sql data from the Content folder", "<wcid>")]
         public static void HandleImportSQL(Session session, params string[] parameters)
