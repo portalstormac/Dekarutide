@@ -127,6 +127,10 @@ namespace ACE.Server.Network.Structure
             if (wo.WeaponMissileDefense.HasValue && wo.WeaponMissileDefense.Value > 0 && wo.WeaponMissileDefense.Value < 1 && ((wo.GetProperty(PropertyInt.ImbueStackingBits) ?? 0) & 1) != 0)
                 PropertiesFloat[PropertyFloat.WeaponMissileDefense] += 1;
 
+            // Mask real value of AbsorbMagicDamage and/or Add AbsorbMagicDamage for ImbuedEffectType.IgnoreSomeMagicProjectileDamage
+            if (PropertiesFloat.ContainsKey(PropertyFloat.AbsorbMagicDamage) || wo.HasImbuedEffect(ImbuedEffectType.IgnoreSomeMagicProjectileDamage))
+                PropertiesFloat[PropertyFloat.AbsorbMagicDamage] = 1;
+
             if (wo is PressurePlate)
             {
                 if (PropertiesInt.ContainsKey(PropertyInt.ResistLockpick))
@@ -447,7 +451,7 @@ namespace ACE.Server.Network.Structure
             else
                 PropertiesInt.Remove(PropertyInt.AppraisalItemSkill);
 
-            if (PropertiesFloat.ContainsKey(PropertyFloat.WeaponDefense) && !(wo is Missile) && !(wo is Ammunition))
+            if (PropertiesFloat.ContainsKey(PropertyFloat.WeaponDefense) && !(wo is Ammunition))
             {
                 var defenseMod = wo.EnchantmentManager.GetDefenseMod();
                 var auraDefenseMod = wo.Wielder != null && wo.IsEnchantable ? wo.Wielder.EnchantmentManager.GetDefenseMod() : 0.0f;

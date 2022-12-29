@@ -70,6 +70,14 @@ namespace ACE.Server.WorldObjects
         {
             if (player.IsDead) return;
 
+            // verify item is still valid
+            if (player.FindObject(Guid.Full, Player.SearchLocations.MyInventory) == null)
+            {
+                //player.SendWeenieError(WeenieError.ObjectGone);   // results in 'Unable to move object!' transient error
+                player.SendTransientError($"Cannot find the {Name}");   // custom message
+                return;
+            }
+
             // trying to use a dispel potion while pk timer is active
             // send error message and cancel - do not consume item
             if (SpellDID != null)
@@ -93,19 +101,22 @@ namespace ACE.Server.WorldObjects
             var soundEvent = new GameMessageSound(player.Guid, GetUseSound(), 1.0f);
             player.EnqueueBroadcast(soundEvent);
 
-            player.TryConsumeFromInventoryWithNetworking(this, 1);
-
-            if (EmptyId != 0)
-            {
-                // We have an empty version.
-                var wo = WorldObjectFactory.CreateNewWorldObject((uint)EmptyId);
-
-                if (wo != null)
-                {
-                    if (!player.TryCreateInInventoryWithNetworking(wo, out _, true))
-                        wo.Destroy();
-                }
-            }
+            if (!UnlimitedUse)
+			{
+	            player.TryConsumeFromInventoryWithNetworking(this, 1);
+	
+	            if (EmptyId != 0)
+	            {
+	                // We have an empty version.
+	                var wo = WorldObjectFactory.CreateNewWorldObject((uint)EmptyId);
+	
+	                if (wo != null)
+	                {
+	                    if (!player.TryCreateInInventoryWithNetworking(wo, out _, true))
+	                        wo.Destroy();
+	                }
+	            }
+        	}
         }
 
         public void BoostVital(Player player)

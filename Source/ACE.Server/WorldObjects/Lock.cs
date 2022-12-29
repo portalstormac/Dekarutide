@@ -107,7 +107,10 @@ namespace ACE.Server.WorldObjects
 
                 structure = unlocker.Structure ?? 0;
                 
-                unlocker.Value = Math.Max(unlocker.Value.Value - unlocker.StructureUnitValue, 0);
+                unlocker.Value -= unlocker.StructureUnitValue;
+
+                if (unlocker.Value < 0) // fix negative value
+                    unlocker.Value = 0;
 
                 if (unlocker.Structure == 0)
                 {

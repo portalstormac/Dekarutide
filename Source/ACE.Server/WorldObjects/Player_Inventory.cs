@@ -926,6 +926,44 @@ namespace ACE.Server.WorldObjects
                 }
             }
 
+            //if (item is Container)
+            //{
+            //    // Blocking all attempts to put containers in things that aren't Players and Storage. This may not be retail, but at this time appears to be best catch all solution to Quest stamp bypass issue.
+            //    if (container is not Player && container is not Storage)
+            //    {
+            //        //Session.Network.EnqueueSend(new GameEventCommunicationTransientString(Session, $"You cannot put {item.Name} in that.")); // Custom error message
+            //        Session.Network.EnqueueSend(new GameEventInventoryServerSaveFailed(Session, itemGuid));
+            //        return false;
+            //    }
+            //}
+
+            //if (container is Storage storage)
+            //{
+            //    if (!storage.IsOpen || storage.Viewer != Guid.Full)
+            //    {
+            //        Session.Network.EnqueueSend(new GameEventInventoryServerSaveFailed(Session, itemGuid, WeenieError.TheContainerIsClosed));
+            //        return false;
+            //    }
+            //}
+
+            //if (container is Chest chest)
+            //{
+            //    if (!chest.IsOpen || chest.Viewer != Guid.Full)
+            //    {
+            //        Session.Network.EnqueueSend(new GameEventInventoryServerSaveFailed(Session, itemGuid, WeenieError.TheContainerIsClosed));
+            //        return false;
+            //    }
+            //}
+
+            if (containerRootOwner == null) // container is on landscape, so you must have it open
+            {
+                if (!container.IsOpen || container.Viewer != Guid.Full)
+                {
+                    Session.Network.EnqueueSend(new GameEventInventoryServerSaveFailed(Session, itemGuid, WeenieError.TheContainerIsClosed));
+                    return false;
+                }
+            }
+
             return true;
         }
 

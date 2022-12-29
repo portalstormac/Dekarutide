@@ -1072,7 +1072,7 @@ namespace ACE.Server.WorldObjects
 
         private double NextProcAttemptTime = 0;
         private static double ProcAttemptInterval = 10;
-        public void TryProcItem(WorldObject attacker, Creature target)
+        public void TryProcItem(WorldObject attacker, Creature target, bool selfTarget)
         {
             var currentTime = Time.GetUnixTime();
 
@@ -1103,6 +1103,7 @@ namespace ACE.Server.WorldObjects
                 return;
 
             var spell = new Spell(ProcSpell.Value);
+
             if (spell.NotFound)
             {
                 if (attacker is Player player)
@@ -1112,6 +1113,17 @@ namespace ACE.Server.WorldObjects
                     else
                         player.Session.Network.EnqueueSend(new GameMessageSystemChat($"{spell.Name} spell not implemented, yet!", ChatMessageType.System));
                 }
+                return;
+            }
+
+            // not sure if this should go before or after the resist check
+            // after would match Player_Magic, but would require changing the signature of TryCastSpell yet again
+            // starting with the simpler check here
+            if (!selfTarget && target != null && target.NonProjectileMagicImmune && !spell.IsProjectile)
+            {
+                if (attacker is Player player)
+                    player.Session.Network.EnqueueSend(new GameMessageSystemChat($"You fail to affect {target.Name} with {spell.Name}", ChatMessageType.Magic));
+
                 return;
             }
 
@@ -1139,6 +1151,13 @@ namespace ACE.Server.WorldObjects
 
             if (spell.NonComponentTargetType == ItemType.None)
                 attacker.TryCastSpell(spell, null, itemCaster, itemCaster, true, true);
+            else if (spell.NonComponentTargetType == ItemType.Vestements)
+            {
+                // TODO: spell.NonComponentTargetType should probably always go through TryCastSpell_WithItemRedirects,
+                // however i don't feel like testing every possible known type of item procspell in the current db to ensure there are no regressions
+                // current test case: 33990 Composite Bow casting Tattercoat
+                attacker.TryCastSpell_WithRedirects(spell, target, itemCaster, itemCaster, true, true);
+            }
             else
                 attacker.TryCastSpell(spell, target, itemCaster, itemCaster, true, true);
         }
