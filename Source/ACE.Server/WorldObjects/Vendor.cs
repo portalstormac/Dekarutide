@@ -17,6 +17,7 @@ using ACE.Server.Network.GameEvent.Events;
 using ACE.Server.Managers;
 using ACE.Server.Factories.Enum;
 using ACE.Server.Network.GameMessages.Messages;
+using ACE.Server.WorldObjects.Entity;
 
 namespace ACE.Server.WorldObjects
 {
@@ -606,6 +607,7 @@ namespace ACE.Server.WorldObjects
 
             // calculate price
             uint totalPrice = 0;
+            uint totalPriceAfterHaggling = 0;
 
             foreach (var item in purchaseItems)
             {
@@ -613,6 +615,58 @@ namespace ACE.Server.WorldObjects
 
                 // detect rollover?
                 totalPrice += cost;
+
+                if (Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.CustomDM)
+                {
+                    CreatureSkill appraisalSkill = player.GetCreatureSkill(Skill.Appraise);
+                    if (appraisalSkill.AdvancementClass >= SkillAdvancementClass.Trained)
+                    {
+                        if (item.ItemType != ItemType.PromissoryNote)
+                        {
+                            var unitCost = cost / item.StackSize ?? 1;
+                            var diff1 = 50 + (uint)Math.Sqrt(Math.Min(unitCost, 250000));
+                            var diff2 = diff1 + 50;
+                            var diff3 = diff2 + 50;
+                            var chance1 = SkillCheck.GetSkillChance(appraisalSkill.Current, diff1);
+                            var chance2 = SkillCheck.GetSkillChance(appraisalSkill.Current, diff2);
+                            var chance3 = SkillCheck.GetSkillChance(appraisalSkill.Current, diff3);
+                            var roll = ThreadSafeRandom.Next(0.0f, 1.0f);
+
+                            if (chance3 > roll)
+                            {
+                                Proficiency.OnSuccessUse(player, appraisalSkill, diff3);
+
+                                totalPriceAfterHaggling += (uint)Math.Max(Math.Ceiling(cost * 0.85f), 1);
+                            }
+                            else if (chance2 > roll)
+                            {
+                                Proficiency.OnSuccessUse(player, appraisalSkill, diff2);
+
+                                totalPriceAfterHaggling += (uint)Math.Max(Math.Ceiling(cost * 0.90f), 1);
+                            }
+                            else if (chance1 > roll)
+                            {
+                                Proficiency.OnSuccessUse(player, appraisalSkill, diff1);
+
+                                totalPriceAfterHaggling += (uint)Math.Max(Math.Ceiling(cost * 0.95f), 1);
+                            }
+                            else
+                                totalPriceAfterHaggling += cost;
+                        }
+                        else
+                            totalPriceAfterHaggling += cost;
+                    }
+                    else
+                        totalPriceAfterHaggling += cost;
+                }
+                else
+                    totalPriceAfterHaggling += cost;
+            }
+
+            if(totalPriceAfterHaggling != totalPrice)
+            {
+                player.Session.Network.EnqueueSend(new GameMessageSystemChat($"Your appraisal skill allows you to haggle for a discount of {totalPrice - totalPriceAfterHaggling:N0} Pyreals!", ChatMessageType.Broadcast));
+                totalPrice = totalPriceAfterHaggling;
             }
 
             // verify player has enough currency
@@ -671,12 +725,16 @@ namespace ACE.Server.WorldObjects
             return cost;
         }
 
-        public int CalculatePayoutCoinAmount(Dictionary<uint, WorldObject> items)
+        public int CalculatePayoutCoinAmount(Dictionary<uint, WorldObject> items, Player player, bool performAppraisal)
         {
             var payout = 0;
 
             foreach (WorldObject item in items.Values)
+            {
+                if (performAppraisal && Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.CustomDM)
+                    MagnifyingGlass.PerformAppraisal(player, item, true);
                 payout += GetBuyCost(item);
+            }
 
             return payout;
         }

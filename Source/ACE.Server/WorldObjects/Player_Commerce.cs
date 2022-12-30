@@ -164,7 +164,7 @@ namespace ACE.Server.WorldObjects
             }
 
             // calculate pyreals to receive
-            var payoutCoinAmount = vendor.CalculatePayoutCoinAmount(sellList);
+            var payoutCoinAmount = vendor.CalculatePayoutCoinAmount(sellList, this, false);
 
             if (payoutCoinAmount < 0)
             {
@@ -176,6 +176,14 @@ namespace ACE.Server.WorldObjects
                 SendUseDoneEvent();
 
                 return;
+            }
+
+            var payoutCoinAmountAfterHaggling = payoutCoinAmount;
+            if (Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.CustomDM)
+            {
+                var appraisalSkill = GetCreatureSkill(Skill.Appraise);
+                if (appraisalSkill.AdvancementClass >= SkillAdvancementClass.Trained)
+                    payoutCoinAmountAfterHaggling = vendor.CalculatePayoutCoinAmount(sellList, this, true);
             }
 
             // verify player has enough pack slots / burden to receive these pyreals
@@ -225,6 +233,8 @@ namespace ACE.Server.WorldObjects
             // UpdateCoinValue removed -- already handled in TryCreateInInventoryWithNetworking
 
             Session.Network.EnqueueSend(new GameMessageSound(Guid, Sound.PickUpItem));
+            if(payoutCoinAmount != payoutCoinAmountAfterHaggling)
+                Session.Network.EnqueueSend(new GameMessageSystemChat($"Your appraisal skill allows you to haggle for an extra {payoutCoinAmountAfterHaggling - payoutCoinAmount:N0} Pyreals!", ChatMessageType.Broadcast));
 
             SendUseDoneEvent();
         }
