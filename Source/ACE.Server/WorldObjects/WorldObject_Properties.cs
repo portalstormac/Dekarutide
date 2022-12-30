@@ -3168,5 +3168,11 @@ namespace ACE.Server.WorldObjects
             get => GetProperty(PropertyFloat.MagicDefenseCap);
             set { if (!value.HasValue) RemoveProperty(PropertyFloat.MagicDefenseCap); else SetProperty(PropertyFloat.MagicDefenseCap, value.Value); }
         }
+
+        public double? ComponentBurnRateMod
+        {
+            get => GetProperty(PropertyFloat.ComponentBurnRateMod);
+            set { if (!value.HasValue) RemoveProperty(PropertyFloat.ComponentBurnRateMod); else SetProperty(PropertyFloat.ComponentBurnRateMod, value.Value); }
+        }
     }
 }

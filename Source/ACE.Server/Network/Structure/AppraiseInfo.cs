@@ -550,6 +550,14 @@ namespace ACE.Server.Network.Structure
                     hasExtraPropertiesText = true;
                 }
 
+                if (PropertiesFloat.TryGetValue(PropertyFloat.ComponentBurnRateMod, out var componentBurnRateMod) && componentBurnRateMod != 0)
+                {
+                    if (hasExtraPropertiesText)
+                        extraPropertiesText += "\n";
+                    extraPropertiesText += $"Bonus to Component Burn Rate: {(componentBurnRateMod > 0 ? "+" : "")}{(componentBurnRateMod * 100).ToString("0.0")}%.";
+                    hasExtraPropertiesText = true;
+                }
+
                 if (hasExtraPropertiesText)
                     PropertiesString[PropertyString.Use] = extraPropertiesText;
             }

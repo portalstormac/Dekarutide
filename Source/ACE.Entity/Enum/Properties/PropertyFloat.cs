@@ -230,6 +230,7 @@ namespace ACE.Entity.Enum.Properties
         VendorRestockInterval          = 10006,
         [ServerOnly]
         VendorStockTimeToRot           = 10007,
+        ComponentBurnRateMod           = 10008,
     }
 
     public static class PropertyFloatExtensions
