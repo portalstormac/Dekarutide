@@ -153,13 +153,17 @@ namespace ACE.Server.WorldObjects
                 {
                     // Not enough mana, stop taunting, remove from targetDistances to incentivize the monster to switch targets.
                     target.Session.Network.EnqueueSend(new GameMessageSystemChat($"You falter in your attempt at taunting {Name}.", ChatMessageType.CombatSelf));
-                    targetDistances.Remove(targetDistances.Single(r => r.Target == AttackTarget));
+                    var entry = targetDistances.FirstOrDefault(r => r.Target == AttackTarget);
+                    if (entry != default(TargetDistance))
+                        targetDistances.Remove(entry);
                 }
-                else if (target.attacksReceivedPerSecond >= skill.Current / 50.0f)
+                else if (target.attacksReceivedPerSecond >= Math.Ceiling(skill.Current / 50.0f))
                 {
                     // We're too busy to keep this taunt going, remove from targetDistances to incentivize the monster to switch targets.
                     target.Session.Network.EnqueueSend(new GameMessageSystemChat($"You're too busy to keep taunting {Name}!", ChatMessageType.CombatSelf));
-                    targetDistances.Remove(targetDistances.Single(r => r.Target == AttackTarget));
+                    var entry = targetDistances.FirstOrDefault(r => r.Target == AttackTarget);
+                    if (entry != default(TargetDistance))
+                        targetDistances.Remove(entry);
                 }
                 else
                 {
@@ -170,7 +174,9 @@ namespace ACE.Server.WorldObjects
                     {
                         // The current taunter has lost the taunt! Give other taunters a shot, remove from targetDistances to incentivize the monster to switch targets.
                         target.Session.Network.EnqueueSend(new GameMessageSystemChat($"Your taunt loses its effect on {Name}!", ChatMessageType.CombatSelf));
-                        targetDistances.Remove(targetDistances.Single(r => r.Target == AttackTarget));
+                        var entry = targetDistances.FirstOrDefault(r => r.Target == AttackTarget);
+                        if (entry != default(TargetDistance))
+                            targetDistances.Remove(entry);
                     }
                     else
                     {
