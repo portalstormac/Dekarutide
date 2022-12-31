@@ -542,6 +542,7 @@ namespace ACE.Server.WorldObjects
                     foreach (var generator in GeneratorProfiles)
                     {
                         generator.KillAll();
+                        generator.StartAllChestsDecay();
                     }
                     break;
                 case GeneratorDestruct.Destroy:
@@ -552,6 +553,10 @@ namespace ACE.Server.WorldObjects
                     break;
                 case GeneratorDestruct.Nothing:
                 default:
+                    foreach (var generator in GeneratorProfiles)
+                    {
+                        generator.StartAllChestsDecay();
+                    }
                     break;
             }
         }
@@ -605,21 +610,20 @@ namespace ACE.Server.WorldObjects
                                 entry.TimeToRot = entry.DefaultTimeToRot.TotalSeconds;
                                 entry.Generator = null;
                                 entry.GeneratorId = null;
+                                entry.RotProof = false;
 
                                 if (entry is Container)
                                 {
                                     if (Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.CustomDM)
                                     {
                                         // Also stop relocking and generating container contents.
-                                        entry.GeneratorProfiles.Clear();
+                                        entry.GeneratorDisabled = true;
                                         if (entry.GetProperty(PropertyBool.DefaultLocked).HasValue)
                                             entry.DefaultLocked = false;
                                     }
-                                    else if (entry.GeneratorProfiles.Count > 0)
-                                        entry.RotProof = false; // Set this so we decay but meanwhile we keep relocking/generating contents.
                                 }
                                 else
-                                    entry.GeneratorProfiles.Clear();
+                                    entry.GeneratorDisabled = true;
                             }
                             Generator.Destroy();
                         }
@@ -659,21 +663,20 @@ namespace ACE.Server.WorldObjects
                             entry.TimeToRot = entry.DefaultTimeToRot.TotalSeconds;
                             entry.Generator = null;
                             entry.GeneratorId = null;
+                            entry.RotProof = false;
 
                             if (entry is Container)
                             {
                                 if (Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.CustomDM)
                                 {
                                     // Also stop relocking and generating container contents.
-                                    entry.GeneratorProfiles.Clear();
+                                    entry.GeneratorDisabled = true;
                                     if (entry.GetProperty(PropertyBool.DefaultLocked).HasValue)
                                         entry.DefaultLocked = false;
                                 }
-                                else if (entry.GeneratorProfiles.Count > 0)
-                                    entry.RotProof = false; // Set this so we decay but meanwhile we keep relocking/generating contents.
                             }
                             else
-                                entry.GeneratorProfiles.Clear();
+                                entry.GeneratorDisabled = true;
                         }
                         Generator.Destroy();
                     }

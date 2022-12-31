@@ -639,6 +639,17 @@ namespace ACE.Server.Entity
             CleanupProfile();
         }
 
+        public void StartAllChestsDecay()
+        {
+            foreach (var rNode in Spawned.Values)
+            {
+                var wo = rNode.TryGetWorldObject();
+
+                if (wo != null && wo is Chest chest)
+                    chest.StartChestDecay();
+            }
+        }
+
         private void CleanupProfile()
         {
             Spawned.Clear();

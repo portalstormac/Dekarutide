@@ -239,20 +239,22 @@ namespace ACE.Server.WorldObjects
                                          //Destroy(); // Chest's complete generated inventory count has been wiped out
             }
             else if (Generator != null) //If we're a generated container start our decay timer once we've been opened and closed.
-            {
-                TimeToRot = DefaultTimeToRot.TotalSeconds;
-                Generator = null;
-                GeneratorId = null;
+                StartChestDecay();
+        }
 
-                if (Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.CustomDM)
-                {
-                    // Also stop relocking and generating container contents.
-                    GeneratorProfiles.Clear();
-                    if (GetProperty(PropertyBool.DefaultLocked).HasValue)
-                        DefaultLocked = false;
-                }
-                else
-                    RotProof = false;
+        public void StartChestDecay()
+        {
+            TimeToRot = DefaultTimeToRot.TotalSeconds;
+            Generator = null;
+            GeneratorId = null;
+            RotProof = false;
+
+            if (Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.CustomDM)
+            {
+                // Also stop relocking and generating container contents.
+                GeneratorDisabled = true;
+                if (GetProperty(PropertyBool.DefaultLocked).HasValue)
+                    DefaultLocked = false;
             }
         }
 
