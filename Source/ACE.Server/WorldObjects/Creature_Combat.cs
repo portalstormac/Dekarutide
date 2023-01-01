@@ -528,7 +528,7 @@ namespace ACE.Server.WorldObjects
                 var skill = GetCreatureSkill(Skill.UnarmedCombat).Current;
 
                 if(ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.CustomDM)
-                    return (int)skill / 10;
+                    return (int)skill / 6;
                 else
                     return (int)skill / 20;
             }
@@ -868,6 +868,10 @@ namespace ACE.Server.WorldObjects
 
             var ignoreShieldMod = attacker.GetIgnoreShieldMod(weapon);
             //Console.WriteLine($"IgnoreShieldMod: {ignoreShieldMod}");
+
+            var pkBattle = player != null && attacker is Player;
+            if (Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.CustomDM && pkBattle)
+                ignoreShieldMod *= 0.5f; // Armor is reduced during PvP.
 
             effectiveLevel *= ignoreShieldMod;
 

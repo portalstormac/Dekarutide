@@ -289,51 +289,46 @@ namespace ACE.Server.Entity
 
             var attackSkill = attacker.GetCreatureSkill(attacker.GetCurrentWeaponSkill());
 
-            if (attackerTechniqueId != TacticAndTechniqueType.Defensive)
+            // critical hit?
+            CriticalChance = WorldObject.GetWeaponCriticalChance(Weapon, attacker, attackSkill, defender);
+
+            if (Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.CustomDM)
             {
-                // critical hit?
-                CriticalChance = WorldObject.GetWeaponCriticalChance(Weapon, attacker, attackSkill, defender);
-
-                if (Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.CustomDM )
+                if (playerAttacker != null)
                 {
-                    if (playerAttacker != null)
+                    if (CombatType != CombatType.Magic)
                     {
-                        if (CombatType != CombatType.Magic)
-                        {
-                            // critical chance scales with power/accuracy bar
-                            CriticalChance += playerAttacker.ScaleWithPowerAccuracyBar(CriticalChance);
-                        }
-
-                        if (isAttackFromSneaking)
-                        {
-                            CriticalChance = 1.0f;
-                            if(playerDefender == null)
-                                SneakAttackMod = 3.0f;
-                        }
-                        else if (attackerTechniqueId == TacticAndTechniqueType.Opportunist)
-                        {
-                            CriticalChance += 0.10f + playerAttacker.ScaleWithPowerAccuracyBar(0.10f); // Extra critical chance while using the Opportunist technique.
-
-                            var currentTime = Time.GetUnixTime();
-                            var chance = 0.2f + playerAttacker.ScaleWithPowerAccuracyBar(0.2f);
-                            if (attacker != defender && playerAttacker.NextTechniqueNegativeActivationTime <= currentTime && chance > ThreadSafeRandom.Next(0.0f, 1.0f))
-                            {
-                                // Chance of inflicting self damage while using the Opportunist technique.
-                                playerAttacker.NextTechniqueNegativeActivationTime = currentTime + Player.TechniqueNegativeActivationInterval;
-                                playerAttacker.DamageTarget(playerAttacker, damageSource);
-                            }
-                        }
+                        // critical chance scales with power/accuracy bar
+                        CriticalChance += playerAttacker.ScaleWithPowerAccuracyBar(CriticalChance);
                     }
 
-                    if(playerDefender != null)
+                    if (isAttackFromSneaking)
                     {
-                        if (defenderTechniqueId == TacticAndTechniqueType.Riposte)
-                            CriticalChance += 0.10f; // Extra chance of receiving critical hits while using the Riposte technique.
+                        CriticalChance = 1.0f;
+                        if (playerDefender == null)
+                            SneakAttackMod = 3.0f;
+                    }
+                    else if (attackerTechniqueId == TacticAndTechniqueType.Opportunist)
+                    {
+                        CriticalChance += 0.10f + playerAttacker.ScaleWithPowerAccuracyBar(0.10f); // Extra critical chance while using the Opportunist technique.
+
+                        var currentTime = Time.GetUnixTime();
+                        var chance = 0.2f + playerAttacker.ScaleWithPowerAccuracyBar(0.2f);
+                        if (attacker != defender && playerAttacker.NextTechniqueNegativeActivationTime <= currentTime && chance > ThreadSafeRandom.Next(0.0f, 1.0f))
+                        {
+                            // Chance of inflicting self damage while using the Opportunist technique.
+                            playerAttacker.NextTechniqueNegativeActivationTime = currentTime + Player.TechniqueNegativeActivationInterval;
+                            playerAttacker.DamageTarget(playerAttacker, damageSource);
+                        }
                     }
                 }
+
+                if (playerDefender != null)
+                {
+                    if (defenderTechniqueId == TacticAndTechniqueType.Riposte)
+                        CriticalChance += 0.10f; // Extra chance of receiving critical hits while using the Riposte technique.
+                }
             }
-            else
-                CriticalChance = 0.0f; // Defensive technique never crits.
 
             // https://asheron.fandom.com/wiki/Announcements_-_2002/08_-_Atonement
             // It should be noted that any time a character is logging off, PK or not, all physical attacks against them become automatically critical.
@@ -382,6 +377,9 @@ namespace ACE.Server.Entity
             var armorCleavingMod = attacker.GetArmorCleavingMod(Weapon);
 
             var ignoreArmorMod = Math.Min(armorRendingMod, armorCleavingMod);
+
+            if (Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.CustomDM && pkBattle)
+                ignoreArmorMod *= 0.5f; // Armor is reduced during PvP.
 
             // get body part / armor pieces / armor modifier
             if (playerDefender != null)

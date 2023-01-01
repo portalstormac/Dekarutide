@@ -536,6 +536,17 @@ namespace ACE.Server.WorldObjects
             var resistanceType = minBoostValue > 0 ? GetBoostResistanceType(spell.VitalDamageType) : GetDrainResistanceType(spell.VitalDamageType);
 
             int tryBoost = ThreadSafeRandom.Next(minBoostValue, maxBoostValue);
+
+            if (Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.CustomDM && targetCreature != this && tryBoost < 0)
+            {
+                var damageRating = creature?.GetDamageRating() ?? 0;
+                var damageRatingMod = Creature.AdditiveCombine(Creature.GetPositiveRatingMod(damageRating));
+
+                var absorbMod = SpellProjectile.GetAbsorbMod(this, targetCreature);
+
+                tryBoost = (int)(tryBoost * damageRatingMod * absorbMod);
+            }
+
             tryBoost = (int)Math.Round(tryBoost * targetCreature.GetResistanceMod(resistanceType));
 
             int boost = tryBoost;
@@ -775,6 +786,16 @@ namespace ACE.Server.WorldObjects
 
             if (spell.TransferCap != 0 && srcVitalChange > spell.TransferCap)
                 srcVitalChange = (uint)spell.TransferCap;
+
+            if (isDrain && Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.CustomDM)
+            {
+                var damageRating = creature?.GetDamageRating() ?? 0;
+                var damageRatingMod = Creature.AdditiveCombine(Creature.GetPositiveRatingMod(damageRating));
+
+                var absorbMod = SpellProjectile.GetAbsorbMod(this, targetCreature);
+
+                srcVitalChange = (uint)(srcVitalChange * damageRatingMod * absorbMod);
+            }
 
             // should healing resistances be applied here?
             var boostMod = isDrain ? (float)destination.GetResistanceMod(GetBoostResistanceType(spell.Destination)) : 1.0f;

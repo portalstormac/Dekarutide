@@ -201,9 +201,6 @@ namespace ACE.Server.WorldObjects
 
         public int GetDamageRating()
         {
-            if (Common.ConfigManager.Config.Server.WorldRuleset <= Common.Ruleset.Infiltration)
-                return 0;
-
             // get from base properties (monsters)?
             var damageRating = DamageRating ?? 0;
 

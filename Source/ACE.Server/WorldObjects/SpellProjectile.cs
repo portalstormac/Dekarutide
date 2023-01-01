@@ -464,40 +464,30 @@ namespace ACE.Server.WorldObjects
             }
 
             // critical hit
-            float criticalChance;
-            if (techniqueId != TacticAndTechniqueType.Defensive)
+            var criticalChance = GetWeaponMagicCritFrequency(weapon, sourceCreature, attackSkill, target);
+
+            if (sourcePlayer != null && source != target)
             {
-                criticalChance = GetWeaponMagicCritFrequency(weapon, sourceCreature, attackSkill, target);
-
-                if (sourcePlayer != null && source != target)
-                {
-                    if (techniqueId == TacticAndTechniqueType.Opportunist)
-                        criticalChance += 0.10f;
-                }
-
-                if (ThreadSafeRandom.Next(0.0f, 1.0f) < criticalChance)
-                {
-                    if (targetPlayer != null && targetPlayer.AugmentationCriticalDefense > 0)
-                    {
-                        var criticalDefenseMod = sourcePlayer != null ? 0.05f : 0.25f;
-                        var criticalDefenseChance = targetPlayer.AugmentationCriticalDefense * criticalDefenseMod;
-
-                        if (criticalDefenseChance > ThreadSafeRandom.Next(0.0f, 1.0f))
-                            critDefended = true;
-                    }
-
-                    if (!critDefended)
-                        criticalHit = true;
-                }
-            }
-            else
-            {
-                // Defensive technique never crits.
-                criticalChance = 0.0f;
-                criticalHit = false;
+                if (techniqueId == TacticAndTechniqueType.Opportunist)
+                    criticalChance += 0.10f;
             }
 
-            var absorbMod = GetAbsorbMod(target);
+            if (ThreadSafeRandom.Next(0.0f, 1.0f) < criticalChance)
+            {
+                if (targetPlayer != null && targetPlayer.AugmentationCriticalDefense > 0)
+                {
+                    var criticalDefenseMod = sourcePlayer != null ? 0.05f : 0.25f;
+                    var criticalDefenseChance = targetPlayer.AugmentationCriticalDefense * criticalDefenseMod;
+
+                    if (criticalDefenseChance > ThreadSafeRandom.Next(0.0f, 1.0f))
+                        critDefended = true;
+                }
+
+                if (!critDefended)
+                    criticalHit = true;
+            }
+
+            var absorbMod = GetAbsorbMod(this, target);
 
             bool isPVP = sourcePlayer != null && targetPlayer != null;
 
@@ -632,7 +622,7 @@ namespace ACE.Server.WorldObjects
             return finalDamage;
         }
 
-        public float GetAbsorbMod(Creature target)
+        public static float GetAbsorbMod(WorldObject source, Creature target)
         {
             if (Common.ConfigManager.Config.Server.WorldRuleset != Common.Ruleset.CustomDM)
             {
@@ -645,7 +635,7 @@ namespace ACE.Server.WorldObjects
                         if (shield != null && shield.GetAbsorbMagicDamage() != null)
                         {
                             if (Common.ConfigManager.Config.Server.WorldRuleset != Common.Ruleset.Infiltration)
-                                return GetShieldMod(target, shield);
+                                return GetShieldMod(source, target, shield);
                             else
                                 return AbsorbMagic(target, shield);
                         }
@@ -678,7 +668,7 @@ namespace ACE.Server.WorldObjects
 
                 var shield = target.GetEquippedShield();
                 if (shield != null && shield.GetAbsorbMagicDamage() != null)
-                    shieldMagicAbsorb = GetShieldMod(target, shield);
+                    shieldMagicAbsorb = GetShieldMod(source, target, shield);
 
                 var caster = target.GetEquippedWand();
                 if (caster != null && caster.GetAbsorbMagicDamage() != null)
@@ -696,7 +686,7 @@ namespace ACE.Server.WorldObjects
         /// <summary>
         /// Calculates the amount of damage a shield absorbs from magic projectile
         /// </summary>
-        public float GetShieldMod(Creature target, WorldObject shield)
+        public static float GetShieldMod(WorldObject source, Creature target, WorldObject shield)
         {
             bool bypassShieldAngleCheck = false;
             if (Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.CustomDM)
@@ -711,7 +701,7 @@ namespace ACE.Server.WorldObjects
                 // is spell projectile in front of creature target,
                 // within shield effectiveness area?
                 var effectiveAngle = 180.0f;
-                var angle = target.GetAngle(this);
+                var angle = target.GetAngle(source);
                 if (Math.Abs(angle) > effectiveAngle / 2.0f)
                     return 1.0f;
             }
@@ -756,7 +746,7 @@ namespace ACE.Server.WorldObjects
         /// Calculates the damage reduction modifier for bows and casters
         /// with 'Magic Absorbing' property
         /// </summary>
-        public float AbsorbMagic(Creature target, WorldObject item)
+        public static float AbsorbMagic(Creature target, WorldObject item)
         {
             // https://asheron.fandom.com/wiki/Category:Magic_Absorbing
 
