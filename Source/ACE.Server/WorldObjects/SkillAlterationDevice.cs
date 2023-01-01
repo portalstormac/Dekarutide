@@ -12,7 +12,6 @@ using ACE.Server.Entity;
 using ACE.Server.Network.GameEvent.Events;
 using ACE.Server.Network.GameMessages.Messages;
 using ACE.Server.WorldObjects.Entity;
-using Google.Protobuf.WellKnownTypes;
 
 namespace ACE.Server.WorldObjects
 {
@@ -79,7 +78,7 @@ namespace ACE.Server.WorldObjects
             if (TypeOfAlteration != SkillAlterationType.ResetLeyLineSeed)
             {
 
-                if (skill == null)
+                if (skill == null || !DatManager.PortalDat.SkillTable.SkillBaseHash.ContainsKey((uint)skill.Skill))
                 {
                     player.Session.Network.EnqueueSend(new GameEventWeenieError(player.Session, WeenieError.YouFailToAlterSkill));
                     return;
@@ -395,6 +394,9 @@ namespace ACE.Server.WorldObjects
 
             foreach (var kvp in player.Skills)
             {
+                if (!DatManager.PortalDat.SkillTable.SkillBaseHash.ContainsKey((uint)kvp.Key))
+                    continue;
+
                 if (kvp.Value.AdvancementClass == SkillAdvancementClass.Specialized)
                 {
                     switch (kvp.Key)
