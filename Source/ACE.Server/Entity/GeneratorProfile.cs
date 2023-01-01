@@ -639,14 +639,14 @@ namespace ACE.Server.Entity
             CleanupProfile();
         }
 
-        public void StartAllChestsDecay()
+        public void StartAllContainersDecay()
         {
             foreach (var rNode in Spawned.Values)
             {
                 var wo = rNode.TryGetWorldObject();
 
-                if (wo != null && wo is Chest chest)
-                    chest.StartChestDecay();
+                if (wo != null && wo is Container container)
+                    container.StarContainerDecay();
             }
         }
 

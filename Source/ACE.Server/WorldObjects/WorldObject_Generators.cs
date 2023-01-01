@@ -542,7 +542,7 @@ namespace ACE.Server.WorldObjects
                     foreach (var generator in GeneratorProfiles)
                     {
                         generator.KillAll();
-                        generator.StartAllChestsDecay();
+                        generator.StartAllContainersDecay();
                     }
                     break;
                 case GeneratorDestruct.Destroy:
@@ -555,7 +555,7 @@ namespace ACE.Server.WorldObjects
                 default:
                     foreach (var generator in GeneratorProfiles)
                     {
-                        generator.StartAllChestsDecay();
+                        generator.StartAllContainersDecay();
                     }
                     break;
             }

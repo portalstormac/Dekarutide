@@ -1092,6 +1092,24 @@ namespace ACE.Server.WorldObjects
                 player.Session.Network.EnqueueSend(itemsToSend.ToArray());*/
             }
 
+            if (!(this is Chest) && Generator != null) // Chests will handle this themselves.
+                StarContainerDecay(); // If we're a generated container start our decay timer once we've been opened and closed.
+
+        }
+        public void StarContainerDecay()
+        {
+            TimeToRot = DefaultTimeToRot.TotalSeconds;
+            Generator = null;
+            GeneratorId = null;
+            RotProof = false;
+
+            if (Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.CustomDM)
+            {
+                // Also stop relocking and generating container contents.
+                GeneratorDisabled = true;
+                if (GetProperty(PropertyBool.DefaultLocked).HasValue)
+                    DefaultLocked = false;
+            }
         }
 
         public virtual void Reset()
