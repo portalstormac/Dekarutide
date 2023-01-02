@@ -16,7 +16,7 @@ namespace ACE.Server.Factories
             var workmanship = SalvageWorkmanshipChances.Roll(tier);
             var numItemsInMaterial = 20;
             var itemWorkmanship = (int)Math.Round(workmanship * numItemsInMaterial);
-            var value = (int)(workmanship * 10000) * SalvageWcids.GetValueMod(salvage.WeenieClassId);
+            var value = (int)(workmanship * 5000) * SalvageWcids.GetValueMod(salvage.WeenieClassId);
             value *= (float)ThreadSafeRandom.Next(0.8f, 1.2f);
 
             salvage.Name = $"Salvage ({structure})";

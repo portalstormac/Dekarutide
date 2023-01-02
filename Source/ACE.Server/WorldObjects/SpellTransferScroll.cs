@@ -264,6 +264,13 @@ namespace ACE.Server.WorldObjects
                         var newManaRate = LootGenerationFactory.CalculateManaRate(newMaxBaseMana);
                         var newMaxMana = (int)spellToAdd.BaseMana * 15;
 
+                        if (target.TinkerLog != null)
+                        {
+                            var tinkers = target.TinkerLog.Split(",");
+                            var appliedMoonstoneCount = tinkers.Count(s => s == "31");
+                            newMaxMana += 500 * appliedMoonstoneCount;
+                        }
+
                         if (isGem)
                         {
                             target.ItemUseable = Usable.Contained;

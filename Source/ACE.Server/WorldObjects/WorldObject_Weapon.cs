@@ -4,6 +4,7 @@ using ACE.Common;
 using ACE.Entity.Enum;
 using ACE.Entity.Enum.Properties;
 using ACE.Server.Entity;
+using ACE.Server.Factories.Tables;
 using ACE.Server.Network.GameEvent.Events;
 using ACE.Server.Network.GameMessages.Messages;
 using ACE.Server.WorldObjects.Entity;
@@ -1132,10 +1133,11 @@ namespace ACE.Server.WorldObjects
                 NextProcAttemptTime = currentTime + ProcAttemptInterval;
 
                 var manaCost = spell.BaseMana / 4;
+                var manaConvDiff = spell.Level * 25;
 
                 var manaConversion = creatureAttacker.GetCreatureSkill(Skill.ManaConversion);
                 if (manaConversion.AdvancementClass >= SkillAdvancementClass.Trained)
-                    manaCost = Creature.GetManaCost((uint)ItemSpellcraft, manaCost, manaConversion.Current);
+                    manaCost = Creature.GetManaCost(manaConvDiff, manaCost, manaConversion.Current, manaConversion.AdvancementClass);
 
                 if (creatureAttacker.Mana.Current >= manaCost)
                     creatureAttacker.UpdateVitalDelta(creatureAttacker.Mana, -(int)manaCost);
@@ -1160,6 +1162,143 @@ namespace ACE.Server.WorldObjects
             }
             else
                 attacker.TryCastSpell(spell, target, itemCaster, itemCaster, true, true);
+        }
+
+        private double NextInnateProcAttemptTime = 0;
+        private static double InnateProcAttemptInterval = 8;
+        public void TryProcInnate(WorldObject attacker, Creature target, bool selfTarget)
+        {
+            if (Common.ConfigManager.Config.Server.WorldRuleset != Common.Ruleset.CustomDM)
+                return;
+
+            var procSpellId = SpellId.Undef;
+            var creature = attacker as Creature;
+            if (creature == null)
+                return;
+
+            bool showCastMessage = false;
+            if (WeaponSkill == Skill.Dagger)
+            {
+                showCastMessage = false;
+
+                var skill = creature.GetCreatureSkill(Skill.Dagger);
+                if (skill.AdvancementClass >= SkillAdvancementClass.Trained)
+                {
+                    if (skill.Current < 200)
+                        procSpellId = SpellId.DF_Trained_Bleed; // Bleeding Blow
+                    else
+                        procSpellId = SpellId.DF_Specialized_Bleed; // Bleeding Assault
+                }
+            }
+            else if (WeaponSkill == Skill.UnarmedCombat)
+            {
+                showCastMessage = true;
+
+                var skill = creature.GetCreatureSkill(Skill.UnarmedCombat);
+                if (skill.AdvancementClass >= SkillAdvancementClass.Trained)
+                {
+                    int spellLevel;
+                    if (skill.Current < 200)
+                        spellLevel = 1;
+                    else if (skill.Current < 250)
+                        spellLevel = 2;
+                    else if (skill.Current < 300)
+                        spellLevel = 3;
+                    else
+                        spellLevel = 4;
+                    switch (W_DamageType)
+                    {
+                        case DamageType.Pierce: procSpellId = SpellLevelProgression.GetSpellAtLevel(SpellId.ForceBolt1, spellLevel); break;
+                        case DamageType.Slash: procSpellId = SpellLevelProgression.GetSpellAtLevel(SpellId.WhirlingBlade1, spellLevel); break;
+                        case DamageType.Bludgeon: procSpellId = SpellLevelProgression.GetSpellAtLevel(SpellId.ShockWave1, spellLevel); break;
+                        case DamageType.Fire: procSpellId = SpellLevelProgression.GetSpellAtLevel(SpellId.FlameBolt1, spellLevel); break;
+                        case DamageType.Cold: procSpellId = SpellLevelProgression.GetSpellAtLevel(SpellId.FrostBolt1, spellLevel); break;
+                        case DamageType.Electric: procSpellId = SpellLevelProgression.GetSpellAtLevel(SpellId.LightningBolt1, spellLevel); break;
+                        case DamageType.Acid: procSpellId = SpellLevelProgression.GetSpellAtLevel(SpellId.AcidStream1, spellLevel); break;
+                    }
+                }
+            }
+
+            if (procSpellId == SpellId.Undef)
+                return;
+
+            var creatureAttacker = attacker as Creature;
+            var playerAttacker = attacker as Player;
+
+            var currentTime = Time.GetUnixTime();
+            if (NextInnateProcAttemptTime > currentTime)
+                return;
+
+            var chance = 0.25f;
+            if (playerAttacker != null)
+                chance += playerAttacker.ScaleWithPowerAccuracyBar((float)chance);
+
+            var rng = ThreadSafeRandom.Next(0.0f, 1.0f);
+            if (rng >= chance)
+                return;
+
+            var spell = new Spell(procSpellId);
+
+            if (spell.NotFound)
+            {
+                if (attacker is Player player)
+                {
+                    if (spell._spellBase == null)
+                        player.Session.Network.EnqueueSend(new GameMessageSystemChat($"SpellId {ProcSpell.Value} Invalid.", ChatMessageType.System));
+                    else
+                        player.Session.Network.EnqueueSend(new GameMessageSystemChat($"{spell.Name} spell not implemented, yet!", ChatMessageType.System));
+                }
+                return;
+            }
+
+            // not sure if this should go before or after the resist check
+            // after would match Player_Magic, but would require changing the signature of TryCastSpell yet again
+            // starting with the simpler check here
+            if (!selfTarget && target != null && target.NonProjectileMagicImmune && !spell.IsProjectile)
+            {
+                if (attacker is Player player)
+                    player.Session.Network.EnqueueSend(new GameMessageSystemChat($"You fail to affect {target.Name} with {spell.Name}", ChatMessageType.Magic));
+
+                return;
+            }
+
+            if (creatureAttacker != null)
+            {
+                NextInnateProcAttemptTime = currentTime + InnateProcAttemptInterval;
+
+                if (WeaponSkill == Skill.UnarmedCombat)
+                {
+                    var manaCost = spell.BaseMana;
+                    var manaConvDiff = spell.Level * 25;
+
+                    var manaConversion = creatureAttacker.GetCreatureSkill(Skill.ManaConversion);
+                    if (manaConversion.AdvancementClass >= SkillAdvancementClass.Trained)
+                        manaCost = Creature.GetManaCost(manaConvDiff, manaCost, manaConversion.Current, manaConversion.AdvancementClass);
+
+                    if (creatureAttacker.Mana.Current >= manaCost)
+                        creatureAttacker.UpdateVitalDelta(creatureAttacker.Mana, -(int)manaCost);
+                    else
+                    {
+                        if (playerAttacker != null)
+                            playerAttacker.Session.Network.EnqueueSend(new GameEventCommunicationTransientString(playerAttacker.Session, $"You don't have enough mana so your {NameWithMaterial} cannot cast {spell.Name}!"));
+                        return;
+                    }
+                }
+            }
+
+            var itemCaster = this is Creature ? null : this;
+
+            if (spell.NonComponentTargetType == ItemType.None)
+                attacker.TryCastSpell(spell, null, itemCaster, itemCaster, true, true, true, showCastMessage);
+            else if (spell.NonComponentTargetType == ItemType.Vestements)
+            {
+                // TODO: spell.NonComponentTargetType should probably always go through TryCastSpell_WithItemRedirects,
+                // however i don't feel like testing every possible known type of item procspell in the current db to ensure there are no regressions
+                // current test case: 33990 Composite Bow casting Tattercoat
+                attacker.TryCastSpell_WithRedirects(spell, target, itemCaster, itemCaster, true, true);
+            }
+            else
+                attacker.TryCastSpell(spell, target, itemCaster, itemCaster, true, true, true, showCastMessage);
         }
 
         private bool? isMasterable;

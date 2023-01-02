@@ -120,7 +120,7 @@ namespace ACE.Server.WorldObjects
             if (enchantmentTickTimestamp == 0 || currentUnixTime > enchantmentTickTimestamp)
             {
                 if (EnchantmentManager.HasEnchantments)
-                    EnchantmentManager.HeartBeat(enchantmentTickInterval);
+                    EnchantmentManager.HeartBeat(enchantmentTickInterval, false);
                 enchantmentTickTimestamp = Time.GetFutureUnixTime(enchantmentTickInterval);
             }
         }

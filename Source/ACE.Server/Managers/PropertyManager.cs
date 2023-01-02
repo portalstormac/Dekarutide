@@ -508,6 +508,7 @@ namespace ACE.Server.Managers
                 PropertyManager.ModifyBool("vendor_shop_uses_generator", true);
                 PropertyManager.ModifyBool("allow_xp_at_max_level", true);
                 PropertyManager.ModifyBool("increase_minimum_encounter_spawn_density", true);
+                PropertyManager.ModifyBool("show_dot_messages", true);                
 
                 PropertyManager.ModifyLong("max_level", 126);
 

@@ -1069,6 +1069,9 @@ namespace ACE.Server.WorldObjects
             //   "Dirty Fighting! <Player> delivers a Bleeding Assault to <target>!"
             //   "Dirty Fighting! <Player> delivers a Traumatic Assault to <target>!"
 
+            if (Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.CustomDM)
+                return;
+
             // dirty fighting skill must be at least trained
             var dirtySkill = GetCreatureSkill(Skill.DirtyFighting);
             if (dirtySkill.AdvancementClass < SkillAdvancementClass.Trained)

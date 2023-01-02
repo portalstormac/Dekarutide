@@ -55,12 +55,12 @@ namespace ACE.Server.WorldObjects
 
             var mana_conversion_skill = (uint)Math.Round(manaConversion.Current * (GetWeaponManaConversionModifier(caster) + robeManaConversionMod));
 
-            var manaCost = GetManaCost(difficulty, baseCost, mana_conversion_skill);
+            var manaCost = GetManaCost(difficulty, baseCost, mana_conversion_skill, manaConversion.AdvancementClass);
 
             return manaCost;
         }
 
-        public static uint GetManaCost(uint difficulty, uint manaCost, uint manaConv)
+        public static uint GetManaCost(uint difficulty, uint manaCost, uint manaConv, SkillAdvancementClass advancementClass)
         {
             if (Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.EoR)
             {
@@ -120,7 +120,16 @@ namespace ACE.Server.WorldObjects
 
                 if (roll < successChance)
                 {
-                    var reductionRoll = ThreadSafeRandom.Next(0.0f, (float)successChance);
+                    var reductionMinAmount = 0.0f;
+                    var reductionMaxAmount = (float)successChance;
+                    if (Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.CustomDM)
+                    {
+                        if(advancementClass == SkillAdvancementClass.Specialized)
+                            reductionMinAmount = (float)successChance / 2.0f;
+                        else
+                            reductionMinAmount = (float)successChance / 4.0f;
+                    }
+                    var reductionRoll = ThreadSafeRandom.Next(reductionMinAmount, reductionMaxAmount);
                     manaCost = (uint)Math.Round(manaCost * (1.0f - reductionRoll));
                 }
             }

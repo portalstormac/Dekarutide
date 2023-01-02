@@ -332,6 +332,9 @@ namespace ACE.Server.WorldObjects
                 numStrikes = attackFrames.Count;
             }
 
+            if(weapon != null)
+                weapon.TryProcInnate(this, creature, false);
+
             // handle self-procs
             TryProcEquippedItems(this, this, true, weapon);
 

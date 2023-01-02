@@ -1218,16 +1218,20 @@ namespace ACE.Server.WorldObjects.Managers
         /// <summary>
         /// Called every ~5 seconds for active object
         /// </summary>
-        public void HeartBeat(double heartbeatInterval)
+        public void HeartBeat(double heartbeatInterval, bool processDoTs = true, bool decayTimers = true)
         {
             var topLayerEnchantments = WorldObject.Biota.PropertiesEnchantmentRegistry.GetEnchantmentsTopLayer(WorldObject.BiotaDatabaseLock, SpellSet.SetSpells);
 
-            HeartBeat_DamageOverTime(topLayerEnchantments);
+            if(processDoTs)
+                HeartBeat_DamageOverTime(topLayerEnchantments);
 
-            var expired = WorldObject.Biota.PropertiesEnchantmentRegistry.HeartBeatEnchantmentsAndReturnExpired(heartbeatInterval, WorldObject.BiotaDatabaseLock);
+            if (decayTimers)
+            {
+                var expired = WorldObject.Biota.PropertiesEnchantmentRegistry.HeartBeatEnchantmentsAndReturnExpired(heartbeatInterval, WorldObject.BiotaDatabaseLock);
 
-            foreach (var enchantment in expired)
-                Remove(enchantment);
+                foreach (var enchantment in expired)
+                    Remove(enchantment);
+            }
         }
 
         /// <summary>

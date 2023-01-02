@@ -160,7 +160,7 @@ namespace ACE.Server.WorldObjects
                     if (manaConversion.AdvancementClass < SkillAdvancementClass.Trained)
                         manaCost = (int)ItemManaCost;
                     else
-                        manaCost = (int)Player.GetManaCost((uint)ItemSpellcraft, (uint)ItemManaCost, manaConversion.Current);
+                        manaCost = (int)Player.GetManaCost((uint)ItemSpellcraft, (uint)ItemManaCost, manaConversion.Current, manaConversion.AdvancementClass);
 
                     if (ItemCurMana >= manaCost)
                     {
