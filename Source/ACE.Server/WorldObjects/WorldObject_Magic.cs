@@ -157,10 +157,10 @@ namespace ACE.Server.WorldObjects
 
                 magicSkill = casterCreature.GetCreatureSkill(magicSchool).Current;
             }
-            else if (caster.ItemSpellcraft != null)
+            else if (caster.ItemSpellcraft != null || Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.CustomDM)
             {
                 // Retrieve casting item's spellcraft
-                magicSkill = (uint)caster.ItemSpellcraft;
+                magicSkill = (uint)(caster.ItemSpellcraft ?? 0);
 
                 if (Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.CustomDM && caster.Wielder is Creature wielder)
                 {

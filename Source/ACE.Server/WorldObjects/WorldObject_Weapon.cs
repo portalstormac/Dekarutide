@@ -1179,7 +1179,7 @@ namespace ACE.Server.WorldObjects
             bool showCastMessage = false;
             if (WeaponSkill == Skill.Dagger)
             {
-                showCastMessage = false;
+                showCastMessage = true;
 
                 var skill = creature.GetCreatureSkill(Skill.Dagger);
                 if (skill.AdvancementClass >= SkillAdvancementClass.Trained)
@@ -1206,7 +1206,8 @@ namespace ACE.Server.WorldObjects
                         spellLevel = 3;
                     else
                         spellLevel = 4;
-                    switch (W_DamageType)
+
+                    switch (creature.GetDamageType(false, CombatType.Melee))
                     {
                         case DamageType.Pierce: procSpellId = SpellLevelProgression.GetSpellAtLevel(SpellId.ForceBolt1, spellLevel); break;
                         case DamageType.Slash: procSpellId = SpellLevelProgression.GetSpellAtLevel(SpellId.WhirlingBlade1, spellLevel); break;

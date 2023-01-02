@@ -511,6 +511,7 @@ namespace ACE.Server.Managers
                 PropertyManager.ModifyBool("show_dot_messages", true);                
 
                 PropertyManager.ModifyLong("max_level", 126);
+                PropertyManager.ModifyLong("fellowship_even_share_level", 80);                
 
                 PropertyManager.ModifyBool("show_dat_warning", true);
                 PropertyManager.ModifyString("dat_warning_msg", "The location you are attempting to enter is not present in your data files.");
