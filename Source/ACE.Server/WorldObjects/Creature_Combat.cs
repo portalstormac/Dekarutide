@@ -1221,6 +1221,9 @@ namespace ACE.Server.WorldObjects
             if (this == target)
                 return; // We don't want to find vulnerabilities on ourselves!
 
+            if (target.IsDead)
+                return; // Target is already dead, abort!
+
             var currentTime = Time.GetUnixTime();
 
             if (NextAssessDebuffActivationTime > currentTime)

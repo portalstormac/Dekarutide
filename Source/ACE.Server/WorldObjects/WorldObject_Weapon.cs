@@ -1075,6 +1075,9 @@ namespace ACE.Server.WorldObjects
         private static double ProcAttemptInterval = 10;
         public void TryProcItem(WorldObject attacker, Creature target, bool selfTarget)
         {
+            if (target.IsDead)
+                return; // Target is already dead, abort!
+
             var currentTime = Time.GetUnixTime();
 
             // roll for a chance of casting spell
@@ -1170,6 +1173,9 @@ namespace ACE.Server.WorldObjects
         {
             if (Common.ConfigManager.Config.Server.WorldRuleset != Common.Ruleset.CustomDM)
                 return;
+
+            if (target.IsDead)
+                return; // Target is already dead, abort!
 
             var procSpellId = SpellId.Undef;
             var creature = attacker as Creature;
