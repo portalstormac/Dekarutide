@@ -474,22 +474,47 @@ namespace ACE.Server.Entity
             if (leader == null)
                 return;
 
-            var maxLevelDiff = fellows.Values.Max(f => Math.Abs((leader.Level ?? 1) - (f.Level ?? 1)));
+            if (Common.ConfigManager.Config.Server.WorldRuleset != Common.Ruleset.CustomDM)
+            {
+                var maxLevelDiff = fellows.Values.Max(f => Math.Abs((leader.Level ?? 1) - (f.Level ?? 1)));
 
-            if (maxLevelDiff <= 5)
-            {
-                ShareXP = DesiredShareXP;
-                EvenShare = true;
-            }
-            else if (maxLevelDiff <= 10)
-            {
-                ShareXP = DesiredShareXP;
-                EvenShare = false;
+                if (maxLevelDiff <= 5)
+                {
+                    ShareXP = DesiredShareXP;
+                    EvenShare = true;
+                }
+                else if (maxLevelDiff <= 10)
+                {
+                    ShareXP = DesiredShareXP;
+                    EvenShare = false;
+                }
+                else
+                {
+                    ShareXP = false;
+                    EvenShare = false;
+                }
             }
             else
             {
-                ShareXP = false;
-                EvenShare = false;
+                var highestLevel = fellows.Values.Max(f => f.Level ?? 1);
+                var lowestLevel = fellows.Values.Min(f => f.Level ?? 1);
+                var maxLevelDiff = highestLevel - lowestLevel;
+
+                if (maxLevelDiff <= 10)
+                {
+                    ShareXP = DesiredShareXP;
+                    EvenShare = true;
+                }
+                else if (maxLevelDiff <= 20)
+                {
+                    ShareXP = DesiredShareXP;
+                    EvenShare = false;
+                }
+                else
+                {
+                    ShareXP = false;
+                    EvenShare = false;
+                }
             }
         }
 
