@@ -218,8 +218,8 @@ namespace ACE.Server.WorldObjects
             Proficiency.OnSuccessUse(healer, healingSkill, difficulty);
 
             var pkLoweredMessage = "";
-            if (Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.CustomDM && healer.PKTimerActive)
-                pkLoweredMessage = " Your recent PvP activity lowers the effectiveness of this action.";
+            //if (Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.CustomDM && healer.PKTimerActive)
+            //    pkLoweredMessage = " Your recent PvP activity lowers the effectiveness of this action.";
 
             var crit = critical ? "expertly " : "";
             var message = new GameMessageSystemChat($"You {crit}heal {targetName} for {healAmount} {BoosterEnum.ToString()} points.{pkLoweredMessage}{remainingMsg}", ChatMessageType.Broadcast);

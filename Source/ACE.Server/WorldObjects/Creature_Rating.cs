@@ -405,8 +405,8 @@ namespace ACE.Server.WorldObjects
             {
                 lumAugBonus = player.LumAugHealingRating;
 
-                if (Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.CustomDM && player.PKTimerActive)
-                    pvpPenalty = -100;
+                //if (Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.CustomDM && player.PKTimerActive)
+                //    pvpPenalty = -100;
             }
 
             return healBoostRating + equipment + enchantments + lumAugBonus + pvpPenalty;

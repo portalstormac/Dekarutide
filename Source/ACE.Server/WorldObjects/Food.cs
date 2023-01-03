@@ -145,8 +145,8 @@ namespace ACE.Server.WorldObjects
             }
 
             var pkLoweredMessage = "";
-            if (Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.CustomDM && BoostValue >= 0 && player.PKTimerActive)
-                pkLoweredMessage = " Your recent PvP activity lowers the effectiveness of this action.";
+            //if (Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.CustomDM && BoostValue >= 0 && player.PKTimerActive)
+            //    pkLoweredMessage = " Your recent PvP activity lowers the effectiveness of this action.";
 
             var verb = BoostValue >= 0 ? "restores" : "takes";
 
