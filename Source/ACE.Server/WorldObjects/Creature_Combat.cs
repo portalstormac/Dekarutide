@@ -871,7 +871,7 @@ namespace ACE.Server.WorldObjects
 
             var pkBattle = player != null && attacker is Player;
             if (Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.CustomDM && pkBattle)
-                ignoreShieldMod *= 0.5f; // Armor is reduced during PvP.
+                ignoreShieldMod *= 0.7f; // Armor is reduced during PvP.
 
             effectiveLevel *= ignoreShieldMod;
 
