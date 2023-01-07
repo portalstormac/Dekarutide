@@ -148,6 +148,8 @@ namespace ACE.Server.Factories
 
             RollBitingStrike(profile, wo);
 
+            RollResistanceCleaving(profile, wo);
+
             RollSlayer(profile, wo);
 
             // material type

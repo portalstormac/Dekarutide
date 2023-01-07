@@ -138,7 +138,8 @@ namespace ACE.Server.Factories
             chance = ApplyQualityModToExtraMutationChance(chance, treasureDeath.LootQualityMod);
             if (chance > ThreadSafeRandom.Next(0.0f, 1.0f))
             {
-                wo.IgnoreArmor = 0.75f; // 0.0 = ignore 100% of all armor.
+                // 0.0 = ignore 100% of all armor.
+                wo.IgnoreArmor = 0.75f; // Equivalent of Imperil III for 300 AL armor.
                 wo.IconOverlayId = 0x06005EBF;
                 return true;
             }
@@ -157,7 +158,8 @@ namespace ACE.Server.Factories
             chance = ApplyQualityModToExtraMutationChance(chance, treasureDeath.LootQualityMod);
             if (chance > ThreadSafeRandom.Next(0.0f, 1.0f))
             {
-                wo.IgnoreShield = 0.50f; // 1.0 = ignore 100% of the armor from shields.
+                // 1.0 = ignore 100% of the armor from shields.
+                wo.IgnoreShield = 0.50f; // Equivalent of Brittlemail V for 300 AL shields.
                 wo.IconOverlayId = 0x06005EC2;
                 wo.Name = $"{wo.Name} of Shield Cleaving";
                 return true;
@@ -178,6 +180,48 @@ namespace ACE.Server.Factories
                 wo.Translucency = 0.7f;
                 wo.Name = $"Hollow {wo.Name}";
                 wo.IconOverlayId = 0x06005EBE;
+                return true;
+            }
+            return false;
+        }
+
+        private static bool RollResistanceCleaving(TreasureDeath treasureDeath, WorldObject wo)
+        {
+            if (Common.ConfigManager.Config.Server.WorldRuleset != Common.Ruleset.CustomDM)
+                return false;
+
+            var chance = ExtraMutationEffects.GetResistanceCleavingChanceForTier(treasureDeath.Tier);
+            chance = ApplyQualityModToExtraMutationChance(chance, treasureDeath.LootQualityMod);
+            if (chance > ThreadSafeRandom.Next(0.0f, 1.0f))
+            {
+                var damageType = wo.W_DamageType;
+                if (damageType == DamageType.Undef)
+                {
+                    var roll = ThreadSafeRandom.Next(0, 6);
+                    switch (roll)
+                    {
+                        case 0: damageType = DamageType.Slash; break;
+                        case 1: damageType = DamageType.Pierce; break;
+                        case 2: damageType = DamageType.Bludgeon; break;
+                        case 3: damageType = DamageType.Fire; break;
+                        case 4: damageType = DamageType.Cold; break;
+                        case 5: damageType = DamageType.Electric; break;
+                        case 6: damageType = DamageType.Acid; break;
+                    }
+                }
+                if (damageType == (DamageType.Slash | DamageType.Pierce))
+                {
+                    var roll = ThreadSafeRandom.Next(0, 1);
+                    switch (roll)
+                    {
+                        case 0: damageType = DamageType.Slash; break;
+                        case 1: damageType = DamageType.Pierce; break;
+                    }
+                }
+
+                wo.ResistanceModifierType = damageType;
+                wo.ResistanceModifier = 1.5f; // Equivalent to level III Elemental Vulnerability.
+                wo.IconOverlayId = 0x06005EC1;
                 return true;
             }
             return false;

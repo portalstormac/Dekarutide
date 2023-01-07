@@ -107,6 +107,8 @@ namespace ACE.Server.Factories
 
             RollArmorCleaving(profile, wo);
 
+            RollResistanceCleaving(profile, wo);
+
             RollShieldCleaving(profile, wo);
 
             RollSlayer(profile, wo);

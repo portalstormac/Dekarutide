@@ -476,7 +476,12 @@ namespace ACE.Server.WorldObjects
 
             // handle quest weapon fixed resistance cleaving
             if (weapon.ResistanceModifierType != null && weapon.ResistanceModifierType == damageType)
-                resistMod = 1.0f + (float)(weapon.ResistanceModifier ?? defaultModifier);       // 1.0 in the data, equivalent to a level 5 vuln
+            {
+                if (Common.ConfigManager.Config.Server.WorldRuleset != Common.Ruleset.CustomDM)
+                    resistMod = 1.0f + (float)(weapon.ResistanceModifier ?? defaultModifier);       // 1.0 in the data, equivalent to a level 5 vuln
+                else
+                    resistMod = (float)(weapon.ResistanceModifier ?? 1.5f); // Equivalent to level III Elemental Vulnerability.
+            }
 
             // handle elemental resistance rending
             var rendDamageType = GetRendDamageType(damageType);
@@ -618,8 +623,6 @@ namespace ACE.Server.WorldObjects
 
         public static float MaxCriticalStrikeMod = 0.5f;
 
-        public static float MaxCriticalStrikeModCustomDM = 0.2f;
-
         public static float GetCriticalStrikeMod(CreatureSkill skill, bool isPvP = false)
         {
             var baseMod = 0.0f;
@@ -634,28 +637,7 @@ namespace ACE.Server.WorldObjects
 
             if (Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.CustomDM)
             {
-                switch (skillType)
-                {
-                    case ImbuedSkillType.Melee:
-
-                        baseMod = Math.Max(0, baseSkill - 100) / 1500.0f;
-                        break;
-
-                    case ImbuedSkillType.Missile:
-
-                        baseMod = Math.Max(0, baseSkill - 60) / 1500.0f;
-                        break;
-
-                    case ImbuedSkillType.Magic:
-
-                        baseMod = Math.Max(0, baseSkill - 60) / 2000.0f;
-                        break;
-
-                    default:
-                        return 0.0f;
-                }
-
-                criticalStrikeMod = Math.Clamp(baseMod, defaultCritFrequency, MaxCriticalStrikeModCustomDM);
+                return 0.2f;
             }
             else
             {
@@ -715,8 +697,6 @@ namespace ACE.Server.WorldObjects
 
         public static float MaxCripplingBlowMod = 6.0f;
 
-        public static float MaxCripplingBlowModCustomDM = 3.0f;
-
         public static float GetCripplingBlowMod(CreatureSkill skill)
         {
             // increases the critical damage multiplier, additive
@@ -738,23 +718,10 @@ namespace ACE.Server.WorldObjects
 
             if (Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.CustomDM)
             {
-                switch (GetImbuedSkillType(skill))
-                {
-                    case ImbuedSkillType.Melee:
-                        baseMod = Math.Max(0, baseSkill - 40) / 120.0f;
-                        break;
-
-                    case ImbuedSkillType.Missile:
-                        baseMod = baseSkill / 120.0f;
-                        break;
-
-                    case ImbuedSkillType.Magic:
-
-                        baseMod = baseSkill / 144.0f;
-                        break;
-                }
-
-                cripplingBlowMod = Math.Clamp(baseMod, 1.0f, MaxCripplingBlowModCustomDM);
+                if (GetImbuedSkillType(skill) == ImbuedSkillType.Magic)
+                    return 2.0f;
+                else
+                    return 2.5f;
             }
             else
             {
@@ -782,9 +749,6 @@ namespace ACE.Server.WorldObjects
         // elemental rending cap, equivalent to level 6 vuln
         public static float MaxRendingMod = 2.5f;
 
-        // elemental rending cap, equivalent to level 3 vuln
-        public static float MaxRendingModCustomDM = 1.5f;
-
         public static float GetRendingMod(CreatureSkill skill)
         {
             var baseSkill = GetBaseSkillImbued(skill);
@@ -793,19 +757,7 @@ namespace ACE.Server.WorldObjects
 
             if (Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.CustomDM)
             {
-                switch (GetImbuedSkillType(skill))
-                {
-                    case ImbuedSkillType.Melee:
-                        rendingMod = baseSkill / 266.0f;
-                        break;
-
-                    case ImbuedSkillType.Missile:
-                    case ImbuedSkillType.Magic:
-                        rendingMod = baseSkill / 240.0f;
-                        break;
-                }
-
-                rendingMod = Math.Clamp(rendingMod, 1.0f, MaxRendingModCustomDM);
+                rendingMod = 1.75f; // Equivalent to level IV Elemental Vulnerability.
             }
             else
             {
@@ -831,8 +783,6 @@ namespace ACE.Server.WorldObjects
 
         public static float MaxArmorRendingMod = 0.6f;
 
-        public static float MaxArmorRendingModCustomDM = 0.35f;
-
         public static float GetArmorRendingMod(CreatureSkill skill)
         {
             var baseSkill = GetBaseSkillImbued(skill);
@@ -841,17 +791,7 @@ namespace ACE.Server.WorldObjects
 
             if (Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.CustomDM)
             {
-                // % of armor ignored, min 0%, max 35%
-                switch (GetImbuedSkillType(skill))
-                {
-                    case ImbuedSkillType.Melee:
-                        armorRendingMod -= Math.Clamp(Math.Max(0, baseSkill - 160) / 685.0f, 0.0f, MaxArmorRendingModCustomDM);
-                        break;
-
-                    case ImbuedSkillType.Missile:
-                        armorRendingMod -= Math.Clamp(Math.Max(0, baseSkill - 144) / 617.0f, 0.0f, MaxArmorRendingModCustomDM);
-                        break;
-                }
+                armorRendingMod -= 1/3; // Equivalent to Imperil IV for 300 AL armor.
             }
             else
             {
@@ -919,7 +859,7 @@ namespace ACE.Server.WorldObjects
             var creatureMod = IgnoreShield ?? 0.0f;
             double weaponMod;
             if (Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.CustomDM && weapon != null && weapon.IsTwoHanded)
-                weaponMod = 1.0f;
+                weaponMod = 0.5f;
             else
                 weaponMod = weapon?.IgnoreShield ?? 0.0f;
 
