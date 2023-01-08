@@ -510,7 +510,15 @@ namespace ACE.Server.WorldObjects
             {
                 // use init + ranks, same as acclient DetermineSpellRange -> InqSkillLevel
                 // this is much lower than base, and omits things like attribute formula + base augs + enlightenment
-                var playerSkill = GetCreatureSkill(spell.School);
+                var magicSchool = spell.School;
+                if (Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.CustomDM)
+                {
+                    var amulet = GetEquippedLeyLineAmulet();
+                    if (amulet != null && amulet.LeyLineEffectId == (uint)LeyLineEffect.GrantCastableSpell && LeyLineAmulet.PossibleAcquireSpells.Contains(SpellLevelProgression.GetLevel1SpellId((SpellId)spell.Id)))
+                        magicSchool = (MagicSchool)amulet.LeyLineSchool;
+                }
+
+                var playerSkill = GetCreatureSkill(magicSchool);
                 magicSkill = playerSkill.InitLevel + playerSkill.Ranks;
             }
 
