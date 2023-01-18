@@ -688,7 +688,7 @@ namespace ACE.Server.WorldObjects
             }
 
             if (FastTick)
-                windupTime = EnqueueMotionAction(castChain, spell.Formula.WindupGestures, CastSpeed, MotionStance.Magic);
+                windupTime = EnqueueMotionAction(castChain, spell.Formula.WindupGestures, CastSpeed, MotionStance.Magic, checkCasting: true);
         }
 
         public void DoCastGesture(Spell spell, WorldObject casterItem, ActionChain castChain)
@@ -715,6 +715,8 @@ namespace ACE.Server.WorldObjects
 
             castChain.AddAction(this, () =>
             {
+                if (!MagicState.IsCasting) return;
+
                 MagicState.CastGestureStartTime = DateTime.UtcNow;
 
                 if (FastTick)
