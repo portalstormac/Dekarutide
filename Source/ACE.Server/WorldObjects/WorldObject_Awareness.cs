@@ -91,9 +91,10 @@ namespace ACE.Server.WorldObjects
             if (AwareList.ContainsKey(player.Guid))
                 AwareList[player.Guid] = expireTime;
             else
+            {
                 AwareList.Add(player.Guid, expireTime);
-
-            player.PhysicsObj.enqueue_obj(PhysicsObj);
+                player.PhysicsObj.enqueue_obj(PhysicsObj);
+            }
         }
     }
 }

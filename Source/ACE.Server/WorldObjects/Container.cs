@@ -1092,11 +1092,11 @@ namespace ACE.Server.WorldObjects
                 player.Session.Network.EnqueueSend(itemsToSend.ToArray());*/
             }
 
-            if (!(this is Chest) && Generator != null) // Chests will handle this themselves.
-                StarContainerDecay(); // If we're a generated container start our decay timer once we've been opened and closed.
+            if (!(this is Chest) && Generator != null && GeneratorId != null) // Chests will handle this themselves.
+                StartContainerDecay(); // If we're a generated container start our decay timer once we've been opened and closed.
 
         }
-        public void StarContainerDecay()
+        public void StartContainerDecay()
         {
             TimeToRot = DefaultTimeToRot.TotalSeconds;
             Generator = null;

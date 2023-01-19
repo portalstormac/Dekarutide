@@ -200,7 +200,7 @@ namespace ACE.Server.WorldObjects
                     return;
                 }
 
-                if (item.CurrentLandblock != null && !item.Visibility && item.Guid != LastOpenedContainerId)
+                if (item.CurrentLandblock != null && (!item.Visibility || IsAware(item)) && item.Guid != LastOpenedContainerId)
                 {
                     if (IsBusy)
                     {

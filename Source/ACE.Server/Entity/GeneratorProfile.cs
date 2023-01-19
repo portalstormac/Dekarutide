@@ -646,7 +646,7 @@ namespace ACE.Server.Entity
                 var wo = rNode.TryGetWorldObject();
 
                 if (wo != null && wo is Container container)
-                    container.StarContainerDecay();
+                    container.StartContainerDecay();
             }
         }
 
