@@ -350,7 +350,7 @@ namespace ACE.Server.Managers
             }
 
             uint areaCampId;
-            if (Player.CurrentLandblock.IsDungeon)
+            if (Player.CurrentLandblock.IsDungeon || (Player.CurrentLandblock.HasDungeon && Player.Location.Indoors))
                 areaCampId = Player.CurrentLandblock.Id.Raw & 0xFFFF0000;
             else
             {
@@ -401,7 +401,7 @@ namespace ACE.Server.Managers
             if (landblock != null)
             {
                 uint areaCampId;
-                if (landblock.IsDungeon)
+                if (Player.CurrentLandblock.IsDungeon || (Player.CurrentLandblock.HasDungeon && Player.Location.Indoors))
                     areaCampId = landblock.Id.Raw & 0xFFFF0000;
                 else
                 {

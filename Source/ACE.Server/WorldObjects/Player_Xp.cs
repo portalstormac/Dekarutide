@@ -107,7 +107,7 @@ namespace ACE.Server.WorldObjects
                     xpMessage = $"T: {(typeCampBonus * 100).ToString("0")}% A: {(areaCampBonus * 100).ToString("0")}% R: {(restCampBonus * 100).ToString("0")}%";
                 }
 
-                if (CurrentLandblock != null && !CurrentLandblock.IsDungeon)
+                if (CurrentLandblock != null && !(CurrentLandblock.IsDungeon || (CurrentLandblock.HasDungeon && Location.Indoors)))
                     totalXP *= 1.25f; // Surface provides 25% xp bonus to account for lower creature density.
 
                 amount = (long)Math.Round(totalXP);
