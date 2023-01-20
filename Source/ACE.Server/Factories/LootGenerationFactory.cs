@@ -220,11 +220,13 @@ namespace ACE.Server.Factories
                 if (deathTreasure == null)
                     return deathTreasure;
 
-                if (tweakedFor is Container)
+                if (tweakedFor is Container container)
                 {
                     // Some overrides to make chests more interesting, ideally this should be done in the data but as a quick tweak this will do.
                     tweakedDeathTreasure = new Database.Models.World.TreasureDeath(deathTreasure);
-                    if (tweakedDeathTreasure.LootQualityMod < 0.2f)
+                    if (container.ResistAwareness.HasValue && tweakedDeathTreasure.LootQualityMod < 0.4f)
+                        tweakedDeathTreasure.LootQualityMod = 0.4f;
+                    else if (tweakedDeathTreasure.LootQualityMod < 0.2f)
                         tweakedDeathTreasure.LootQualityMod = 0.2f;
 
                     tweakedDeathTreasure.MundaneItemChance = 0;

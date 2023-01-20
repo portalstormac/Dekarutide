@@ -227,7 +227,7 @@ namespace ACE.Server.WorldObjects
             hiddenChest.Location.LandblockId = new LandblockId(hiddenChest.Location.GetCell());
             hiddenChest.Generator = this;
             hiddenChest.Tier = tier;
-            hiddenChest.ResistAwareness = 75 * tier;
+            hiddenChest.ResistAwareness = tier * 65;
 
             if(ThreadSafeRandom.Next(0.0f, 1.0f) < 0.5f)
                 hiddenChest.IsLocked = true;
@@ -275,7 +275,7 @@ namespace ACE.Server.WorldObjects
                 trapTrigger.Location.LandblockId = new LandblockId(trapTrigger.Location.GetCell());
                 trapTrigger.ActivationTarget = trapObject.Guid.Full;
                 trapTrigger.Generator = this;
-                trapTrigger.ResistAwareness = 75 * tier;
+                trapTrigger.ResistAwareness = tier * 65;
 
                 if (trapTrigger.EnterWorld())
                 {
