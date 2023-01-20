@@ -217,7 +217,7 @@ namespace ACE.Server.WorldObjects
         {
             DeployedObjects.RemoveAll(x => x.TryGetWorldObject() == null);
 
-            var tier = Math.Clamp(Tier ?? 1, 1, HiddenChests.Count - 1);
+            var tier = Math.Clamp(Tier ?? 1, 1, HiddenChests.Count);
             var hiddenChest = WorldObjectFactory.CreateNewWorldObject(HiddenChests[tier - 1]);
 
             if (hiddenChest == null)
