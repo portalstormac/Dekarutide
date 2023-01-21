@@ -196,7 +196,7 @@ namespace ACE.Server.WorldObjects
                 }
 
                 var chestRoll = ThreadSafeRandom.Next(0.0f, 1.0f);
-                if (chestRoll < 0.01 + (0.01 * chestExtraChance))
+                if (chestRoll < 0.015 + (0.015 * chestExtraChance))
                     DeployHiddenChest();
             }
         }
@@ -217,7 +217,12 @@ namespace ACE.Server.WorldObjects
         {
             DeployedObjects.RemoveAll(x => x.TryGetWorldObject() == null);
 
-            var tier = Math.Clamp(Tier ?? 1, 1, HiddenChests.Count);
+            var tierMod = 0;
+            if (Tier > 2 && ThreadSafeRandom.Next(0.0f, 1.0f) < 0.25)
+                tierMod = 1;
+
+            var tier = Math.Clamp((Tier ?? 1) + tierMod, 1, HiddenChests.Count);
+            var unmodTier = Math.Clamp(Tier ?? 1, 1, HiddenChests.Count);
             var hiddenChest = WorldObjectFactory.CreateNewWorldObject(HiddenChests[tier - 1]);
 
             if (hiddenChest == null)
@@ -227,7 +232,7 @@ namespace ACE.Server.WorldObjects
             hiddenChest.Location.LandblockId = new LandblockId(hiddenChest.Location.GetCell());
             hiddenChest.Generator = this;
             hiddenChest.Tier = tier;
-            hiddenChest.ResistAwareness = tier * 65;
+            hiddenChest.ResistAwareness = unmodTier * 65;
 
             if(ThreadSafeRandom.Next(0.0f, 1.0f) < 0.5f)
                 hiddenChest.IsLocked = true;

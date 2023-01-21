@@ -177,8 +177,15 @@ namespace ACE.Server.WorldObjects
         {
             var awarenessSkill = GetCreatureSkill(Skill.Awareness);
 
-            if(wo is Container && awarenessSkill.AdvancementClass < SkillAdvancementClass.Trained)
-                return false;
+            if (wo is Container)
+            {
+                if (awarenessSkill.AdvancementClass < SkillAdvancementClass.Trained)
+                    return false;
+
+                var lockpickSkill = GetCreatureSkill(Skill.Lockpick);
+                if (wo.IsLocked && lockpickSkill.AdvancementClass < SkillAdvancementClass.Trained)
+                    return false;
+            }
 
             var chance = SkillCheck.GetSkillChance(awarenessSkill.Current, (uint)(wo.ResistAwareness ?? 0));
             if (chance > ThreadSafeRandom.Next(0.0f, 1.0f))
