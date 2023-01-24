@@ -785,17 +785,15 @@ namespace ACE.Server.WorldObjects
 
         public static float GetArmorRendingMod(CreatureSkill skill)
         {
-            var baseSkill = GetBaseSkillImbued(skill);
-
             var armorRendingMod = 1.0f;
 
             if (Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.CustomDM)
-            {
-                armorRendingMod -= 1/3; // Equivalent to Imperil IV for 300 AL armor.
-            }
+                armorRendingMod -= 1.0f/3.0f; // Equivalent to Imperil IV for 300 AL armor.
             else
             {
                 // % of armor ignored, min 0%, max 60%
+                var baseSkill = GetBaseSkillImbued(skill);
+
                 switch (GetImbuedSkillType(skill))
                 {
                     case ImbuedSkillType.Melee:
