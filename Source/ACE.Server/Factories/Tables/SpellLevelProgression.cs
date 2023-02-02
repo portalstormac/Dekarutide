@@ -7708,6 +7708,138 @@ namespace ACE.Server.Factories.Tables
             SpellId.CantripArmorAptitude4,
         };
 
+        public static readonly List<SpellId> AwarenessMasterySelf = new List<SpellId>()
+        {
+            SpellId.AwarenessMasterySelf1,
+            SpellId.AwarenessMasterySelf2,
+            SpellId.AwarenessMasterySelf3,
+            SpellId.AwarenessMasterySelf4,
+            SpellId.AwarenessMasterySelf5,
+            SpellId.AwarenessMasterySelf6,
+            SpellId.AwarenessMasterySelf7,
+            SpellId.AwarenessMasterySelf8,
+        };
+
+        public static readonly List<SpellId> AwarenessMasteryOther = new List<SpellId>()
+        {
+            SpellId.AwarenessMasteryOther1,
+            SpellId.AwarenessMasteryOther2,
+            SpellId.AwarenessMasteryOther3,
+            SpellId.AwarenessMasteryOther4,
+            SpellId.AwarenessMasteryOther5,
+            SpellId.AwarenessMasteryOther6,
+            SpellId.AwarenessMasteryOther7,
+            SpellId.AwarenessMasteryOther8,
+        };
+
+        public static readonly List<SpellId> AwarenessIneptitudeOther = new List<SpellId>()
+        {
+            SpellId.AwarenessIneptitudeOther1,
+            SpellId.AwarenessIneptitudeOther2,
+            SpellId.AwarenessIneptitudeOther3,
+            SpellId.AwarenessIneptitudeOther4,
+            SpellId.AwarenessIneptitudeOther5,
+            SpellId.AwarenessIneptitudeOther6,
+            SpellId.AwarenessIneptitudeOther7,
+            SpellId.AwarenessIneptitudeOther8,
+        };
+
+        public static readonly List<SpellId> CantripAwarenessAptitude = new List<SpellId>()
+        {
+            SpellId.CantripAwarenessAptitude1,
+            SpellId.CantripAwarenessAptitude2,
+            SpellId.CantripAwarenessAptitude3,
+            SpellId.CantripAwarenessAptitude4,
+        };
+
+        public static readonly List<SpellId> AppraiseMasterySelf = new List<SpellId>()
+        {
+            SpellId.AppraiseMasterySelf1,
+            SpellId.AppraiseMasterySelf2,
+            SpellId.AppraiseMasterySelf3,
+            SpellId.AppraiseMasterySelf4,
+            SpellId.AppraiseMasterySelf5,
+            SpellId.AppraiseMasterySelf6,
+            SpellId.AppraiseMasterySelf7,
+            SpellId.AppraiseMasterySelf8,
+        };
+
+        public static readonly List<SpellId> AppraiseMasteryOther = new List<SpellId>()
+        {
+            SpellId.AppraiseMasteryOther1,
+            SpellId.AppraiseMasteryOther2,
+            SpellId.AppraiseMasteryOther3,
+            SpellId.AppraiseMasteryOther4,
+            SpellId.AppraiseMasteryOther5,
+            SpellId.AppraiseMasteryOther6,
+            SpellId.AppraiseMasteryOther7,
+            SpellId.AppraiseMasteryOther8,
+        };
+
+        public static readonly List<SpellId> AppraiseIneptitudeOther = new List<SpellId>()
+        {
+            SpellId.AppraiseIneptitudeOther1,
+            SpellId.AppraiseIneptitudeOther2,
+            SpellId.AppraiseIneptitudeOther3,
+            SpellId.AppraiseIneptitudeOther4,
+            SpellId.AppraiseIneptitudeOther5,
+            SpellId.AppraiseIneptitudeOther6,
+            SpellId.AppraiseIneptitudeOther7,
+            SpellId.AppraiseIneptitudeOther8,
+        };
+
+        public static readonly List<SpellId> CantripAppraiseAptitude = new List<SpellId>()
+        {
+            SpellId.CantripAppraiseAptitude1,
+            SpellId.CantripAppraiseAptitude2,
+            SpellId.CantripAppraiseAptitude3,
+            SpellId.CantripAppraiseAptitude4,
+        };
+
+        public static readonly List<SpellId> SneakingMasterySelf = new List<SpellId>()
+        {
+            SpellId.SneakingMasterySelf1,
+            SpellId.SneakingMasterySelf2,
+            SpellId.SneakingMasterySelf3,
+            SpellId.SneakingMasterySelf4,
+            SpellId.SneakingMasterySelf5,
+            SpellId.SneakingMasterySelf6,
+            SpellId.SneakingMasterySelf7,
+            SpellId.SneakingMasterySelf8,
+        };
+
+        public static readonly List<SpellId> SneakingMasteryOther = new List<SpellId>()
+        {
+            SpellId.SneakingMasteryOther1,
+            SpellId.SneakingMasteryOther2,
+            SpellId.SneakingMasteryOther3,
+            SpellId.SneakingMasteryOther4,
+            SpellId.SneakingMasteryOther5,
+            SpellId.SneakingMasteryOther6,
+            SpellId.SneakingMasteryOther7,
+            SpellId.SneakingMasteryOther8,
+        };
+
+        public static readonly List<SpellId> SneakingIneptitudeOther = new List<SpellId>()
+        {
+            SpellId.SneakingIneptitudeOther1,
+            SpellId.SneakingIneptitudeOther2,
+            SpellId.SneakingIneptitudeOther3,
+            SpellId.SneakingIneptitudeOther4,
+            SpellId.SneakingIneptitudeOther5,
+            SpellId.SneakingIneptitudeOther6,
+            SpellId.SneakingIneptitudeOther7,
+            SpellId.SneakingIneptitudeOther8,
+        };
+
+        public static readonly List<SpellId> CantripSneakingAptitude = new List<SpellId>()
+        {
+            SpellId.CantripSneakingAptitude1,
+            SpellId.CantripSneakingAptitude2,
+            SpellId.CantripSneakingAptitude3,
+            SpellId.CantripSneakingAptitude4,
+        };
+
         public static readonly List<SpellId> CantripWarriorVitality = new List<SpellId>()
         {
             SpellId.WarriorsLesserVitality,
@@ -8485,6 +8617,18 @@ namespace ACE.Server.Factories.Tables
             AddSpells(ArmorMasteryOther);
             AddSpells(ArmorIneptitudeOther);
             AddSpells(CantripArmorAptitude);
+            AddSpells(AwarenessMasterySelf);
+            AddSpells(AwarenessMasteryOther);
+            AddSpells(AwarenessIneptitudeOther);
+            AddSpells(CantripAwarenessAptitude);
+            AddSpells(AppraiseMasterySelf);
+            AddSpells(AppraiseMasteryOther);
+            AddSpells(AppraiseIneptitudeOther);
+            AddSpells(CantripAppraiseAptitude);
+            AddSpells(SneakingMasterySelf);
+            AddSpells(SneakingMasteryOther);
+            AddSpells(SneakingIneptitudeOther);
+            AddSpells(CantripSneakingAptitude);
         }
 
         private static void AddSpells(List<SpellId> spells)

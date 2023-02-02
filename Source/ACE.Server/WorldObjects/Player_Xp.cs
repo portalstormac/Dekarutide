@@ -279,6 +279,8 @@ namespace ACE.Server.WorldObjects
                     Session.Network.EnqueueSend(new GameMessageSystemChat($"Your fellowship shared {amount:N0} experience with you!", ChatMessageType.Broadcast));
                 else if (xpType == XpType.Kill && xpMessage != "")
                     Session.Network.EnqueueSend(new GameMessageSystemChat($"You've earned {amount:N0} experience! {xpMessage}", ChatMessageType.Broadcast));
+                else if (xpType == XpType.Proficiency && xpMessage != "")
+                    Session.Network.EnqueueSend(new GameMessageSystemChat($"You've earned {amount:N0} {xpMessage} experience!", ChatMessageType.Broadcast));
             }
 
             if (HasVitae && xpType != XpType.Allegiance)

@@ -108,7 +108,7 @@ namespace ACE.Server.Entity
                 //Console.WriteLine($"Earned {pp} PP ({skill.Skill})");
 
                 // send CP to player as unassigned XP
-                player.GrantXP(totalXPGranted, XpType.Proficiency, ShareType.None);
+                player.GrantXP(totalXPGranted, XpType.Proficiency, ShareType.None, $"{skill.Skill.ToSentence()} skill");
 
                 // send PP to player as skill XP, which gets spent from the CP sent
                 if (pp > 0)

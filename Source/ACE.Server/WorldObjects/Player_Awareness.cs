@@ -29,7 +29,7 @@ namespace ACE.Server.WorldObjects
                 Session.Network.EnqueueSend(new GameMessageSystemChat("You start sneaking.", ChatMessageType.Broadcast));
                 EnqueueBroadcast(new GameMessageScript(Guid, PlayScript.SneakingBegin));
 
-                var spell = new Spell(SpellId.MireFoot);
+                var spell = new Spell(SpellId.Sneaking);
                 var addResult = EnchantmentManager.Add(spell, null, null, true);
                 Session.Network.EnqueueSend(new GameEventMagicUpdateEnchantment(Session, new Enchantment(this, addResult.Enchantment)));
                 HandleRunRateUpdate(spell);
@@ -71,7 +71,7 @@ namespace ACE.Server.WorldObjects
             }
             actionChain.AddAction(this, () =>
             {
-                var propertiesEnchantmentRegistry = EnchantmentManager.GetEnchantment((uint)SpellId.MireFoot, null);
+                var propertiesEnchantmentRegistry = EnchantmentManager.GetEnchantment((uint)SpellId.Sneaking, null);
                 if (propertiesEnchantmentRegistry != null)
                 {
                     EnchantmentManager.Dispel(propertiesEnchantmentRegistry);

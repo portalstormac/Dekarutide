@@ -464,6 +464,11 @@ namespace ACE.Server.Factories.Tables
                     ( SpellId.LockpickMasteryOther1,        1.0f ),
                     ( SpellId.ArcanumSalvagingOther1,       1.0f ),
 
+                    ( SpellId.ArmorMasteryOther1,           1.0f ),
+                    ( SpellId.AwarenessMasteryOther1,       1.0f ),
+                    ( SpellId.AppraiseMasteryOther1,        1.0f ),
+                    ( SpellId.SneakingMasteryOther1,        1.0f ),
+
                     ( SpellId.LightWeaponsMasteryOther1,    0.5f ), // AxeMasteryOther1
                     ( SpellId.FinesseWeaponsMasteryOther1,  0.5f ), // DaggerMasteryOther1
                     //( SpellId.MaceMasteryOther1,            0.5f ),
@@ -508,6 +513,9 @@ namespace ACE.Server.Factories.Tables
                     ( SpellId.MonsterAttunementOther1,   1.0f ),
                     ( SpellId.ArcanumSalvagingOther1,    1.0f ),
                     ( SpellId.ArmorMasteryOther1,        1.0f ),
+                    ( SpellId.AwarenessMasteryOther1,    1.0f ),
+                    ( SpellId.AppraiseMasteryOther1,     1.0f ),
+                    ( SpellId.SneakingMasteryOther1,     1.0f ),
                 };
 
                 // crowns
@@ -629,6 +637,8 @@ namespace ACE.Server.Factories.Tables
 
                     ( SpellId.DualWieldMasteryOther1,        1.0f ),
                     ( SpellId.ArmorMasteryOther1,            1.0f ),
+                    ( SpellId.AwarenessMasteryOther1,        1.0f ),
+                    ( SpellId.AppraiseMasteryOther1,         1.0f ),
                 };
 
                 // boots, chiran sandals, sollerets
@@ -652,6 +662,7 @@ namespace ACE.Server.Factories.Tables
                     ( SpellId.MissileWeaponsMasteryOther1, 1.0f ), // BowMasteryOther1
                     //( SpellId.CrossbowMasteryOther1,       1.0f ),
                     ( SpellId.ThrownWeaponMasteryOther1,   1.0f ),
+                    ( SpellId.SneakingMasteryOther1,       1.0f ),
                 };
 
                 // caps, qafiyas, turbans, fezs, berets
@@ -752,6 +763,7 @@ namespace ACE.Server.Factories.Tables
 
                     ( SpellId.JumpingMasteryOther1,        0.5f ),
                     ( SpellId.SprintOther1,                0.5f ),
+                    ( SpellId.SneakingMasteryOther1,       0.5f ),
                 };
 
                 // nether caster - should never be used with Infiltration data but here for completioness.
