@@ -325,7 +325,8 @@ namespace ACE.Server.WorldObjects
                 return false;
 
             // refund xp and skill credits
-            RefundXP(creatureSkill.ExperienceSpent);
+            if (!creatureSkill.IsSecondary)
+                RefundXP(creatureSkill.ExperienceSpent);
 
             // salvaging / tinkering skills specialized through augmentation only
             // cannot be unspecialized here, only refund xp
