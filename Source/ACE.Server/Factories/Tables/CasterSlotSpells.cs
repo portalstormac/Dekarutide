@@ -575,6 +575,16 @@ namespace ACE.Server.Factories.Tables
                     { SpellId.CurseFestering1,                  "Curse Festering" },
                     { SpellId.CurseWeakness1,                   "Curse Weakness" },
                     { SpellId.CurseDestructionOther1,           "Curse Destruction" },
+
+                    // CustomDM spells
+                    { SpellId.ArmorMasterySelf1,                "Armor Mastery" },
+                    { SpellId.ArmorMasteryOther1,               "Armor Mastery" },
+                    { SpellId.AwarenessMasterySelf1,            "Awareness" },
+                    { SpellId.AwarenessMasterySelf1,            "Awareness" },
+                    { SpellId.AppraiseMasterySelf1,             "Appraisal" },
+                    { SpellId.AppraiseMasteryOther1,            "Appraisal" },
+                    { SpellId.SneakingMasterySelf1,             "Sneaking" },
+                    { SpellId.SneakingMasteryOther1,            "Sneaking" },
                 };
             }
         }
