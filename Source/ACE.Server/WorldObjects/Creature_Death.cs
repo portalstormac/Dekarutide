@@ -197,7 +197,7 @@ namespace ACE.Server.WorldObjects
 
                 float totalXP;
 
-                if (Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.CustomDM)
+                if (Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.CustomDM && !UseXpOverride)
                     totalXP = GetCreatureDeathXP(Level ?? 0, (int)Health.MaxValue, Biota.PropertiesSpellBook?.Count ?? 0) * damagePercent;
                 else
                     totalXP = (XpOverride ?? 0) * damagePercent;

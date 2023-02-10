@@ -203,6 +203,8 @@ namespace ACE.Entity.Enum.Properties
         VendorSellsSpecialItems          = 9014,
         [ServerOnly]
         VendorPKOnly                     = 9015,
+        [ServerOnly]
+        UseXpOverride                    = 9016,
     }
 
     public static class PropertyBoolExtensions
