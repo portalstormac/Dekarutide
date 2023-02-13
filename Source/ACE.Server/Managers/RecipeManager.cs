@@ -129,6 +129,8 @@ namespace ACE.Server.Managers
             {
                 actionChain.AddAction(player, () => ShowDialog(player, source, target, recipe, percentSuccess.Value));
                 actionChain.AddAction(player, () => player.IsBusy = false);
+                
+                log.Info($"Player = {player.Name}; Tool = {source.Name}; Target = {target.Name}; Chance on conformation dialog: {percentSuccess.Value}");
             }
             else
             {
@@ -141,6 +143,8 @@ namespace ACE.Server.Managers
 
                     player.IsBusy = false;
                 });
+                
+                log.Info($"Player = {player.Name}; Tool = {source.Name}; Target = {target.Name}; Chance after conformation dialog: {percentSuccess.Value}");
             }
 
             actionChain.EnqueueChain();
@@ -243,7 +247,11 @@ namespace ACE.Server.Managers
 
                 var difficulty = (int)Math.Floor(((salvageMod * 5.0f) + ((itemWorkmanship * salvageMod * 0.8f) - (toolWorkmanship * salvageMod * 1.0f))) * attemptMod * 3.0f);
 
+                log.Info($"Tinker Info: Player = {player.Name}; Tool = {tool.Name}; Target = {target.Name}; SalvageMod={salvageMod}; ItemWS={itemWorkmanship}; ToolWS={toolWorkmanship}; AttemptMod={attemptMod}");
+                
                 successChance = SkillCheck.GetSkillChance(250, difficulty);
+                
+                log.Info($"Success Chance: Player = {player.Name}; Tool = {tool.Name}; Target = {target.Name}; SuccessChance = {successChance}");
             }
 
             // imbue: divide success by 3
@@ -373,7 +381,9 @@ namespace ACE.Server.Managers
                 return;
             }
 
-            var success = ThreadSafeRandom.Next(0.0f, 1.0f) < successChance;
+            var roll = ThreadSafeRandom.Next(0.0f, 1.0f);
+            var success = roll < successChance;
+            log.Info($"Player = { player.Name}; Tool = { source.Name}; Target = { target.Name}; Chance = {successChance}; Roll = {roll}");
 
             if (recipe.IsImbuing())
             {
