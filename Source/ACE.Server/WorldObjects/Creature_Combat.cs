@@ -945,8 +945,13 @@ namespace ACE.Server.WorldObjects
                 var angle = creatureTarget.GetAngle(this);
                 var behind = Math.Abs(angle) > 90.0f;
 
+                var weapon = GetEquippedMeleeWeapon();
+                var daggerBonus = 0.0f;
+                if (weapon != null && weapon.WeaponSkill == Skill.Dagger)
+                    daggerBonus = 0.1f;
+
                 if (behind)
-                    return 1.2f; // 20% damage bonus
+                    return 1.2f + daggerBonus; // 20% damage bonus
                 else
                     return 1.0f;
             }
