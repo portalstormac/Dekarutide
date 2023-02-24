@@ -512,7 +512,7 @@ namespace ACE.Server.WorldObjects
             {
                 lifeMagicDamage = LifeProjectileDamage * Spell.DamageRatio;
 
-                if (Common.ConfigManager.Config.Server.WorldRuleset != Common.Ruleset.CustomDM)
+                if (!isPVP)
                 {
                     // could life magic projectiles crit?
                     // if so, did they use the same 1.5x formula as war magic, instead of 2.0x?
