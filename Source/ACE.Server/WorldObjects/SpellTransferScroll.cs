@@ -75,7 +75,7 @@ namespace ACE.Server.WorldObjects
                 return;
             }
 
-            if (!RecipeManager.VerifyUse(player, source, target, true) || target.Workmanship == null || target.Retained == true)
+            if (!RecipeManager.VerifyUse(player, source, target, true) || target.Workmanship == null)
             {
                 player.SendUseDoneEvent(WeenieError.YouDoNotPassCraftingRequirements);
                 return;
@@ -323,7 +323,13 @@ namespace ACE.Server.WorldObjects
                 player.NextUseTime = DateTime.UtcNow.AddSeconds(animTime);
             }
             else // Extraction Scroll
-            {
+                       {
+                if (target.Retained == true)
+                {
+                    player.Session.Network.EnqueueSend(new GameMessageSystemChat($"The {target.NameWithMaterial} is Retained!.", ChatMessageType.Craft));
+                    player.SendUseDoneEvent();
+                    return;
+                }
                 int spellCount = 0;
                 var allSpells = target.Biota.GetKnownSpellsIds(target.BiotaDatabaseLock);
                 if (target.ProcSpell != null && target.ProcSpell != 0)
