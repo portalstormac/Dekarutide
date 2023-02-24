@@ -445,9 +445,15 @@ namespace ACE.Server.WorldObjects
 
             // life spells
             // additive: armor/imperil
-            var bodyArmorMod = defender.EnchantmentManager.GetBodyArmorMod();
-            if (ignoreMagicResist && Common.ConfigManager.Config.Server.WorldRuleset != Common.Ruleset.CustomDM)
-                bodyArmorMod = IgnoreMagicResistScaled(bodyArmorMod);
+            int bodyArmorMod;
+            if (Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.CustomDM)
+                bodyArmorMod = defender.EnchantmentManager.GetBodyArmorMod(true); // Do not take into account armor debuffs yet.
+            else
+            {
+                bodyArmorMod = defender.EnchantmentManager.GetBodyArmorMod();
+                if (ignoreMagicResist)
+                    bodyArmorMod = IgnoreMagicResistScaled(bodyArmorMod);
+            }
 
             // handle armor rending mod here?
             //if (bodyArmorMod > 0)
@@ -460,10 +466,11 @@ namespace ACE.Server.WorldObjects
                 effectiveAL += bodyArmorMod;
             else
             {
-                if (!ignoreMagicResist)
-                    effectiveAL += defender.EnchantmentManager.GetBodyArmorMod(false); // Take into account armor debuffs.
                 if (bodyArmorMod > effectiveAL)
                     effectiveAL = bodyArmorMod; // Body armor doesn't stack with equipment armor, use whichever is highest.
+
+                if (!ignoreMagicResist)
+                    effectiveAL += defender.EnchantmentManager.GetBodyArmorMod(false); // Take into account armor debuffs now, but only if weapon isn't hollow.
             }
 
             // Armor Rending reduces physical armor too?
