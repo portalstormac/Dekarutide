@@ -372,14 +372,14 @@ namespace ACE.Server.Entity
             // armor rending and cleaving
             var armorRendingMod = 1.0f;
             if (Weapon != null && Weapon.HasImbuedEffect(ImbuedEffectType.ArmorRending))
-                armorRendingMod = WorldObject.GetArmorRendingMod(attackSkill);
+                armorRendingMod = WorldObject.GetArmorRendingMod(attackSkill, pkBattle);
 
             var armorCleavingMod = attacker.GetArmorCleavingMod(Weapon);
 
             var ignoreArmorMod = Math.Min(armorRendingMod, armorCleavingMod);
 
-            if (Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.CustomDM && pkBattle)
-                ignoreArmorMod *= 0.7f; // Armor is reduced during PvP.
+            //if (Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.CustomDM && pkBattle)
+            //    ignoreArmorMod *= 0.7f; // Armor is reduced during PvP.
 
             // get body part / armor pieces / armor modifier
             if (playerDefender != null)
@@ -413,7 +413,7 @@ namespace ACE.Server.Entity
                 ArmorMod = 1.0f;
 
             // get resistance modifiers
-            WeaponResistanceMod = WorldObject.GetWeaponResistanceModifier(Weapon, attacker, attackSkill, DamageType);
+            WeaponResistanceMod = WorldObject.GetWeaponResistanceModifier(Weapon, attacker, attackSkill, DamageType, pkBattle);
 
             if (playerDefender != null)
             {
