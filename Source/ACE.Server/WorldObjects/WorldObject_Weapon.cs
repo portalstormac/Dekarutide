@@ -373,7 +373,8 @@ namespace ACE.Server.WorldObjects
 
             if (weapon != null && weapon.HasImbuedEffect(ImbuedEffectType.CripplingBlow))
             {
-                var cripplingBlowMod = GetCripplingBlowMod(skill);
+                bool isPvP = wielder is Player && target is Player;
+                var cripplingBlowMod = GetCripplingBlowMod(skill, isPvP);
 
                 critDamageMod = Math.Max(critDamageMod, cripplingBlowMod);
             }
@@ -467,7 +468,7 @@ namespace ACE.Server.WorldObjects
         /// <summary>
         /// Returns the resistance modifier or rending modifier
         /// </summary>
-        public static float GetWeaponResistanceModifier(WorldObject weapon, Creature wielder, CreatureSkill skill, DamageType damageType)
+        public static float GetWeaponResistanceModifier(WorldObject weapon, Creature wielder, CreatureSkill skill, DamageType damageType, bool isPvP = false)
         {
             float resistMod = defaultModifier;
 
@@ -491,7 +492,7 @@ namespace ACE.Server.WorldObjects
 
             if (rendDamageType != ImbuedEffectType.Undef && weapon.HasImbuedEffect(rendDamageType) && skill != null)
             {
-                var rendingMod = GetRendingMod(skill);
+                var rendingMod = GetRendingMod(skill, isPvP);
 
                 resistMod = Math.Max(resistMod, rendingMod);
             }
@@ -635,7 +636,7 @@ namespace ACE.Server.WorldObjects
 
             float criticalStrikeMod;
 
-            if (Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.CustomDM)
+            if (Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.CustomDM && !isPvP)
             {
                 return 0.2f;
             }
@@ -645,13 +646,14 @@ namespace ACE.Server.WorldObjects
                 {
                     case ImbuedSkillType.Melee:
 
-                        baseMod = Math.Max(0, baseSkill - 100) / 600.0f;
+                        baseMod = Math.Clamp(Math.Max(0, baseSkill - 100) / 600.0f, 0.0f, 0.50f);
                         break;
 
                     case ImbuedSkillType.Missile:
+                        baseMod = Math.Clamp(Math.Max(0, baseSkill - 60) / 600.0f, 0.0f, 0.50f);
+                        break;
                     case ImbuedSkillType.Magic:
-
-                        baseMod = Math.Max(0, baseSkill - 60) / 600.0f;
+                        baseMod = Math.Clamp(Math.Max(0, baseSkill - 60) / 600.0f, 0.0f, isPvP ? 0.25f : 0.5f);
                         break;
 
                     default:
@@ -697,7 +699,7 @@ namespace ACE.Server.WorldObjects
 
         public static float MaxCripplingBlowMod = 6.0f;
 
-        public static float GetCripplingBlowMod(CreatureSkill skill)
+        public static float GetCripplingBlowMod(CreatureSkill skill, bool isPvP = false)
         {
             // increases the critical damage multiplier, additive
 
@@ -714,9 +716,9 @@ namespace ACE.Server.WorldObjects
 
             var baseMod = 1.0f;
 
-            float cripplingBlowMod;
+            float cripplingBlowMod = 0.0f;
 
-            if (Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.CustomDM)
+            if (Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.CustomDM && !isPvP)
             {
                 if (GetImbuedSkillType(skill) == ImbuedSkillType.Magic)
                     return 2.0f;
@@ -728,20 +730,17 @@ namespace ACE.Server.WorldObjects
                 switch (GetImbuedSkillType(skill))
                 {
                     case ImbuedSkillType.Melee:
-                        baseMod = Math.Max(0, baseSkill - 40) / 60.0f;
+                        cripplingBlowMod = Math.Clamp(Math.Max(0, baseSkill - 40) / 60.0f, 1.0f, MaxCripplingBlowMod);
                         break;
 
                     case ImbuedSkillType.Missile:
+                        cripplingBlowMod = Math.Clamp(baseSkill / 60.0f, 1.0f, MaxCripplingBlowMod);
+                        break;
                     case ImbuedSkillType.Magic:
-
-                        baseMod = baseSkill / 60.0f;
+                        cripplingBlowMod = isPvP ? Math.Clamp(0.5f + ((baseSkill - 60.0f) / 60.0f - 0.5f) * 2.25f, 0.5f, 1.0f) : Math.Clamp(baseSkill / 60.0f, 0.5f, 4.0f);
                         break;
                 }
-
-                cripplingBlowMod = Math.Clamp(baseMod, 1.0f, MaxCripplingBlowMod);
             }
-
-            //Console.WriteLine($"CripplingBlowMod: {cripplingBlowMod}");
 
             return cripplingBlowMod;
         }
@@ -749,13 +748,13 @@ namespace ACE.Server.WorldObjects
         // elemental rending cap, equivalent to level 6 vuln
         public static float MaxRendingMod = 2.5f;
 
-        public static float GetRendingMod(CreatureSkill skill)
+        public static float GetRendingMod(CreatureSkill skill, bool isPvP = false)
         {
             var baseSkill = GetBaseSkillImbued(skill);
 
             var rendingMod = 1.0f;
 
-            if (Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.CustomDM)
+            if (Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.CustomDM && !isPvP)
             {
                 rendingMod = 1.75f; // Equivalent to level IV Elemental Vulnerability.
             }
@@ -783,11 +782,11 @@ namespace ACE.Server.WorldObjects
 
         public static float MaxArmorRendingMod = 0.6f;
 
-        public static float GetArmorRendingMod(CreatureSkill skill)
+        public static float GetArmorRendingMod(CreatureSkill skill, bool isPvP = false)
         {
             var armorRendingMod = 1.0f;
 
-            if (Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.CustomDM)
+            if (Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.CustomDM && !isPvP)
                 armorRendingMod -= 1.0f/3.0f; // Equivalent to Imperil IV for 300 AL armor.
             else
             {

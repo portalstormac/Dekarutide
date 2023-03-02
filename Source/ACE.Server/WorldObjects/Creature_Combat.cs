@@ -862,16 +862,16 @@ namespace ACE.Server.WorldObjects
             //if (effectiveSL < 0 && effectiveRL != 0)
                 //effectiveRL = 1.0f / effectiveRL;
 
-            var effectiveLevel = effectiveSL * effectiveRL;
+            var effectiveLevel = GetSkillModifiedShieldLevel(effectiveSL);
 
-            effectiveLevel = GetSkillModifiedShieldLevel(effectiveLevel);
+            effectiveLevel *= effectiveRL;
 
             var ignoreShieldMod = attacker.GetIgnoreShieldMod(weapon);
             //Console.WriteLine($"IgnoreShieldMod: {ignoreShieldMod}");
 
-            var pkBattle = player != null && attacker is Player;
-            if (Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.CustomDM && pkBattle)
-                ignoreShieldMod *= 0.7f; // Armor is reduced during PvP.
+            //var pkBattle = player != null && attacker is Player;
+            //if (Common.ConfigManager.Config.Server.WorldRuleset == Common.Ruleset.CustomDM && pkBattle)
+            //    ignoreShieldMod *= 0.7f; // Armor is reduced during PvP.
 
             effectiveLevel *= ignoreShieldMod;
 
