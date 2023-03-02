@@ -582,7 +582,7 @@ namespace ACE.Server.WorldObjects
                     }
                 }
 
-                var rng = ThreadSafeRandom.Next(0.0f, 1.0f);
+                var rng = new Random().NextDouble();
                 if (chance > rng)
                     castingPreCheckStatus = CastingPreCheckStatus.Success;
             }
@@ -969,7 +969,7 @@ namespace ACE.Server.WorldObjects
                                 var currentTime = Time.GetUnixTime();
                                 if (amulet.LeyLineTriggerChance == 1.0f || amulet.NextLeyLineTriggerTime <= currentTime)
                                 {
-                                    var rng = ThreadSafeRandom.Next(0.0f, 1.0f);
+                                    var rng = new Random().NextDouble();
                                     if (amulet.LeyLineTriggerChance > rng)
                                     {
                                         amulet.NextLeyLineTriggerTime = currentTime + LeyLineAmulet.LeyLineTriggerInterval;
