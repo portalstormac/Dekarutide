@@ -242,7 +242,7 @@ namespace ACE.Server.WorldObjects
 
                 actionChain.AddAction(player, () =>
                 {
-                    var success = ThreadSafeRandom.Next(0.0f, 1.0f) < chance;
+                    var success = new Random().NextDouble() < chance;
                     if (success)
                     {
                         if (isProc)
@@ -403,7 +403,7 @@ namespace ACE.Server.WorldObjects
 
                 actionChain.AddAction(player, () =>
                 {
-                    var success = ThreadSafeRandom.Next(0.0f, 1.0f) < chance;
+                    var success = new Random().NextDouble() < chance;
                     var spellName = "a spell";
                     if (success)
                     {

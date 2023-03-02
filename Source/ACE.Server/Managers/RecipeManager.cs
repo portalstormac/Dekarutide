@@ -381,7 +381,7 @@ namespace ACE.Server.Managers
                 return;
             }
 
-            var roll = ThreadSafeRandom.Next(0.0f, 1.0f);
+            var roll = new Random().NextDouble();
             var success = roll < successChance;
             log.Info($"Player = { player.Name}; Tool = { source.Name}; Target = { target.Name}; Chance = {successChance}; Roll = {roll}");
 
@@ -1067,8 +1067,8 @@ namespace ACE.Server.Managers
             var destroyTargetChance = success ? recipe.SuccessDestroyTargetChance : recipe.FailDestroyTargetChance;
             var destroySourceChance = success ? recipe.SuccessDestroySourceChance : recipe.FailDestroySourceChance;
 
-            var destroyTarget = ThreadSafeRandom.Next(0.0f, 1.0f) < destroyTargetChance;
-            var destroySource = ThreadSafeRandom.Next(0.0f, 1.0f) < destroySourceChance;
+            var destroyTarget = new Random().NextDouble() < destroyTargetChance;
+            var destroySource = new Random().NextDouble() < destroySourceChance;
 
             var createItem = success ? recipe.SuccessWCID : recipe.FailWCID;
             var createAmount = success ? recipe.SuccessAmount : recipe.FailAmount;
