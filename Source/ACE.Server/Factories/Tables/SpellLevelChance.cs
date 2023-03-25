@@ -180,26 +180,27 @@ namespace ACE.Server.Factories.Tables
 
                 T5_SpellLevelChances = new ChanceTable<int>()
                 {
-                    ( 5, 0.95f ),
-                    ( 6, 0.05f ),
+                    ( 5, 0.60f ),
+                    ( 6, 0.30f ),
+                    ( 7, 0.10f ),
                 };
 
                 T6_SpellLevelChances = new ChanceTable<int>()
                 {
-                    ( 6, 0.95f ),
-                    ( 7, 0.05f ),
+                    ( 6, 0.80f ),
+                    ( 7, 0.20f ),
                 };
 
                 T7_SpellLevelChances = new ChanceTable<int>()
                 {
-                    ( 6, 0.90f ),
-                    ( 7, 0.10f ),
+                    ( 6, 0.60f ),
+                    ( 7, 0.40f ),
                 };
 
                 T8_SpellLevelChances = new ChanceTable<int>()
                 {
-                    ( 6, 0.75f ),
-                    ( 7, 0.25f ),
+                    ( 6, 0.40f ),
+                    ( 7, 0.60f ),
                 };
 
                 spellLevelChances = new List<ChanceTable<int>>()
