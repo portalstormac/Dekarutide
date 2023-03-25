@@ -60,6 +60,7 @@ namespace ACE.Server.Factories.Tables
                     ( SpellId.FireProtectionOther1,         0.15f ),
                     ( SpellId.BladeProtectionOther1,        0.15f ),
                     ( SpellId.PiercingProtectionOther1,     0.15f ),
+                    ( SpellId.Impenetrability1,             0.20f ),
                 };
             }
 
