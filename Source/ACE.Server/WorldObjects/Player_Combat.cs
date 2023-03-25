@@ -481,7 +481,7 @@ namespace ACE.Server.WorldObjects
                 {
                     var techniqueTrinket = GetEquippedTrinket();
                     if (techniqueTrinket != null && techniqueTrinket.TacticAndTechniqueId == (int)TacticAndTechniqueType.PowerShot)
-                        return 0.6f;
+                        return AccuracyLevel + 0.2f;
                 }
                 return AccuracyLevel + 0.6f;
             }
